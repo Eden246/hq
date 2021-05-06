@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<style>
+.box {
+    width: 500px;
+    padding: 40px;
+
+    text-align: center;
+    transition: 0.25s;
+    margin-top: 100px
+}
+
+.box input[type="text"],
+.box input[type="password"] {
+    border: 0;
+    background: none;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 2px solid #3498db;
+    padding: 10px 10px;
+    width: 250px;
+    border-radius: 24px;
+    transition: 0.25s
+}
+
+.box h1 {
+    font-weight: 500
+}
+
+.box input[type="text"]:focus,
+.box input[type="password"]:focus {
+    width: 300px;
+    border-color: #2ecc71
+}
+
+.box input[type="submit"] {
+    border: 0;
+    background: none;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 2px solid #2ecc71;
+    padding: 14px 40px;
+    outline: none;
+    border-radius: 24px;
+    transition: 0.25s;
+    font-family: 'Kosugi Maru', sans-serif;
+    cursor: pointer
+    
+}
+
+.box input[type="submit"]:hover {
+    background: #2ecc71
+}
+</style>
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-12 text-center">
+            <form class="box" method="post">
+                {% csrf_token %}    
+                <h1><span style="color:gold;">ログイン</span></h1>
+                {% render_field form.username class="form-control" placeholder="お名前（空白なし）" %}
+                {% render_field form.password class="form-control" placeholder="暗証番号" %}
+                <input type="submit" name="" value="ログイン">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

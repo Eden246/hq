@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+.box {
+    width: 200px;
+    padding: 40px;
+    font-size: 1em;
+    text-align: center;
+    transition: 0.25s;
+    margin-top: 50px
+}
+
+.box input {
+    border: 0;
+    background: none;
+    margin: 20px auto;
+    text-align: center;
+    border: 5px solid #3498db;
+    padding: 20px 30px;
+    width: 300px;
+    outline: none;
+    border-radius: 24px;
+    transition: 0.25s
+
+}
+
+.box h1 {
+    width: 300px;
+}
+
+.box input:focus{
+    width: 400px;
+    border-color: #2ecc71
+}
+
+.box input[type="submit"] {
+    border: 0;
+    background: none;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 5px solid #2ecc71;
+    padding: 14px 20px;
+    outline: none;
+    color: gold;
+    border-radius: 24px;
+    transition: 0.25s;
+    cursor: pointer;
+    width: 300px;
+}
+
+.box input[type="submit"]:hover {
+    background: #2ecc71
+}
+
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+            opacity: 1; /* Firefox */
+}
+
+.form-control:-ms-input-placeholder { /* Internet Explorer 10-11 */
+            color: green;
+}
+</style>
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-12 text-center">
+            <form method="POST" class="box" autocomplete="off" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h1 style="color:#FED85D;">会員登録</h1>
+                {% render_field userform.username|attr:'required:true' style="font-size:20px" class="form-control" placeholder="お名前（ハイフン無し）" %}
+                {% render_field userform.email|attr:'required:true' style="font-size:20px" class="form-control" placeholder="メールアドレス" %}
+                {% render_field userform.password|attr:'required:true'  style="font-size:20px" class="form-control" placeholder="暗証番号（６文字以上）" %}
+                {% render_field clientform.facility|attr:'required:true' style="font-size:20px"  class="form-control" placeholder="施設名" %}
+                {% render_field clientform.phone|attr:'required:true' style="font-size:20px"  class="form-control" placeholder="電話番号" %}
+                <input type="submit"value="登録">
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+    

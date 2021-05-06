@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-5 col-sm-6">
+            <a href="{% url 'home' %}" class="btn btn-success">戻る</a>
+        </div>
+    </div>
+    <br>
+    <form class="d-flex" method="GET" action="{% url 'user-search' %}">
+        <div class="input-group">
+            <span class="input-group-text" id="basic-addon1">@</span>
+            <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" name="query" value="{{ request.GET.query }}">
+            <button class="remove-default-btn" type="submit"><i class="fa fa-search"></i></button>
+        </div>
+      </form>
+    {% for client in client_list %}
+        <div class="row justify-content-center mt-3">
+            <div class="col-md-5 col-sm-12 border-bottom position-relative">
+                <p><a class="text-primary post-link" href="{% url 'profile' client.pk %}">{{ client.user }}</a></p>
+                {% if client.facility %}
+                    <p>{{ client.facility }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock content %}

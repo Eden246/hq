@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row justify-content-center mt-3 mb-5">
+		<div class="col-md-5 col-sm-12">
+			<form method="POST">
+				{% csrf_token %}
+				<p>専門相談員を選択してください。</p>
+				{{ form }}
+				<div class="d-grid gap-2">
+					<button class="btn btn-success mt-3" type="submit">選択</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12 p-3">
+			<h3 style="color:#2ecc40">お問い合わせ履歴</h3>
+		</div>
+	</div>
+
+	{% for thread in threads.all %}
+	<div class="row">
+		<div class="card col-md-12 p-3 shadow-sm text-center" style="background: rgb(46,204,64);
+background: linear-gradient(90deg, rgba(46,204,64,1) 0%, rgba(202,202,220,1) 48%, rgba(0,212,255,1) 100%);">
+			<h5><p style="color:rgba(46,204,64,1)">顧客：《{{ thread.user }}》</p><p style="color:navy;">相談員：《{{ thread.receiver }}》</p></h5>
+			<a class="stretched-link" href="{% url 'thread' thread.pk %}"></a>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+
+{% endblock content %}

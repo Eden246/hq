@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-6">
+            <a href="{% url 'home'%}" class="btn btn-light">戻る</a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-5">
+        <div class="card shadow-sm col-12">
+        <h3>{{ user.username }}</h3>
+            
+            {% if request.user == user %}
+                <a href="{% url 'profile_edit' user.client.pk %}"><i class="fa fa-edit"></i></a>
+            {% endif %}
+                
+        <br>
+        <h3>{{ client.facility }}</h3>
+        <br>
+        <h3>{{ client.phone }}</h3>
+        </div>
+    </div>
+
+
+        {% if user.is_staff %}
+        <p>予約数:{{ number_of_followers }}</p>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>予約リスト</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+        {% for follower in followers %}
+                <tr>
+                    <td><a class="text-primary post-link" href="{% url 'profile' follower.client.pk%}">{{ follower.username }}</a></td>
+                    <td>
+                        <form action="{% url 'remove_follower_staff'  follower.client.user.pk%}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-success" type="submit">完了</button>
+                        </form>
+                    </td>
+                </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        
+
+
+    {% for post in posts %}
+        <a href="{% url 'post_detail' post.pk %}">{{ post.body }}</a>
+        {{ post.date }}
+        <br><br>
+    {% endfor %}
+        
+</div>
+
+{% endblock content %}
+    

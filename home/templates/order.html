@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if user.is_staff %}
+{% else %}
+{% if is_following %}
+<form action="{% url 'remove_follower'%}" method="post">
+    {% csrf_token %}
+    <button class="btn btn-outline-danger" type="submit">申請取り消し</button>
+</form>
+{% else %}
+<form action="{% url 'add_follower'%}" method="post">
+    {% csrf_token %}
+    <button class="btn btn-outline-success" type="submit">申請</button>
+</form>
+{% endif %}
+{% endif %}
+
+
+
+{% endblock content %}
+    

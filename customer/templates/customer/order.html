@@ -1,0 +1,125 @@
+  
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mb-5">
+    <div class="row justify-content-center mt-1">
+        <div class="col-md-12 col-sm-12 p-4">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="pt-5">
+                    {% for item in handrail %}
+                    <div class="row">
+                        <div class="col-md-2 col-sm-12">
+                        {% if item.image %}
+                            <img class="rounded" src="{{ item.image.url }}" width="150" height="100"/>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-8 col-sm-12">
+                            <div class="d-flex flex-row">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                                    <label class="form-check-label">{{ item.name }}</label>
+                                </div>&emsp;
+                                <p class="font-weight-bold pl-5">介護保険価格：{{ item.price }}円</p>
+                            </div>
+                            <p>{{ item.description }}</p>
+                        </div>
+                    </div>
+                    <hr />
+                {% endfor %}
+                </div>
+
+                <div class="pt-5">
+                    {% for item in wheelchair %}
+                    <div class="row mt-4">
+                        <div class="col-md-2 col-sm-12">
+                        {% if item.image %}
+                            <img class="rounded" src="{{ item.image.url }}" width="150" height="100"/>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-8 col-sm-12">
+                            <div class="d-flex flex-row">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                                    <label class="form-check-label">{{ item.name }}</label>
+                                </div>&emsp;
+                                <p class="font-weight-bold pl-5">介護保険価格：{{ item.price }}円</p>
+                            </div>
+                            <p>{{ item.description }}</p>
+                        </div>
+                    </div>
+                    <hr />
+                    {% endfor %}
+                </div>
+
+                <div class="pt-5">
+                    {% for item in bed %}
+                    <div class="row mt-4">
+                        <div class="col-md-2 col-sm-12">
+                        {% if item.image %}
+                            <img class="rounded" src="{{ item.image.url }}" width="150" height="100"/>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-8 col-sm-12">
+                            <div class="d-flex flex-row">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                                    <label class="form-check-label">{{ item.name }}</label>
+                                </div>&emsp;
+                                <p class="font-weight-bold pl-5">介護保険価格：{{ item.price }}円</p>
+                            </div>
+                            <p>{{ item.description }}</p>
+                        </div>
+                    </div>
+                    <hr />
+                    {% endfor %}
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="form-group pt-3">
+                            <label for="name">お名前</label>
+                            <input required type="text" id="name_id" placeholder="桃太郎" class="form-control" name="name">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="form-group pt-3">
+                            <label for="email">メールアドレス</label>
+                            <input required type="text" id="email_id" placeholder="example@example.com" class="form-control" name="email">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="form-group pt-3">
+                            <label for="phone">電話番号</label>
+                            <input required type="text" id="phone_id" placeholder="050-555-9999" class="form-control" name="phone">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="form-group pt-3">
+                            <label for="facility">施設</label>
+                            <input required type="text" id="facility_id" placeholder="○○ケアホーム" class="form-control" name="facility">
+                        </div>
+                    </div>
+                </div>
+
+                    
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                        <button type="submit" class="btn btn-primary">予約</button>
+                      </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+var name = " {{ user.username }}";
+document.getElementById("name_id").value = name;
+var email = " {{ user.email }}";
+document.getElementById("email_id").value = email;
+var phone = " {{ user.client.phone }}";
+document.getElementById("phone_id").value = phone;
+var facility = " {{ user.client.facility }}";
+document.getElementById("facility_id").value = facility;
+</script>
+{% endblock content %}

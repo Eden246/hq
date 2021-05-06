@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.child-comment {
+    margin-left:1rem;
+}
+</style>
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-12">
+            <a href="{% url 'post'%}" class="btn btn-light">戻る</a>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-3">
+        <div class="col-12 border-bottom">
+            <p><strong>{{ post.client.facility }}(<a href="{% url 'profile' post.user.client.pk%}">{{ post.user }}</a>)<strong>&emsp;{{ post.date }}</p>
+                {% if post.image %}
+                    <img style="width:500px" src="{{ post.image.url }}" class="post-image">
+                {% endif %}
+            <p>{{ post.body }}</p>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-3 mb-5">
+        <div class="col-12 border-bottom">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="col-md-4">
+                    <div class="d-grid">
+                        <button class="btn btn-success">コメント</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% for comment in comments %}
+    {% if comment.is_parent %}
+    <div class="row justify-content-center mt-3">
+        <div class="col-12 border-bottom">
+            <p>
+            {{ comment.user }}&emsp;{{ comment.date }}{% if request.user == comment.user or user.is_admin or user.is_staff %}
+            <a href="{% url 'comment_delete' post.pk comment.pk %}"><i class="fa fa-trash"></i></a>
+            </p>
+            {% endif %}
+            <p>{{ comment.comment }}</p>
+            <button class="remove-default-btn" style="color:green;" onclick="commentReplyToggle('{{comment.pk}}')"><i class="fa fa-comment"></i>コメント</button>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+        </div>
+    </div>
+    <div class="row justify-content-center d-none" id="{{comment.pk}}">
+        <div class="col-12 border-bottom">
+            <form method="post" action="{% url 'comment-reply' post.pk comment.pk%}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid col-6">
+                    <button class="btn btn-success">コメント</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% for child_comment in comment.children %}
+    <div class="row justify-content-center mb-0 child-comment">
+        <div class="col-12 border-bottom">
+            <p class="post-text">
+                <a class="text-primary post-link" href="{% url 'profile' comment.user.client.pk %}">{{ child_comment.user }}</a>&emsp;{{ child_comment.date }}
+                {% if request.user == comment.user or user.is_admin or user.is_staff %}
+                <a href="{% url 'comment_delete' post.pk child_comment.pk %}"><i class="fa fa-trash"></i></a>
+                {% endif %}
+            </p>
+            {{ child_comment.comment }}
+            <button class="remove-default-btn" style="color:green;" onclick="commentReplyToggle('{{child_comment.pk}}')"><i class="fa fa-comment"></i>コメント</button>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <div class="row justify-content-center d-none" id="{{child_comment.pk}}">
+                <div class="col-12 border-bottom">
+                    <form method="post" action="{% url 'comment-reply' post.pk comment.pk%}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-grid col-6">
+                            <button class="btn btn-success">コメント</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <br>
+    {% endfor %}
+</div>
+
+<script>
+function commentReplyToggle(parent_id){
+    const row = document.getElementById(parent_id);
+    if (row.classList.contains('d-none')){
+        row.classList.remove('d-none');
+    } else{
+        row.classList.add('d-none');
+    }
+}
+
+</script>
+{% endblock content %}
