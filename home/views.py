@@ -24,7 +24,8 @@ def SignupView(request):
         clientform=ClientForm(request.POST,request.FILES)
         if userform.is_valid() and clientform.is_valid():
             user=userform.save()
-            user.set_password(user.password)
+            password = user.password
+            user.set_password(password)
             user.save()
             client=clientform.save(commit=False)
             client.user=user
@@ -34,7 +35,13 @@ def SignupView(request):
         return redirect('home')
     return render(request,'signup.html',context=context)
 
-class PostView(LoginRequiredMixin, View):
+def clean_password(self):
+    password = self.cleaned_data.get('password1')
+    if len(password) < 8:
+        raise ValidationError('Password too short')
+    return super(MyUserCreationForm, self).clean_password1()
+
+class PostView(View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.all().order_by('-date')
         form = PostForm()
@@ -63,7 +70,7 @@ class PostView(LoginRequiredMixin, View):
 
         return render(request, 'post.html', context)
 
-class PostDetailView(LoginRequiredMixin, View):
+class PostDetailView(View):
     def get(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
         form = CommentForm()
@@ -253,7 +260,8 @@ class RemoveNotification(View):
 
         return HttpResponse('Success', content_type='text/plain')
 
-class ListThreads(View):
+class ListThreads(LoginRequiredMixin,View):
+    login_url = '/login/'
     def get(self, request,*args, **kwargs):
         form = ThreadForm()
         threads = ThreadModel.objects.filter(Q(user=request.user) | Q(receiver=request.user))
@@ -323,7 +331,7 @@ class MessageNotification(View):
 
         return redirect('thread', pk=message_pk)
 
-class UserSearch(View):
+class UserSearch(View,UserPassesTestMixin):
     def get(self, request, *args, **kwargs):
         query = self.request.GET.get('query')
         client_list = Client.objects.filter(
@@ -335,6 +343,10 @@ class UserSearch(View):
         }
 
         return render(request, 'user-search.html', context)
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == self.request.user.is_staff or self.request.user.is_superuser
 
 class CommentReplyView(LoginRequiredMixin, View):
     def post(self, request, post_pk, pk,*args, **kwargs):

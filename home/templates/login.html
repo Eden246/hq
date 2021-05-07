@@ -38,7 +38,7 @@
 
 .box input[type="submit"] {
     border: 0;
-    background: none;
+    color: #2ecc71;
     display: block;
     margin: 20px auto;
     text-align: center;
@@ -53,20 +53,22 @@
 }
 
 .box input[type="submit"]:hover {
-    background: #2ecc71
+    background: #2ecc71;
+    color: white;
 }
 </style>
 <div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-12 text-center">
+    <div class="row mt-5">
             <form class="box" method="post">
                 {% csrf_token %}    
-                <h1><span style="color:gold;">ログイン</span></h1>
+                <h1><span style="color:#2ecc71;">ログイン</span></h1>
                 {% render_field form.username class="form-control" placeholder="お名前（空白なし）" %}
                 {% render_field form.password class="form-control" placeholder="暗証番号" %}
                 <input type="submit" name="" value="ログイン">
+                <p><a href="{% url "reset_password" %}">もしパスワードお忘れですか？</a></p>
+                <hr>
+                <a  href="{% url 'signup' %}" class="btn btn-success" style="background-color:navy;">会員登録</a>
             </form>
-        </div>
     </div>
 </div>
 {% endblock content %}

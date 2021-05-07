@@ -23,34 +23,6 @@
         </div>
     </div>
 
-
-        {% if user.is_staff %}
-        <p>予約数:{{ number_of_followers }}</p>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>予約リスト</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-        {% for follower in followers %}
-                <tr>
-                    <td><a class="text-primary post-link" href="{% url 'profile' follower.client.pk%}">{{ follower.username }}</a></td>
-                    <td>
-                        <form action="{% url 'remove_follower_staff'  follower.client.user.pk%}" method="post">
-                        {% csrf_token %}
-                        <button class="btn btn-outline-success" type="submit">完了</button>
-                        </form>
-                    </td>
-                </tr>
-        {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
-        
-
-
     {% for post in posts %}
         <a href="{% url 'post_detail' post.pk %}">{{ post.body }}</a>
         {{ post.date }}

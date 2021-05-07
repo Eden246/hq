@@ -8,21 +8,27 @@
 </style>
 
 <div class="container">
-    <div class="row mt-5">
+    <br>
+    <div class="row">
         <div class="col-12">
-            <a href="{% url 'post'%}" class="btn btn-light">戻る</a>
+            <a href="{% url 'post'%}">戻る</a>
         </div>
     </div>
-    <div class="row justify-content-center mt-3">
+    <br>
+
+    <div class="row justify-content-center mt-1">
         <div class="col-12 border-bottom">
-            <p><strong>{{ post.client.facility }}(<a href="{% url 'profile' post.user.client.pk%}">{{ post.user }}</a>)<strong>&emsp;{{ post.date }}</p>
-                {% if post.image %}
-                    <img style="width:500px" src="{{ post.image.url }}" class="post-image">
-                {% endif %}
-            <p>{{ post.body }}</p>
+            <strong>{{ post.client.facility }}<strong>&emsp;{{ post.date }}</p>
+            {% if post.image %}
+            <img style="width:500px" src="{{ post.image.url }}" class="post-image">
+            {% endif %}
+            <br><br>
+            {{ post.body }}
+            <br><br>
         </div>
     </div>
-    <div class="row justify-content-center mt-3 mb-5">
+    {% if user.is_authenticated %}
+    <div class="row justify-content-center mb-5">
         <div class="col-12 border-bottom">
             <form method="post">
                 {% csrf_token %}
@@ -35,16 +41,19 @@
             </form>
         </div>
     </div>
+    {% endif %}
     {% for comment in comments %}
     {% if comment.is_parent %}
     <div class="row justify-content-center mt-3">
         <div class="col-12 border-bottom">
             <p>
-            {{ comment.user }}&emsp;{{ comment.date }}{% if request.user == comment.user or user.is_admin or user.is_staff %}
-            <a href="{% url 'comment_delete' post.pk comment.pk %}"><i class="fa fa-trash"></i></a>
+                {{ comment.user }}&emsp;{{ comment.date }}{% if request.user == comment.user or user.is_admin or user.is_staff %}
+                <a href="{% url 'comment_delete' post.pk comment.pk %}"><i class="fa fa-trash"></i></a>
+                {% endif %}
+                <br>
+                {{ comment.comment }}
             </p>
-            {% endif %}
-            <p>{{ comment.comment }}</p>
+        {% if user.is_authenticated %}
             <button class="remove-default-btn" style="color:green;" onclick="commentReplyToggle('{{comment.pk}}')"><i class="fa fa-comment"></i>コメント</button>
             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
         </div>
@@ -60,16 +69,19 @@
             </form>
         </div>
     </div>
+    {% endif %}
     {% for child_comment in comment.children %}
     <div class="row justify-content-center mb-0 child-comment">
         <div class="col-12 border-bottom">
             <p class="post-text">
-                <a class="text-primary post-link" href="{% url 'profile' comment.user.client.pk %}">{{ child_comment.user }}</a>&emsp;{{ child_comment.date }}
+                {{ child_comment.user }}&emsp;{{ child_comment.date }}
                 {% if request.user == comment.user or user.is_admin or user.is_staff %}
                 <a href="{% url 'comment_delete' post.pk child_comment.pk %}"><i class="fa fa-trash"></i></a>
                 {% endif %}
+                <br>
+                {{ child_comment.comment }}
             </p>
-            {{ child_comment.comment }}
+            {% if user.is_authenticated %}
             <button class="remove-default-btn" style="color:green;" onclick="commentReplyToggle('{{child_comment.pk}}')"><i class="fa fa-comment"></i>コメント</button>
             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
             <div class="row justify-content-center d-none" id="{{child_comment.pk}}">
@@ -83,6 +95,7 @@
                     </form>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

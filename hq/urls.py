@@ -5,10 +5,28 @@ from django.contrib.auth.views import LoginView,LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
 
 app_name = 'core'
 
 urlpatterns = [
+    path('reset_password/',
+     auth_views.PasswordResetView.as_view(template_name="accounts/password_reset.html"),
+     name="reset_password"),
+
+    path('reset_password_sent/', 
+        auth_views.PasswordResetDoneView.as_view(template_name="accounts/password_reset_sent.html"), 
+        name="password_reset_done"),
+
+    path('reset/<uidb64>/<token>/',
+     auth_views.PasswordResetConfirmView.as_view(template_name="accounts/password_reset_form.html"), 
+     name="password_reset_confirm"),
+
+    path('reset_password_complete/', 
+        auth_views.PasswordResetCompleteView.as_view(template_name="accounts/password_reset_done.html"), 
+        name="password_reset_complete"),
+
+
     path('admin/', admin.site.urls),
     path('', Home, name='home'),
     path('signup/', SignupView,name='signup'),
@@ -21,7 +39,6 @@ urlpatterns = [
     path('post/<int:post_pk>/comment/delete/<int:pk>', CommentDeleteView.as_view(), name='comment_delete'),
     path('post/<int:post_pk>/comment/<int:pk>/reply', CommentReplyView.as_view(), name='comment-reply'),
     path('profile/<int:pk>', ProfileView, name='profile'),
-    path('order/<int:pk>', Order, name='order'),
     path('profile/edit/<int:pk>', ClientEditView.as_view(), name='profile_edit'),
     path('order/followers/add', AddFollowerView, name='add_follower'),
     path('order/followers/remove', RemoveFollowerView, name='remove_follower'),
@@ -36,6 +53,7 @@ urlpatterns = [
     path('inbox/<int:pk>/create-message', CreateMessage.as_view(), name='create-message'),
     path('user-search/', UserSearch.as_view(), name='user-search'),
     path('search/', TemplateView.as_view(template_name="user-search.html"), name='search'),
+    path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path('order/', include('customer.urls')),
     path('dashboard/', include('dashboard.urls')),
 ] 

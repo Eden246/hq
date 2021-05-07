@@ -2,35 +2,71 @@
 
 {% block content %}
 
-<div class="container">
-	<div class="row justify-content-center mt-3 mb-5">
-		<div class="col-md-5 col-sm-12">
-			<form method="POST">
-				{% csrf_token %}
-				<p>専門相談員を選択してください。</p>
-				{{ form }}
-				<div class="d-grid gap-2">
-					<button class="btn btn-success mt-3" type="submit">選択</button>
-				</div>
-			</form>
-		</div>
-	</div>
+<style>
+.card {
+	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	background-size: 400% 400%;
+	animation: gradient 5s ease infinite;
+}
 
-	<div class="row">
-		<div class="col-md-12 p-3">
-			<h3 style="color:#2ecc40">お問い合わせ履歴</h3>
-		</div>
-	</div>
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+</style>
 
-	{% for thread in threads.all %}
-	<div class="row">
-		<div class="card col-md-12 p-3 shadow-sm text-center" style="background: rgb(46,204,64);
-background: linear-gradient(90deg, rgba(46,204,64,1) 0%, rgba(202,202,220,1) 48%, rgba(0,212,255,1) 100%);">
-			<h5><p style="color:rgba(46,204,64,1)">顧客：《{{ thread.user }}》</p><p style="color:navy;">相談員：《{{ thread.receiver }}》</p></h5>
-			<a class="stretched-link" href="{% url 'thread' thread.pk %}"></a>
-		</div>
-	</div>
-	{% endfor %}
+{% if user.is_authenticated %}
+<section id="contact" class="padd-section">
+<div class="container" data-aos="fade-down">
+    <div class="col-md-4 col-sm-12">
+        <h2 class="text-center">メッセージお問い合わせ</h2>
+		<br>
+        <form method="POST">
+            {% csrf_token %}
+            <p class="text-center">《専門相談員選択》</p>
+            {{ form }}
+            <div class="d-grid gap-2">
+                <button class="btn btn-success mt-3" type="submit">選択</button>
+            </div>
+        </form>
+    </div>
 </div>
+<br><br><br><br>
 
+
+
+
+<div class="container" data-aos="fade-right">
+	<div class="col-md-4">
+	    <div class="p-3">
+	        <h3 class="text-center" style="color:#2ecc40">メッセージ履歴</h3>
+	    </div>
+	    {% for thread in threads.all %}
+	    <div class="card col-12 shadow-sm text-center">
+	 		<div class="btn-group mt-2 mb-4" role="group" aria-label="actionButtons">
+				<a href="#" class="d-block btn btn-outline-light" download>お客様：{{ thread.user }}</a>
+				<a href="#" target="_blank" class="d-block btn btn-outline-light">相談員：{{ thread.receiver }}</a>
+			</div>
+	        <a class="stretched-link" href="{% url 'thread' thread.pk %}"></a>
+	    </div>
+	</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="container">
+    <div class="row justify-content-center mt-3 mb-5">
+        <h2>ログインが必要です。</h2>
+    </div>
+</div>
+{% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" integrity="sha256-qM7QTJSlvtPSxVRjVWNM2OfTAz/3k5ovHOKmKXuYMO4=" crossorigin="anonymous"></script>
 {% endblock content %}

@@ -1,80 +1,79 @@
   
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
+
+{% if messages %}
+  <ul class="messages">
+         {% for message in messages %}
+               <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+         {% endfor %}
+  </ul>
+  {% endif %}
+
+<a href="#header" class="back-to-top"><i class="fas fa-level-up-alt"></i></a>
 <div class="container mb-5">
     <div class="row justify-content-center mt-1">
-        <div class="col-md-12 col-sm-12 p-4">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="pt-5">
-                    {% for item in handrail %}
+        <form method="POST">
+            {% csrf_token %}
+            <section id="about-us" class="about-us padd-section">
+            <h3 class="text-center">車いす</h3>
+                {% for item in wheelchair %}
+                <div class="container" data-aos="fade-up">
                     <div class="row">
-                        <div class="col-md-2 col-sm-12">
-                        {% if item.image %}
-                            <img class="rounded" src="{{ item.image.url }}" width="150" height="100"/>
-                        {% endif %}
-                        </div>
-                        <div class="col-md-8 col-sm-12">
-                            <div class="d-flex flex-row">
-                                <div class="form-group form-check">
-                                    <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-                                    <label class="form-check-label">{{ item.name }}</label>
-                                </div>&emsp;
-                                <p class="font-weight-bold pl-5">介護保険価格：{{ item.price }}円</p>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="row">
+                                <div class="hit-the-floor">{{ item.name }}</div>
+                                    {% if item.image %}
+                                    <img class="rounded center-block" src="{{ item.image.url }}" style="width: 300px;"/>
+                                    {% endif %}
+                                    <div class="about-content" data-aos="fade-left" data-aos-delay="100">
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                                            <h4><span><label class="form-check-label">選択</label></span></h4>
+                                            <h3>{{ item.price }}円（自己負担は1割分/月額）</h3>
+                                        </div>
+                                        &emsp;
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
+                                        </ul>
+                                        <br><br>
+                                    </div>
+                                </div>
                             </div>
-                            <p>{{ item.description }}</p>
                         </div>
                     </div>
-                    <hr />
+                </div>
                 {% endfor %}
-                </div>
-
-                <div class="pt-5">
-                    {% for item in wheelchair %}
-                    <div class="row mt-4">
-                        <div class="col-md-2 col-sm-12">
-                        {% if item.image %}
-                            <img class="rounded" src="{{ item.image.url }}" width="150" height="100"/>
-                        {% endif %}
-                        </div>
-                        <div class="col-md-8 col-sm-12">
-                            <div class="d-flex flex-row">
-                                <div class="form-group form-check">
-                                    <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-                                    <label class="form-check-label">{{ item.name }}</label>
-                                </div>&emsp;
-                                <p class="font-weight-bold pl-5">介護保険価格：{{ item.price }}円</p>
+            <h3 class="text-center">手すり</h3>
+                {% for item in handrail %}
+                <div class="container" data-aos="fade-up">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="row">
+                                <div class="hit-the-floor">{{ item.name }}</div>
+                                    {% if item.image %}
+                                    <img class="rounded center-block" src="{{ item.image.url }}" style="width: 300px;"/>
+                                    {% endif %}
+                                    <div class="about-content" data-aos="fade-left" data-aos-delay="100">
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                                            <h4><span><label class="form-check-label">選択</label></span></h4>
+                                            <h3>{{ item.price }}円（自己負担は1割分/月額）</h3>
+                                        </div>
+                                        &emsp;
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
+                                        </ul>
+                                        <br><br>
+                                    </div>
+                                </div>
                             </div>
-                            <p>{{ item.description }}</p>
                         </div>
                     </div>
-                    <hr />
-                    {% endfor %}
                 </div>
-
-                <div class="pt-5">
-                    {% for item in bed %}
-                    <div class="row mt-4">
-                        <div class="col-md-2 col-sm-12">
-                        {% if item.image %}
-                            <img class="rounded" src="{{ item.image.url }}" width="150" height="100"/>
-                        {% endif %}
-                        </div>
-                        <div class="col-md-8 col-sm-12">
-                            <div class="d-flex flex-row">
-                                <div class="form-group form-check">
-                                    <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-                                    <label class="form-check-label">{{ item.name }}</label>
-                                </div>&emsp;
-                                <p class="font-weight-bold pl-5">介護保険価格：{{ item.price }}円</p>
-                            </div>
-                            <p>{{ item.description }}</p>
-                        </div>
-                    </div>
-                    <hr />
-                    {% endfor %}
-                </div>
+                {% endfor %}
+            </section>
                 <div class="row">
                     <div class="col-md-6 col-sm-12">
                         <div class="form-group pt-3">
@@ -110,7 +109,9 @@
             </form>
         </div>
     </div>
-</div>
+</div> 
+
+
 
 <script>
 var name = " {{ user.username }}";
