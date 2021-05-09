@@ -2,6 +2,82 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<style>
+.checkbox-wrap {
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+.checkbox-wrap input {
+  opacity: 0;
+  cursor: pointer; }
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0; }
+
+.checkmark:after {
+  content: "\f1db";
+  font-family: "FontAwesome";
+  position: absolute;
+  color: rgba(0, 0, 0, 0.3);
+  font-size: 20px;
+  margin-top: -4px;
+  -webkit-transition: 0.3s;
+  -o-transition: 0.3s;
+  transition: 0.6s; }
+  @media (prefers-reduced-motion: reduce) {
+    .checkmark:after {
+      -webkit-transition: none;
+      -o-transition: none;
+      transition: none; } }
+
+.checkbox-wrap input:checked ~ .checkmark:after {
+  display: block;
+  content: "\f058";
+  font-family: "FontAwesome";
+  color: #a8c66c;
+  -webkit-transform: rotate(-360deg);
+  -ms-transform: rotate(-360deg);
+  transform: rotate(-360deg); }
+
+.hide {
+    display: none;
+}
+.floating-btn {
+	border-radius: 26.5px;
+	background-color: #a8c66c;
+	border: 1px solid #a8c66c;
+	box-shadow: 0 22px 22px -12px #a8c66c;
+	color: #fff;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 20px;
+	padding: 12px 20px;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 999;
+}
+
+.floating-btn:hover {
+	background-color: #ffffff;
+	color: #a8c66c;
+}
+
+.floating-btn:focus {
+	outline: none;
+}
+
+</style>
+
 
 {% if messages %}
   <ul class="messages">
@@ -10,6 +86,24 @@
          {% endfor %}
   </ul>
   {% endif %}
+<br>
+<form method="GET">
+  <div class="form-group col-md-4">
+    <select name="category" id="category" class="form-control">
+      <option selected>品目を選択してください</option>
+      {% for category in categories %}
+        <option value="{{category}}">{{ category }}</option>
+      {% endfor %}
+    </select>
+    <button style="display:none;" type="submit" class="btn btn-primary mode">選択</button>
+  </div>
+</form>
+
+<script>
+$('#category').change(function(){ 
+    jQuery('.mode').click();
+});
+</script>
 
 <a href="#header" class="back-to-top"><i class="fas fa-level-up-alt"></i></a>
 <div class="container mb-5">
@@ -17,8 +111,7 @@
         <form method="POST">
             {% csrf_token %}
             <section id="about-us" class="about-us padd-section">
-            <h3 class="text-center">車いす</h3>
-                {% for item in wheelchair %}
+                {% for item in items %}
                 <div class="container" data-aos="fade-up">
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
@@ -29,42 +122,15 @@
                                     {% endif %}
                                     <div class="about-content" data-aos="fade-left" data-aos-delay="100">
                                         <div class="form-group form-check">
+                                            <label class="checkbox-wrap form-check-label">選択
                                             <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-                                            <h4><span><label class="form-check-label">選択</label></span></h4>
+						                    <span class="checkmark"></span>
+						                    </label>
                                             <h3>{{ item.price }}円（自己負担は1割分/月額）</h3>
-                                        </div>
-                                        &emsp;
-                                        <ul class="list-unstyled">
+                                            <ul class="list-unstyled">
                                             <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
-                                        </ul>
-                                        <br><br>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            <h3 class="text-center">手すり</h3>
-                {% for item in handrail %}
-                <div class="container" data-aos="fade-up">
-                    <div class="row">
-                        <div class="col-md-6 col-sm-12">
-                            <div class="row">
-                                <div class="hit-the-floor">{{ item.name }}</div>
-                                    {% if item.image %}
-                                    <img class="rounded center-block" src="{{ item.image.url }}" style="width: 300px;"/>
-                                    {% endif %}
-                                    <div class="about-content" data-aos="fade-left" data-aos-delay="100">
-                                        <div class="form-group form-check">
-                                            <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-                                            <h4><span><label class="form-check-label">選択</label></span></h4>
-                                            <h3>{{ item.price }}円（自己負担は1割分/月額）</h3>
+                                            </ul>
                                         </div>
-                                        &emsp;
-                                        <ul class="list-unstyled">
-                                            <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
-                                        </ul>
                                         <br><br>
                                     </div>
                                 </div>
@@ -74,44 +140,62 @@
                 </div>
                 {% endfor %}
             </section>
-                <div class="row">
-                    <div class="col-md-6 col-sm-12">
-                        <div class="form-group pt-3">
-                            <label for="name">お名前</label>
-                            <input required type="text" id="name_id" placeholder="桃太郎" class="form-control" name="name">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-12">
-                        <div class="form-group pt-3">
-                            <label for="email">メールアドレス</label>
-                            <input required type="text" id="email_id" placeholder="example@example.com" class="form-control" name="email">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-12">
-                        <div class="form-group pt-3">
-                            <label for="phone">電話番号</label>
-                            <input required type="text" id="phone_id" placeholder="050-555-9999" class="form-control" name="phone">
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-12">
-                        <div class="form-group pt-3">
-                            <label for="facility">施設</label>
-                            <input required type="text" id="facility_id" placeholder="○○ケアホーム" class="form-control" name="facility">
-                        </div>
-                    </div>
-                </div>
-
-                    
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-                        <button type="submit" class="btn btn-primary">予約</button>
-                      </div>
-            </form>
         </div>
     </div>
 </div> 
+<section class="hide">
+    <div class="row">
+        <div class="col-md-6 col-sm-12">
+            <div class="form-group pt-3">
+                <label for="name">お名前</label>
+                <input required type="text" id="name_id" placeholder="桃太郎" class="form-control" name="name">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <div class="form-group pt-3">
+                <label for="email">メールアドレス</label>
+                <input required type="text" id="email_id" placeholder="example@example.com" class="form-control" name="email">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <div class="form-group pt-3">
+                <label for="phone">電話番号</label>
+                <input required type="text" id="phone_id" placeholder="050-555-9999" class="form-control" name="phone">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <div class="form-group pt-3">
+                <label for="facility">施設</label>
+                <input required type="text" id="facility_id" placeholder="○○ケアホーム" class="form-control" name="facility">
+            </div>
+        </div>
+    </div>
+</section>
 
+{% if items.has_other_pages %}
+  <ul class="pagination justify-content-center">
+    {% if items.has_previous %}
+      <li class="m-2"><a class="p-3" href="?page={{ items.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="m-2 disabled"><span class="p-3">&laquo;</span></li>
+    {% endif %}
+    {% for i in items.paginator.page_range %}
+      {% if items.number == i %}
+        <li class="m-2 active"><span class="p-3">{{ i }} <span class="sr-only">(current)</span></span></li>
+      {% else %}
+        <li class="m-2"><a class="p-3" href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if items.has_next %}
+      <li class="m-2"><a class="p-3" href="?page={{ items.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="m-2 disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+{% endif %}
 
+<button type="submit" class="floating-btn">予約</button>
+</form>
 
 <script>
 var name = " {{ user.username }}";

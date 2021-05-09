@@ -34,13 +34,7 @@ def SignupView(request):
             client_group[0].user_set.add(user)
         return redirect('home')
     return render(request,'signup.html',context=context)
-
-def clean_password(self):
-    password = self.cleaned_data.get('password1')
-    if len(password) < 8:
-        raise ValidationError('Password too short')
-    return super(MyUserCreationForm, self).clean_password1()
-
+    
 class PostView(View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.all().order_by('-date')

@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.auth.models import User
 from home.models import *
 from django.shortcuts import redirect
+from django.core.paginator import Paginator
 
 class About(View):
     def get(self, request, *args, **kwargs):
@@ -13,14 +14,21 @@ class About(View):
 
 class Order(View):
     def get(self, request, *args, **kwargs):
-        handrail = MenuItem.objects.filter(category__name__contains='手すり')
-        wheelchair = MenuItem.objects.filter(category__name__contains='車いす')
-        bed = MenuItem.objects.filter(category__name__contains='ベット')
+        items_list = MenuItem.objects.all()
+        categories = Category.objects.all()
+        category = request.GET.get('category')
+        
+        if category != ' ' and category is not None and category != '選択してください':
+            items_list = items_list.filter(category__name__icontains=category)
+        
+        page = request.GET.get('page', 1)
+        paginator = Paginator(items_list, 1)
+        items = paginator.page(page)
 
+            
         context = {
-            'handrail':handrail,
-            'wheelchair':wheelchair,
-            'bed':bed,
+            'items':items,
+            'categories':categories
         }
 
         return render(request, 'customer/order.html', context)

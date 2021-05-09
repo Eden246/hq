@@ -19,7 +19,7 @@ class Category(models.Model):
 class OrderModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     price = models.IntegerField()
-    items = models.ManyToManyField('MenuItem', related_name='order', blank=True)
+    items = models.ManyToManyField('MenuItem', related_name='order')
     name = models.CharField(max_length=50, blank=True)
     email = models.CharField(max_length=50, blank=True)
     facility = models.CharField(max_length=50, blank=True)
