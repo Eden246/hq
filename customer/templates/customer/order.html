@@ -48,9 +48,6 @@
   -ms-transform: rotate(-360deg);
   transform: rotate(-360deg); }
 
-.hide {
-    display: none;
-}
 .floating-btn {
 	border-radius: 26.5px;
 	background-color: #a8c66c;
@@ -75,6 +72,85 @@
 .floating-btn:focus {
 	outline: none;
 }
+
+#slideOut {
+  position: fixed;
+  width: 400px;
+  height: 800px;
+  top: 380px;
+  right: -400px;
+  /* Animation  */
+  transition-property: all;
+  transition-duration: .5s;
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+
+
+/* Display slideOut */
+
+.showSlideOut {
+  right: 0px !important;
+}
+
+
+/* Tab */
+
+.slideOutTab {
+  margin-top: 250px;
+  position: absolute;
+  left: -40px;
+  height: 200px;
+  width: 40px;
+  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+  background: #F2AB34;
+  border-radius: 15px 0px 0px 15px
+}
+
+.slideOutTab div {
+  text-align: center;
+  position: relative;
+  right: 70px;
+  top: 90px;
+  background: #F2AB34;
+  width: 180px;
+  -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+  writing-mode: lr-tb;
+}
+
+
+/* None relevant included styling */
+
+body,
+html {
+  overflow: visible;
+  height: 100%;
+  width: 100%;
+}
+
+
+
+section {
+  height: 100%;
+  width: 100%;
+}
+
+.modal-body {
+  height: 400px;
+}
+
+section {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+ .intro {
+        display: table-cell;
+        vertical-align: middle;
+ 
+      }
 
 </style>
 
@@ -104,6 +180,60 @@ $('#category').change(function(){
     jQuery('.mode').click();
 });
 </script>
+<!-- // SlideOut -->
+<div id="slideOut" style="z-index: 2;">
+<!--   // Tab -->
+  <div class="slideOutTab">
+    <div>
+    
+      <p><i style="width:30px;" class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートを開く</p>
+    </div>
+  </div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4 class="modal-title">カート目録</h4>
+    </div>
+    <div class="modal-body">
+      <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col">商品名</th>
+                <th scope="col">単価</th>
+                <th scope="col">数量</th>
+                <th scope="col">削除</th>
+                <th scope="col">値段</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in unorders %}
+          <tr>
+            <td>{{ order.items.name }}</td>
+            <td>{{ order.items.price }}円</td>
+            <td>{{ order.quantity }}</td>
+            <td><a href="{% url 'remove_from_cart' order.items.pk %}">
+        <i class="fa fa-minus mr-2"></i></a></td>
+            <td>{{ order.get_total_item_price }}円</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+          <tfoot>
+            <tr>
+              <td>合計：</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              
+              <td>{{unpaid_orders.get_total}}円</td>
+            </tr>
+          </tfoot>
+        </table>
+      <br><br>
+      <a href="{% url 'cart' %}">
+        <i style="font-size: 3rem;" class="fa fa-book mr-2"></i></a>
+    </div>
+  </div>
+</div>
+
 
 <a href="#header" class="back-to-top"><i class="fas fa-level-up-alt"></i></a>
 <div class="container mb-5">
@@ -123,7 +253,7 @@ $('#category').change(function(){
                                     <div class="about-content" data-aos="fade-left" data-aos-delay="100">
                                         <div class="form-group form-check">
                                             <label class="checkbox-wrap form-check-label">選択
-                                            <input type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                                            <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
 						                    <span class="checkmark"></span>
 						                    </label>
                                             <h3>{{ item.price }}円（自己負担は1割分/月額）</h3>
@@ -143,34 +273,7 @@ $('#category').change(function(){
         </div>
     </div>
 </div> 
-<section class="hide">
-    <div class="row">
-        <div class="col-md-6 col-sm-12">
-            <div class="form-group pt-3">
-                <label for="name">お名前</label>
-                <input required type="text" id="name_id" placeholder="桃太郎" class="form-control" name="name">
-            </div>
-        </div>
-        <div class="col-md-6 col-sm-12">
-            <div class="form-group pt-3">
-                <label for="email">メールアドレス</label>
-                <input required type="text" id="email_id" placeholder="example@example.com" class="form-control" name="email">
-            </div>
-        </div>
-        <div class="col-md-6 col-sm-12">
-            <div class="form-group pt-3">
-                <label for="phone">電話番号</label>
-                <input required type="text" id="phone_id" placeholder="050-555-9999" class="form-control" name="phone">
-            </div>
-        </div>
-        <div class="col-md-6 col-sm-12">
-            <div class="form-group pt-3">
-                <label for="facility">施設</label>
-                <input required type="text" id="facility_id" placeholder="○○ケアホーム" class="form-control" name="facility">
-            </div>
-        </div>
-    </div>
-</section>
+
 
 {% if items.has_other_pages %}
   <ul class="pagination justify-content-center">
@@ -194,17 +297,25 @@ $('#category').change(function(){
   </ul>
 {% endif %}
 
-<button type="submit" class="floating-btn">予約</button>
+<button type="submit" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートに入れる</button>
 </form>
 
 <script>
-var name = " {{ user.username }}";
-document.getElementById("name_id").value = name;
-var email = " {{ user.email }}";
-document.getElementById("email_id").value = email;
-var phone = " {{ user.client.phone }}";
-document.getElementById("phone_id").value = phone;
-var facility = " {{ user.client.facility }}";
-document.getElementById("facility_id").value = facility;
+$("input:checkbox").click(function() {
+    if ($(this).is(":checked")) {
+        var group = "input:checkbox[name='" + $(this).attr("name") + "']";
+        $(group).prop("checked", false);
+        $(this).prop("checked", true);
+    } else {
+        $(this).prop("checked", false);
+    }
+});
+
+this.$slideOut = $('#slideOut');
+
+// Slideout show
+this.$slideOut.find('.slideOutTab').on('click', function() {
+  $("#slideOut").toggleClass('showSlideOut');
+});
 </script>
 {% endblock content %}

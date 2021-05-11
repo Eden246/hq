@@ -13,11 +13,8 @@
     <div class="row justify-content-center mt-5">
         <div class="col-md-5 col-sm-12 text-center">
             <h3 class="pb-3">予約内容</h3>
-            {% for item in items %}
-                <p>{{ item.name }} <span class="pl-3">：&emsp;{{ item.price }}円</span></p>
-            {% endfor %}
-
-            <p class="font-weight-bold pt-4">合計：{{ price }}</p>
+            <p class="font-weight-bold pt-4">予約者：{{user.username}}様</p>
+            <p class="font-weight-bold pt-4">合計：{{price}}円</p>
         </div>
     </div>
 </div>

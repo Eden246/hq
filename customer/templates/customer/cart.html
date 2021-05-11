@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br><br>
+      <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th scope="col">商品名</th>
+                <th scope="col">単価</th>
+                <th scope="col">数量</th>
+                <th scope="col">値段</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+          <tr>
+            <td>{{ item.items.name }}</td>
+            <td>{{ item.items.price }}円</td>
+            <td>{{ item.quantity }}</td>
+
+            <td>{{ item.get_total_item_price }}円</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+          <tfoot>
+            <tr>
+              <td>合計：</td>
+              <td></td>
+              <td></td>
+              <td>{{unpaid_orders.get_total}}円</td>
+            </tr>
+          </tfoot>
+        </table>
+<form method="POST">
+    {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group pt-3">
+                    <label for="name">お名前</label>
+                    <input required type="text" id="name_id" placeholder="桃太郎" class="form-control" name="name">
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group pt-3">
+                    <label for="email">メールアドレス</label>
+                    <input required type="text" id="email_id" placeholder="example@example.com" class="form-control" name="email">
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group pt-3">
+                    <label for="phone">電話番号</label>
+                    <input required type="text" id="phone_id" placeholder="050-555-9999" class="form-control" name="phone">
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group pt-3">
+                    <label for="facility">施設</label>
+                    <input required type="text" id="facility_id" placeholder="○○ケアホーム" class="form-control" name="facility">
+                </div>
+            </div>
+        </div>
+     <br>
+    <button type="submit" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i></button>
+</form>
+
+
+<script>
+var name = " {{ user.username }}";
+document.getElementById("name_id").value = name;
+var email = " {{ user.email }}";
+document.getElementById("email_id").value = email;
+var phone = " {{ user.client.phone }}";
+document.getElementById("phone_id").value = phone;
+var facility = " {{ user.client.facility }}";
+document.getElementById("facility_id").value = facility;
+</script>
+{% endblock content %}

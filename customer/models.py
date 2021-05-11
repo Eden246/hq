@@ -1,4 +1,6 @@
 from django.db import models
+from django.urls.base import reverse_lazy
+from django.contrib.auth.models import User
 
 class MenuItem(models.Model):
     name = models.CharField(max_length=100)
@@ -10,22 +12,46 @@ class MenuItem(models.Model):
     def __str__(self):
         return self.name
 
+    def get_remove_from_cart_url(self):
+        return reverse_lazy("remove-from-cart", kwargs={
+            'pk': self.pk
+        })
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
+class OrderItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    items = models.ForeignKey('MenuItem', on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    ordered = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.items.name)
+        
+    @property
+    def get_total_item_price(self):
+        return int(self.quantity) * int(self.items.price)
+
 class OrderModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
-    price = models.IntegerField()
-    items = models.ManyToManyField('MenuItem', related_name='order')
+    items = models.ManyToManyField('OrderItem', related_name='order', blank=True)
     name = models.CharField(max_length=50, blank=True)
     email = models.CharField(max_length=50, blank=True)
     facility = models.CharField(max_length=50, blank=True)
     phone = models.CharField(max_length=50, blank=True)
     is_paid = models.BooleanField(default=False)
+    price = models.IntegerField()
     
     def __str__(self):
-        return f'注文日付:{self.created_on.strftime("%Y%m%d|%H:%M:%S")}'
+        return f'カート生成日付:{self.created_on.strftime("%Y%m%d|%H:%M:%S")}'
 
+    def get_total(self):
+        total = 0
+        for order_item in self.items.all():
+            total += order_item.get_total_item_price()
+        return total

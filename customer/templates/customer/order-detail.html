@@ -11,11 +11,15 @@
             <div class="col-md-6 col-sm-12 mt-5">
                 <h5　class="pt-3">顧客情報</h5>
                 <p><span style="font-weight:400;">お名前：</span>{{ order.name }}</p>
-                <p><span style="font-weight:400;">メールアドレス</span>{{ order.email }}</p>
-                <p><span style="font-weight:400;">電話番号</span>{{ order.phone }}</p>
-                <p><span style="font-weight:400;">施設</span>{{ order.facility }}</p>
-                <h5 class="pt-3">予約情報</h5>
-                <p><span style="font-weight:400;">予約合計：</span>{{ order.price }}</p>
+                <p><span style="font-weight:400;">メールアドレス：</span>{{ order.email }}</p>
+                <p><span style="font-weight:400;">電話番号：</span>{{ order.phone }}</p>
+                <p><span style="font-weight:400;">施設：</span>{{ order.facility }}</p>
+                <h5 class="pt-3">《予約情報》</h5>
+                {% for item in order.items.all %}
+                <p><span style="font-weight:400;">品目：</span>{{ item }}</p>
+                {% endfor %}
+                <p><span style="font-weight:400;">注文日付：</span>{{ order.created_on }}</p>
+                <p><span style="font-weight:400;">予約合計：</span>{{ order.price }}円</p>
             </div>
             <div class="col-md-6 col-sm-12">
                 <h5>決済有無</h5>

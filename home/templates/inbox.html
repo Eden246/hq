@@ -44,21 +44,21 @@
 
 
 <div class="container" data-aos="fade-right">
-	<div class="col-md-4">
-	    <div class="p-3">
-	        <h3 class="text-center" style="color:#2ecc40">メッセージ履歴</h3>
-	    </div>
-	    {% for thread in threads.all %}
-	    <div class="card col-12 shadow-sm text-center">
-	 		<div class="btn-group mt-2 mb-4" role="group" aria-label="actionButtons">
-				<a href="#" class="d-block btn btn-outline-light" download>お客様：{{ thread.user }}</a>
-				<a href="#" target="_blank" class="d-block btn btn-outline-light">相談員：{{ thread.receiver }}</a>
-			</div>
-	        <a class="stretched-link" href="{% url 'thread' thread.pk %}"></a>
-	    </div>
-	</div>
-</div>
-{% endfor %}
+    <div class="col-md-4">
+        <div class="p-3">
+            <h3 class="text-center" style="color:#2ecc40">メッセージ履歴</h3>
+        </div>
+        {% for thread in threads.all %}
+        <div class="card col-12 shadow-sm text-center">
+            <div class="btn-group mt-2 mb-4" role="group" aria-label="actionButtons">
+                <a href="#" class="d-block btn btn-outline-light" download>お客様：{{ thread.user }}</a>
+                <a href="#" target="_blank" class="d-block btn btn-outline-light">相談員：{{ thread.receiver }}</a>
+            </div>
+            <a class="stretched-link" href="{% url 'thread' thread.pk %}"></a>
+        </div>
+	<hr style="  border-top: 10px dashed #e73c7e; background-color: #ee7752;">
+    {% endfor %}
+    </div>
 </div>
 {% else %}
 <div class="container">
