@@ -23,7 +23,7 @@
             <img style="width:500px" src="{{ post.image.url }}" class="post-image">
             {% endif %}
             <br><br>
-            {{ post.body }}
+            <h4>{{ post.body }}</h4>
             <br><br>
         </div>
     </div>
@@ -35,7 +35,7 @@
                 {{ form.as_p }}
                 <div class="col-md-4">
                     <div class="d-grid">
-                        <button class="btn btn-success">コメント</button>
+                        <button class="btn btn-success"style="width:70%">コメント</button>
                     </div>
                 </div>
             </form>
@@ -64,7 +64,7 @@
                 {% csrf_token %}
                 {{ form.as_p }}
                 <div class="d-grid col-6">
-                    <button class="btn btn-success">コメント</button>
+                    <button class="btn btn-success"style="width:70%">コメント</button>
                 </div>
             </form>
         </div>
@@ -90,7 +90,7 @@
                         {% csrf_token %}
                         {{ form.as_p }}
                         <div class="d-grid col-6">
-                            <button class="btn btn-success">コメント</button>
+                            <button class="btn btn-success"style="width:70%">コメント</button>
                         </div>
                     </form>
                 </div>

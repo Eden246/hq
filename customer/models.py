@@ -45,7 +45,9 @@ class OrderModel(models.Model):
     facility = models.CharField(max_length=50, blank=True)
     phone = models.CharField(max_length=50, blank=True)
     is_paid = models.BooleanField(default=False)
-    price = models.IntegerField()
+    price = models.IntegerField(blank=True, null=True)
+    ordered = models.BooleanField(default=False)
+    description = models.CharField(max_length=100, blank=True)
     
     def __str__(self):
         return f'カート生成日付:{self.created_on.strftime("%Y%m%d|%H:%M:%S")}'
@@ -53,5 +55,5 @@ class OrderModel(models.Model):
     def get_total(self):
         total = 0
         for order_item in self.items.all():
-            total += order_item.get_total_item_price()
+            total += order_item.get_total_item_price
         return total

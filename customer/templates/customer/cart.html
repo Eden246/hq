@@ -1,36 +1,64 @@
 {% extends 'base.html' %}
-
 {% block content %}
+
+<style>
+.floating-btn {
+	border-radius: 26.5px;
+	background-color: #a8c66c;
+	border: 1px solid #a8c66c;
+	box-shadow: 0 22px 22px -12px #a8c66c;
+	color: #fff;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 20px;
+	padding: 12px 20px;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 999;
+}
+
+.floating-btn:hover {
+	background-color: #ffffff;
+	color: #a8c66c;
+}
+
+.floating-btn:focus {
+	outline: none;
+}
+</style>
+
 <br><br>
-      <table class="table table-hover table-striped">
-        <thead>
-            <tr>
-                <th scope="col">商品名</th>
-                <th scope="col">単価</th>
-                <th scope="col">数量</th>
-                <th scope="col">値段</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in items %}
-          <tr>
+
+<h2>予約確認</h2>
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th scope="col">商品名</th>
+            <th scope="col">単価</th>
+            <th scope="col">数量</th>
+            <th scope="col">値段</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+        <tr>
             <td>{{ item.items.name }}</td>
             <td>{{ item.items.price }}円</td>
             <td>{{ item.quantity }}</td>
-
             <td>{{ item.get_total_item_price }}円</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-          <tfoot>
-            <tr>
-              <td>合計：</td>
-              <td></td>
-              <td></td>
-              <td>{{unpaid_orders.get_total}}円</td>
-            </tr>
-          </tfoot>
-        </table>
+        </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+          <td>合計：</td>
+          <td></td>
+          <td></td>
+          <td>{{unpaid_orders.get_total}}円</td>
+        </tr>
+    </tfoot>
+</table>
 <form method="POST">
     {% csrf_token %}
         <div class="row">
@@ -60,7 +88,7 @@
             </div>
         </div>
      <br>
-    <button type="submit" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i></button>
+    <button type="submit" class="floating-btn"><i class="fa fa-paper-plane" aria-hidden="true"></i>&emsp;予約</button>
 </form>
 
 

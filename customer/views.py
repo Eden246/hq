@@ -14,12 +14,26 @@ class Order(View):
     def get(self, request, *args, **kwargs):
         items_list = MenuItem.objects.all()
         categories = Category.objects.all()
-        unorders = OrderItem.objects.filter(user=request.user, ordered=False)
-        unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
-
+        if request.user.is_authenticated:
+            unorders = OrderItem.objects.filter(user=request.user, ordered=False)
+            unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
+        else:
+            unorders = None
+            unpaid_orders = None
+        name = request.GET.get('name')
+        detail = request.GET.get('detail')
         category = request.GET.get('category')
+        maxPrice = request.GET.get('maxPrice')
         
-        if category != ' ' and category is not None and category != '選択してください':
+        if name != ' ' and name is not None:
+            items_list = items_list.filter(name__icontains=name)
+
+        if detail != ' ' and detail is not None:
+            items_list = items_list.filter(description__icontains=detail)
+        
+        if maxPrice != ' ' and maxPrice is not None:
+            items_list = items_list.filter(price__range=(0, maxPrice))
+        if category != ' ' and category is not None and category != '全ての品目':
             items_list = items_list.filter(category__name__icontains=category)
         
         page = request.GET.get('page', 1)
@@ -29,7 +43,7 @@ class Order(View):
             
         context = {
             'unorders': unorders,
-            'unpaid_orders': unpaid_orders[0],
+            'unpaid_orders': unpaid_orders,
             'items':items,
             'categories':categories
         }
@@ -53,7 +67,7 @@ class Order(View):
                 order.items.add(order_item)
                 return redirect("order")
         else:
-            order = OrderModel.objects.create(user=request.user)
+            order = OrderModel.objects.create(user=request.user, name="カート生成")
             order.items.add(order_item)
             return redirect("order")
 
@@ -76,8 +90,12 @@ def remove_from_cart(request, pk):
                 messages.info(request, "品目が削除されました。")
                 return redirect("order")
         else:
+            order_item.delete()
+            messages.info(request, "品目が削除されました。")
             return redirect("order")
     else:
+        order_item.delete()
+        messages.info(request, "品目が削除されました。")
         return redirect("order")
 
 class CartView(View):
@@ -92,7 +110,18 @@ class CartView(View):
     def post(self, request, *args, **kwargs):
         unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
         items = unpaid_orders[0].items.all()
-        
+
+        field_object = OrderModel._meta.get_field('items')
+        field_value = field_object.value_from_object(unpaid_orders.first())
+
+        item_name = []
+        quantity = []
+        for field in field_value:
+            item_name.append(field.items.name)
+            quantity.append(field.quantity)
+
+        description = dict(zip(item_name, quantity))
+
         item_ids = []
         for item in items:
             item_ids.append(item.id)
@@ -113,17 +142,19 @@ class CartView(View):
             phone=phone,
             facility=facility,
             price=price,
+            ordered=True,
+            description=description
             )
         order.items.add(*item_ids)
         
-        body = ('ご予約ありがとうございます。確認次第に相談員からのご連絡差し上げます。\n'
-            f'合計：\n'
+        body = (f'{facility}の{name}様、只今ご予約承りました！\n確認が終わる次第に津営業所の相談員がこちらの番号（{phone}）でご連絡差し上げます。\n'
+            f'品目リスト：{description}\n合計：{price}\n'
         )
 
         send_mail(
-            'ご予約ありがとうございます。',
+            f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
             body,
-            'example@example.com',
+            'so-kan@life-techno.com',
             [email],
             fail_silently= False
         )
@@ -131,8 +162,11 @@ class CartView(View):
         for staff in staffs:
             notification = Notification.objects.create(notification_type=4, from_user=request.user, to_user=staff, order=order)
         
+
         context = {
             'price':price,
+            'order':order,
+            'description':description,
         }
 
         delete_orders = unpaid_orders[0].items.all()
@@ -172,17 +206,3 @@ class OrderNotification(LoginRequiredMixin, UserPassesTestMixin,View):
 
     def test_func(self):
         return self.request.user.groups.filter(name='staff').exists()
-
-def add_to_cart(request, pk):
-    item = get_object_or_404(MenuItem, pk=pk)
-    order_item = OrderItem.objects.create(item=item)
-    unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
-    if unpaid_orders.exists():
-        order = unpaid_orders[0]
-        if order.items.filter(item__pk = item.pk).exists():
-            order_item.quantity += 1
-            order_item.save()
-    else:
-        order = OrderModel.objects.create(user=request.user)
-        order.items.add(order_item)
-    return redirect("order")

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <main id="main">
-
     <!-- ======= Team Section ======= -->
     <section id="team" class="padd-section text-center">
         <div class="container" data-aos="fade-up">
@@ -9,55 +9,33 @@
                 <h2>津営業所</h2>
             </div>
                 <!-- ======= Video Section ======= -->
-            <section id="video" class="text-center">
-                <div class="overlay">
-                    <div class="container-fluid container-full" data-aos="zoom-in">
-                        <div class="row">
-                            <a href="https://www.youtube.com/watch?v=foYFWaPT0c0&ab_channel=%E3%82%B3%E3%83%A1%E3%83%AA%E5%85%AC%E5%BC%8F%E3%83%81%E3%83%A3%E3%83%B3%E3%83%8D%E3%83%AB" class="js-modal-btn play-btn" data-video-id="s22ViV7tBKE"></a>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/gw27xRe1lCY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <!-- End Video Section -->
             <br><br>
             <div class="row">
                 <div class="col-md-6 col-md-4 col-lg-3" data-aos="zoom-in" data-aos-delay="100">
                     <div class="team-block bottom">
-                        <img src="eigyo1.jpg" class="img-responsive" alt="img">
+                        <img src="{% static 'ichiro.jpg' %}"  style="height:100%" class="img-responsive" alt="img">
                         <div class="team-content">
                             <ul class="list-unstyled">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="{% url 'inbox'%}" class="inbox-icon btn btn-success text-white"><i class="fa fa-comments" aria-hidden="true"></i>メッセージお問い合わせ</a></li>
                             </ul>
-                            <span>担当者</span>
-                            <h4>田中一郎</h4>
+                            <span>事業部長</span>
+                            <h4>鈴木一郎</h4>
+                            <h5>電話番号：080-9999-9999</h5>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-md-4 col-lg-3" data-aos="zoom-in" data-aos-delay="300">
                     <div class="team-block bottom">
-                        <img src="eigyo2.jpg" class="img-responsive" alt="img">
+                        <img src="{% static 'eigyo1.jpg' %}" class="img-responsive" alt="img">
                         <div class="team-content">
                             <ul class="list-unstyled">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                <li><a href="{% url 'inbox'%}" class="inbox-icon btn btn-success text-white"><i class="fa fa-comments" aria-hidden="true"></i>メッセージお問い合わせ</a></li>
                             </ul>
-                            <span>manager</span>
-                            <h4>Kimberly Tran</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-md-4 col-lg-3" data-aos="zoom-in" data-aos-delay="400">
-                    <div class="team-block bottom">
-                        <img src="eigyo3.jpg" class="img-responsive" alt="img">
-                        <div class="team-content">
-                            <ul class="list-unstyled">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                            </ul>
-                            <span>manager</span>
-                            <h4>Kimberly Tran</h4>
+                            <span>専門相談員</span>
+                            <h4>野茂英雄</h4>
+                            <h5>電話番号：080-5555-5555</h5>
                         </div>
                     </div>
                 </div>

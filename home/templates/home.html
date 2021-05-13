@@ -8,12 +8,12 @@
     <section id="blog" class="padd-sectio">
         <div class="container" data-aos="fade-up">
         <div class="section-title text-center">
-            <h2 class="border-bottom" style="color: #71c55d;">相談員の訪問依頼</h2>
+            <h2 class="border-bottom" style="color: #71c55d;">ウェブカタログ型・予約システム</h2>
             <p class="separator">
                 {% if user.is_authenticated %}
                     {% if user.is_staff %}
                     {{ user.username }}様！
-                    <br>今日もお疲れ様ます！
+                    <br>今日もお疲れ様です！
                     {% else %}
                     {{ user.username }}様！
                     <br>いつもありがとうございます！
@@ -21,7 +21,7 @@
                     <br><br>
                     <a href="{% url 'order' %}" class="btn btn-warning">予約</a>&emsp;
                 {% else %}
-                ライフテクノサービス、レンタル事業部
+                <h3><a href="{% url "order" %}"><i class="fa fa-book"style="font-size: 1em;"></i>ウェブカタログを観る</a></h3>
                 {% endif %}
             </p>
         </div>

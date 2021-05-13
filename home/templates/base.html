@@ -20,7 +20,11 @@
   <link href="{% static 'style.css'%}" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <style>
+<style>
+*, html {
+    margin:0;
+    padding:0;  
+}
       body {
         font-family: 'Kosugi Maru', sans-serif;
       }
@@ -187,15 +191,50 @@ th{
     opacity: 1;
 }
 
+.gradient-border {
+  --borderWidth: 3px;
+  background: #1D1F20;
+  position: relative;
+  border-radius: var(--borderWidth);
+}
+.gradient-border:after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--borderWidth));
+  left: calc(-1 * var(--borderWidth));
+  height: calc(100% + var(--borderWidth) * 2);
+  width: calc(100% + var(--borderWidth) * 2);
+  background: linear-gradient(60deg, #ACD185, #2e6, #06D85F, #1098ad, #07b39b, #6fba82);
+  border-radius: calc(2 * var(--borderWidth));
+  z-index: -1;
+  animation: animatedgradient 3s ease alternate infinite;
+  background-size: 300% 300%;
+}
+
+@keyframes animatedgradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
 </style>
 
     </style>
     
   </head>
   <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light gradient-border">
     <div class="container-fluid">
-      <h1><a href="{% url 'home' %}"><span>ライフ</span>テクノサービス</a></h1>
+      <h1><a href="{% url 'home' %}"><span>ライフ</span>テクノサービス</a></h1>&emsp;通知:
+          {% if user.is_authenticated %}
+            {% show_notifications %}
+          {% endif %}
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -208,7 +247,7 @@ th{
             <a class="inbox-icon" href="{% url 'about' %}">津営業所</a>
           </div>
           <div class="nav-link inbox-icon-container">
-          <a class="inbox-icon" href="{% url 'post' %}">行事</a>
+          <a class="inbox-icon" href="{% url 'post' %}">営業所の便り</a>
           </div>
 
           <div class="nav-link inbox-icon-container">
@@ -237,10 +276,6 @@ th{
           <div class="nav-link inbox-icon-container">
             <a href="{% url 'inbox'%}" class="inbox-icon"><i class="fa fa-comments" aria-hidden="true"></i>お問い合わせ</a>
           </div>
-
-          {% if user.is_authenticated %}
-            {% show_notifications %}
-          {% endif %}
 
         </div>
       </div>
