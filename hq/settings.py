@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '#kaj33i2+e$(qx01j)9vd)1o81r-$vr+&yuyw=9!5str^8amjp'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["kangsm.pythonanywhere.com", "*"]
+ALLOWED_HOSTS = ['127.0.0.1','sampledomain.com']
 
 
 # Application definition
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -145,4 +146,4 @@ EMAIL_HOST_USER = 'jofew7@gmail.com'
 EMAIL_HOST_PASSWORD = 'B_3fNSrsB'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'ライフテクノサービス<so-kan@life-techno.jp>'
+DEFAULT_FROM_EMAIL = 'ライフテクノサービス<jofew7@gmail.com>'
