@@ -20,7 +20,7 @@ class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
         context = {
             'orders': unpaid_orders,
             'total_revenue': total_revenue,
-            'total_orders' : len(orders)
+            'total_orders' : len(orders),
         }
 
         return render(request, 'dashboard/dashboard.html',context)
