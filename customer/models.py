@@ -51,9 +51,4 @@ class OrderModel(models.Model):
     
     def __str__(self):
         return f'カート生成日付:{self.created_on.strftime("%Y%m%d|%H:%M:%S")}'
-
-    def get_total(self):
-        total = 0
-        for order_item in self.items.all():
-            total += order_item.get_total_item_price
-        return total
+        

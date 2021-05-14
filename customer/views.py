@@ -16,10 +16,8 @@ class Order(View):
         categories = Category.objects.all()
         if request.user.is_authenticated:
             unorders = OrderItem.objects.filter(user=request.user, ordered=False)
-            unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
         else:
             unorders = None
-            unpaid_orders = None
         name = request.GET.get('name')
         detail = request.GET.get('detail')
         category = request.GET.get('category')
@@ -36,14 +34,17 @@ class Order(View):
         if category != ' ' and category is not None and category != '全ての品目':
             items_list = items_list.filter(category__name__icontains=category)
         
+        price = 0
+        for item in unorders:
+            price += item.get_total_item_price
+
         page = request.GET.get('page', 1)
         paginator = Paginator(items_list, 2)
         items = paginator.page(page)
-
             
         context = {
             'unorders': unorders,
-            'unpaid_orders': unpaid_orders,
+            'price': price,
             'items':items,
             'categories':categories
         }
