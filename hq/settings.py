@@ -26,7 +26,7 @@ SECRET_KEY = '#kaj33i2+e$(qx01j)9vd)1o81r-$vr+&yuyw=9!5str^8amjp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["kangsm.pythonanywhere.com"]
 
 
 # Application definition
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'customer',
     'dashboard',
-    
+
 ]
 
 MIDDLEWARE = [
