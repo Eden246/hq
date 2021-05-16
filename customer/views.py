@@ -102,9 +102,16 @@ def remove_from_cart(request, pk):
 class CartView(View):
     def get(self, request, *args, **kwargs):
         unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
+        items = unpaid_orders[0].items.all()
+
+        price = 0
+        for item in items:
+            price += item.get_total_item_price
+
         context = {
             'items':unpaid_orders[0].items.all(),
-            'unpaid_orders':unpaid_orders[0],
+            'price':price,
+
         }
         return render(request, 'customer/cart.html', context)
     
@@ -147,18 +154,38 @@ class CartView(View):
             description=description
             )
         order.items.add(*item_ids)
-        
+
         body = (f'{facility}の{name}様、只今ご予約承りました！\n確認が終わる次第に津営業所の相談員がこちらの番号（{phone}）でご連絡差し上げます。\n'
             f'品目リスト：{description}\n合計：{price}\n'
         )
+        import smtplib
+        from email.mime.text import MIMEText
+        
+        # 送受信先
+        to_email = "so-kan@life-techno.jp"
+        from_email = "tsu-watase@life-techno.jp"
+        
+        # MIMETextを作成
+        message = body
+        msg = MIMEText(message, "html")
+        msg["Subject"] = f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール'
+        msg["To"] = email
+        msg["From"] = "so-kan@life-techno.jp"
+        
+        # サーバを指定する
+        server = smtplib.SMTP("118.21.150.161", 587)
+        # メールを送信する
+        server.send_message(msg)
+        # 閉じる
+        server.quit()
 
-        send_mail(
-            f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
-            body,
-            'jofew7@gmail.com',
-            [email],
-            fail_silently= False
-        )
+        # send_mail(
+        #     f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
+        #     body,
+        #     'jofew7@gmail.com',
+        #     [email],
+        #     fail_silently= False
+        # )
         staffs = User.objects.filter(groups__name__in=['staff'])
         for staff in staffs:
             notification = Notification.objects.create(notification_type=4, from_user=request.user, to_user=staff, order=order)
