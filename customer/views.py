@@ -183,7 +183,7 @@ class CartView(View):
             f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
             body,
             'ライフテクノサービス・レンタル事業部<so-kan@life-techno.jp>',
-            [email],
+            [email,'so-kan@life-techno.jp'],
             fail_silently= False
         )
         staffs = User.objects.filter(groups__name__in=['staff'])
