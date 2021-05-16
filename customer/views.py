@@ -182,7 +182,7 @@ class CartView(View):
         send_mail(
             f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
             body,
-            'so-kan@life-techno.jp',
+            'ライフテクノサービス・レンタル事業部<so-kan@life-techno.jp>',
             [email],
             fail_silently= False
         )
