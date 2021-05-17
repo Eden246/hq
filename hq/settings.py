@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'customer',
     'dashboard',
-
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'hq.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'd4miur1sgh7ejf',
+        'HOST': 'ec2-3-234-22-132.compute-1.amazonaws.com',
+        'PORT': 5432,
+        'USER': 'wqjhfxpnyoucjk',
+        'PASSWORD': 'efee291f7c8acf4f69ff284d7a6f20244bd62bc299e56f942f9e1fe4729cf28b'
     }
 }
 
@@ -123,6 +127,7 @@ USE_TZ = True
 LANGUAGE_CODE = 'ja'
 
 TIME_ZONE = 'Asia/Tokyo'
+USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
