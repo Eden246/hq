@@ -15,7 +15,8 @@ class Order(View):
         items_list = MenuItem.objects.all()
         categories = Category.objects.all()
         if request.user.is_authenticated:
-            unorders = OrderItem.objects.filter(user=request.user, ordered=False)
+            unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
+            unorders = unpaid_orders[0].items.all()
         else:
             unorders = None
         name = request.GET.get('name')
@@ -35,8 +36,9 @@ class Order(View):
             items_list = items_list.filter(category__name__icontains=category)
         
         price = 0
-        for item in unorders:
-            price += item.get_total_item_price
+        if request.user.is_authenticated:
+            for item in unorders:
+                price += item.get_total_item_price
 
         page = request.GET.get('page', 1)
         paginator = Paginator(items_list, 2)

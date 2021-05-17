@@ -7,16 +7,13 @@ class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, *args, **kwargs):
         orders = OrderModel.objects.filter(ordered=True, is_paid=False)
 
-        unpaid_orders = []
         total_revenue = 0
-        for order in orders:
-            total_revenue += order.get_total()
 
-            if not order.is_paid:
-                unpaid_orders.append(order)
+        for order in orders:
+            total_revenue += order.price
 
         context = {
-            'orders': unpaid_orders,
+            'orders': orders,
             'total_revenue': total_revenue,
             'total_orders' : len(orders),
         }
