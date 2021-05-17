@@ -27,7 +27,7 @@ SECRET_KEY = '#kaj33i2+e$(qx01j)9vd)1o81r-$vr+&yuyw=9!5str^8amjp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','hqq-system.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1','kangsm.pythonanywhere.com']
 
 
 # Application definition
@@ -109,10 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'ja'
-
-TIME_ZONE = 'Asia/Tokyo'
-
 USE_I18N = True
 
 USE_L10N = True
@@ -122,7 +118,6 @@ USE_TZ = True
 LANGUAGE_CODE = 'ja'
 
 TIME_ZONE = 'Asia/Tokyo'
-USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
