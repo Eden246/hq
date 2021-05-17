@@ -14,8 +14,8 @@ class Order(View):
     def get(self, request, *args, **kwargs):
         items_list = MenuItem.objects.all()
         categories = Category.objects.all()
-        if OrderModel.objects.exists():
-            unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
+        unpaid_orders = OrderModel.objects.filter(user=request.user, is_paid=False)
+        if unpaid_orders.exists():
             unorders = unpaid_orders[0].items.all()
         else:
             unorders = None
@@ -36,7 +36,7 @@ class Order(View):
             items_list = items_list.filter(category__name__icontains=category)
         
         price = 0
-        if OrderModel.objects.exists():
+        if unpaid_orders.exists():
             for item in unorders:
                 price += item.get_total_item_price
 
