@@ -70,14 +70,16 @@
 }
 
 #slideOut {
-  position: firexed;
+  position: fixed;
   width: 400px;
   height: 800px;
-  top: 380px;
+  right:1200px;
+  top:30%;
+
   /* Animation  */
   transition-property: all;
-  transition-duration: .5s;
-  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.1, 0.5, 0.5, 0.5);
 }
 
 
@@ -91,11 +93,12 @@
 /* Tab */
 
 .slideOutTab {
+  position: fixed;
   margin-top: 250px;
-  position: relative;
   height: 200px;
+  left: 0%;
   width: 40px;
-  
+  bottom:30%;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
   box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
   background: #06D85F;
@@ -118,6 +121,8 @@
 section {
   height: 100%;
   width: 100%;
+  left: 300px;
+
 }
 
 .modal-body {
