@@ -22,3 +22,4 @@ class Dashboard(LoginRequiredMixin, UserPassesTestMixin, View):
     
     def test_func(self):
         return self.request.user.groups.filter(name='staff').exists()
+
