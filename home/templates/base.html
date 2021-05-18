@@ -222,58 +222,58 @@ th{
 		background-position: 0% 50%;
 	}
 }
+.nav-link {
+  font-size:15px;
+}
 
 </style>
-
-    </style>
-    
   </head>
   <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light gradient-border">
+  <nav class="navbar navbar-light bg-light gradient-border">
     <div class="container-fluid">
-      <h1><a href="{% url 'home' %}"><span>ライフ</span>テクノサービス</a></h1>&emsp;通知:
-          {% if user.is_authenticated %}
-            {% show_notifications %}
-          {% endif %}
+      <h2><a href="{% url 'home' %}">ライフテクノサービス</a>&emsp;<i style="font-size: 0.73em; color:gold;" class="fa fa-bell"></i>{% if user.is_authenticated %}
+          {% show_notifications %}
+        {% endif %}</h2>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
             <a class="inbox-icon" href="{% url 'home' %}">ホーム</a>
           </div>
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
             <a class="inbox-icon" href="{% url 'about' %}">津営業所</a>
           </div>
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
           <a class="inbox-icon" href="{% url 'post' %}">営業所の便り</a>
           </div>
 
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
           <a class="inbox-icon" href="{% url 'order' %}">予約</a>
           </div>
           {% if user.is_authenticated %}
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
           <a class="inbox-icon" href="{% url 'logout' %}">ログアウト</a>
           </div>
             {% if user.is_staff %}
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
             <a class="inbox-icon" href="{% url 'dashboard' %}">予約リスト</a>
           </div>
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
             <a class="inbox-icon" href="{% url 'search' %}">ユーザー検索</a>
           </div>
             {% endif %}
           {% else %}
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
             <a class="inbox-icon" href="{% url 'login' %}">ログイン</a>
           </div>
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
             <a class="inbox-icon" href="{% url 'signup' %}">会員登録</a>
           </div>
           {% endif %}
-          <div class="nav-link inbox-icon-container">
+          <div class="nav-link inbox-icon-container text-center">
             <a href="{% url 'inbox'%}" class="inbox-icon"><i class="fa fa-comments" aria-hidden="true"></i>お問い合わせ</a>
           </div>
 
