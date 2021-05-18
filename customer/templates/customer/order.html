@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+
 <style>
 .checkbox-wrap {
   position: relative;
@@ -73,8 +74,8 @@
   position: fixed;
   width: 400px;
   height: 800px;
-  right:1200px;
-  top:30%;
+  top:2000px;
+  right:0%;
 
   /* Animation  */
   transition-property: all;
@@ -82,11 +83,10 @@
   transition-timing-function: cubic-bezier(0.1, 0.5, 0.5, 0.5);
 }
 
-
 /* Display slideOut */
 
 .showSlideOut {
-  right: 0px !important;
+  top: 25% !important;
 }
 
 
@@ -94,28 +94,29 @@
 
 .slideOutTab {
   position: fixed;
-  margin-top: 250px;
-  height: 200px;
-  left: 0%;
-  width: 40px;
-  bottom:30%;
+  height: 30px;
+  right: 0%;
+  width: 200px;
+  bottom:80px;
+  color: gold;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
   box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
   background: #06D85F;
-  border-radius: 0px 15px 15px 0px
+  border-radius: 15px 0px 0px 15px
+}
+
+.slideOutTab:hover {
+	background-color: gold;
+	color: #a8c66c;
+  cursor: pointer;
 }
 
 .slideOutTab div {
   text-align: center;
   position: relative;
-  right: 70px;
-  top: 90px;
-  background: #06D85F;
-  width: 180px;
-  -webkit-transform: rotate(270deg);
+  {% comment %} -webkit-transform: rotate(270deg);
   -moz-transform: rotate(270deg);
-  -o-transform: rotate(270deg);
-  writing-mode: lr-tb;
+  -o-transform: rotate(270deg); {% endcomment %}
 }
 
 section {
@@ -234,6 +235,34 @@ section {
   text-overflow: clip;
 
 }
+@media only screen and (max-height: 800px), only screen and (max-device-height: 800px) {
+#slideOut {
+  position: fixed;
+  width: 400px;
+  height: 800px;
+  top:2000px;
+  right:0%;
+
+  /* Animation  */
+  transition-property: all;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.3, 0.5, 0.5, 0.5);
+}
+
+/* Display slideOut */
+
+.showSlideOut {
+  top: 5% !important;
+}
+    }
+@media only screen and (max-height: 600px), only screen and (max-device-height: 600px) {
+.modal-body {
+  height: 100px;
+}
+.table {
+  display:none;
+}
+    }
 </style>
 
 
@@ -332,10 +361,7 @@ $('#category').change(function(){
 <div id="slideOut" style="z-index: 2;">
 <!--   // Tab -->
   <div class="slideOutTab">
-    <div>
-    
-      <p><i style="width:30px;" class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートを開く</p>
-    </div>
+  <div class="p-10" ><i style="width:30px;" class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートを開く</div>
   </div>
 
   <div class="modal-content">
