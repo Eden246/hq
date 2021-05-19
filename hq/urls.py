@@ -59,9 +59,7 @@ urlpatterns = [
     path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path('order/', include('customer.urls')),
     path('dashboard/', include('dashboard.urls')),
+
     url(r'^media/(?P<path>.*)$', serve,{'document_root':       settings.MEDIA_ROOT}), 
     url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
 ] 
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
