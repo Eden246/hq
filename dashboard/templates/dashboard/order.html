@@ -1,0 +1,38 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+{% include 'dashboard/top.html' %}
+    <div class="row my-4">
+        <div class="col-xl-4"></div>
+        <div class="col-xl-8">
+            <div class="card mx-auto" style="width:50%">
+                <h4 class="text-center">未完了・予約件数</h4>
+                <h1 class="text-center" style="color:#ad0003;">{{ total_orders }}件</h1>
+            </div>
+            <hr>
+            <table class="table bg-white table-hover table-striped">
+                <thead class="bg-info text-white">
+                    <tr>
+                        <th scope="col" style="width: 10px;">#</th>
+                        <th scope="col">施設名</th>
+                        <th scope="col">電話番号</th>
+                        <th scope="col">金額</th>
+                        <th scope="col">予約時間</th>
+                        <th scope="col">詳細</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}                    
+                    <tr>
+                        <th scope="row">{{ order.pk }}</th>
+                        <td>{{ order.facility }}</td>
+                        <td>{{ order.phone }}</td>
+                        <td>{{ order.price }}</td>
+                        <td>{{ order.created_on  | date:"bd日af"}}</td>
+                        <td><a href="{% url 'order-detail' order.pk %}"><i class="fa fa-edit"></i></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

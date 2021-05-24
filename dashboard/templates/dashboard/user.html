@@ -1,0 +1,31 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+{% include 'dashboard/top.html' %}
+
+    <div class="row my-4">
+        <div class="col-md-4"></div>
+        <div class="col-md-8">
+            <table class="table bg-white">
+                <thead class="bg-info text-white">
+                    <tr>
+                        <th scope="col">名前</th>
+                        <th scope="col">メール</th>
+                        <th scope="col">電話</th>
+                        <th scope="col">住所</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.client.phone }}</td>
+                        <td>{{ user.client.facility }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}
+    

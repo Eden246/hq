@@ -8,6 +8,7 @@ class MenuItem(models.Model):
     image = models.ImageField(upload_to='menu_images/', blank=True)
     price = models.IntegerField()
     category = models.ManyToManyField('Category', related_name='item')
+    quantity = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -25,12 +26,12 @@ class Category(models.Model):
 
 class OrderItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    items = models.ForeignKey('MenuItem', on_delete=models.CASCADE)
+    items = models.ForeignKey('MenuItem', on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField(default=1)
     ordered = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.items.name)
+        return f'{self.items} | {self.quantity}件'
         
     @property
     def get_total_item_price(self):
@@ -39,7 +40,7 @@ class OrderItem(models.Model):
 class OrderModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
-    items = models.ManyToManyField('OrderItem', related_name='order', blank=True)
+    items = models.ManyToManyField('OrderItem', related_name='order')
     name = models.CharField(max_length=50, blank=True)
     email = models.CharField(max_length=50, blank=True)
     facility = models.CharField(max_length=50, blank=True)

@@ -1,0 +1,29 @@
+{% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'dashboard/top.html' %}
+    <div class="row my-4">
+    <div class="col-md-4"></div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                顧客情報
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <span class="h4">プロフィール</span>
+                        <hr>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ user_form | crispy }}
+                            {{ profile_form | crispy }}
+                            <input class="btn btn-info" type="submit" value="更新">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

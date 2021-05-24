@@ -15,7 +15,9 @@
             <h3 class="pb-3">予約内容</h3>
             <p class="font-weight-bold pt-4">予約者：{{user.username}}様</p>
             <p class="font-weight-bold pt-4">予約日付：{{order.created_on}}</p>
-            <p class="font-weight-bold pt-4">品目：{{description}}</p>
+            {% for item in order.items.all %}
+                <p class="font-weight-bold pt-4">品名：{{ item }}</p>
+            {% endfor %}
             <p class="font-weight-bold pt-4">合計：{{price}}円</p>
         </div>
     </div>

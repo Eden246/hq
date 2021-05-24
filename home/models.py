@@ -7,7 +7,6 @@ class Client(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     facility = models.CharField(max_length=40)
     phone = models.CharField(max_length=40)
-    followers = models.ManyToManyField(User, blank=True, related_name='followers')
 
     def __str__(self):
         return f"{self.user}+{self.facility}"

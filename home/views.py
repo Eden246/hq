@@ -179,52 +179,6 @@ class ClientEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         client = self.get_object()
         return self.request.user == client.user or self.request.user.is_staff or self.request.user.is_superuser
 
-def Order(request,pk):
-        client = Client.objects.get(pk=pk)
-        user = client.user
-
-        staff = Client.objects.get(pk=5)
-
-        followers = staff.followers.all()
-
-        if len(followers) == 0:
-            is_following = False
-
-        for follower in followers:
-            if follower == request.user:
-                is_following =True
-                break
-            else:
-                is_following = False
-
-        context = {
-            'user':user,
-            'is_following':is_following,
-            }
-        return render(request, 'order.html', context)
-
-@login_required
-def AddFollowerView(request):
-    client = Client.objects.get(pk=5)
-    client.followers.add(request.user)
-
-    notification = Notification.objects.create(notification_type=4, from_user=request.user, to_user=client.user)
-
-
-    return redirect('home')
-
-@login_required
-def RemoveFollowerView(request):
-    client = Client.objects.get(pk=5)
-    client.followers.remove(request.user)
-    return redirect('home')
-@login_required
-
-def RemoveFollowerStaffView(request, pk):
-    client = Client.objects.get(pk=5)
-    client.followers.remove(pk)
-    return redirect('home')
-
 class PostNotification(View):
     def get(self, request, notification_pk, post_pk, *args, **kwargs):
         notification = Notification.objects.get(pk=notification_pk)

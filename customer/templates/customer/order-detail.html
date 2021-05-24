@@ -16,10 +16,10 @@
                 <p><span style="font-weight:400;">施設：</span>{{ order.facility }}</p>
                 <h5 class="pt-3">《予約情報》</h5>
                 {% for item in order.items.all %}
-                <p><span style="font-weight:400;">品目：</span>{{ item }}</p>
+                <p><span style="font-weight:400;">品名：</span>{{ item }}</p>
                 {% endfor %}
                 <p><span style="font-weight:400;">注文日付：</span>{{ order.created_on }}</p>
-                <p><span style="font-weight:400;">品目：</span>{{ order.description }}</p>
+                <p><span style="font-weight:400;">内容：</span>{{ order.description }}</p>
                 <p><span style="font-weight:400;">合計：</span>{{ order.price }}円</p>
             </div>
             <div class="col-md-6 col-sm-12">

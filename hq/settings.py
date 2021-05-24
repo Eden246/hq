@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'customer',
     'dashboard',
+    'crispy_forms',
+
 ]
 
 
@@ -140,3 +142,6 @@ EMAIL_HOST_USER = 'jofew7@gmail.com'
 EMAIL_HOST_PASSWORD = 'B_3fNSrsB'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+LOGIN_URL = 'login'

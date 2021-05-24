@@ -1,4 +1,3 @@
-  
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
@@ -351,11 +350,7 @@ $(function(){
   </div>
 </form>
 
-{% comment %} <script>
-$('#category').change(function(){ 
-    jQuery('.mode').click();
-});
-</script> {% endcomment %}
+
 
 <!-- // SlideOut -->
 <div id="slideOut" style="z-index: 2;">
@@ -369,6 +364,8 @@ $('#category').change(function(){
       <h4 class="modal-title">カート目録</h4>
     </div>
     <div class="modal-body">
+    
+{% if order_item %}
 {% if user.is_authenticated %}
       <table class="table table-hover table-striped">
         <thead>
@@ -381,7 +378,7 @@ $('#category').change(function(){
             </tr>
         </thead>
         <tbody>
-        {% for order in unorders %}
+        {% for order in order_item %}
           <tr>
             <td>{{ order.items.name }}</td>
             <td>{{ order.items.price }}円</td>
@@ -408,6 +405,9 @@ $('#category').change(function(){
   {% else %}
     ログインが必要です。
   {% endif %}
+  {% else %}
+  カートへなにも入っていません。
+{% endif %}
 
     </div>
   </div>
@@ -423,6 +423,7 @@ $('#category').change(function(){
             {% csrf_token %}
             <section id="about-us" class="about-us padd-section">
                 {% for item in items %}
+                {% if item.quantity > 0 %}
                 <div class="container" data-aos="fade-up">
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
@@ -433,7 +434,7 @@ $('#category').change(function(){
                                     {% endif %}
                                     <div class="about-content" data-aos="fade-left" data-aos-delay="100">
                                         <div class="form-group form-check">
-                                            <label class="checkbox-wrap form-check-label">選択
+                                            <label class="checkbox-wrap form-check-label" id="onetarget">選択
                                             <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
 						                    <span class="checkmark"></span>
 						                    </label>
@@ -449,6 +450,7 @@ $('#category').change(function(){
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 {% endfor %}
             </section>
         </div>
@@ -488,7 +490,7 @@ $('#category').change(function(){
 {% endif %}
 <br><br><br>
 {% if user.is_authenticated %}
-<button type="submit" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートに入れる</button>
+<button type="submit" id="one" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートに入れる</button>
 {% else %}
 <a href="{% url 'login' %}" class="floating-btn">ログインして予約</a>
 {% endif %}
@@ -511,6 +513,15 @@ this.$slideOut = $('#slideOut');
 // Slideout show
 this.$slideOut.find('.slideOutTab').on('click', function() {
   $("#slideOut").toggleClass('showSlideOut');
+});
+
+$("#one").click(function(){
+    if($('#onetarget input:checked').length == 0)
+    {
+        alert('カートに入れる品目を選んでください。');
+        return false;
+    }
+    
 });
 </script>
 {% endblock content %}
