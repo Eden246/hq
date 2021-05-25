@@ -2,6 +2,7 @@ from django.db import models
 from django.urls.base import reverse_lazy
 from django.contrib.auth.models import User
 
+
 class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -18,29 +19,34 @@ class MenuItem(models.Model):
             'pk': self.pk
         })
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
+
 class OrderItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    items = models.ForeignKey('MenuItem', on_delete=models.CASCADE, blank=True, null=True)
+    items = models.ForeignKey(
+        'MenuItem', on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField(default=1)
     ordered = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.items} | {self.quantity}件'
-        
+
     @property
     def get_total_item_price(self):
         return int(self.quantity) * int(self.items.price)
 
+
 class OrderModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
-    items = models.ManyToManyField('OrderItem', related_name='order')
+    items = models.ManyToManyField(
+        'OrderItem')
     name = models.CharField(max_length=50, blank=True)
     email = models.CharField(max_length=50, blank=True)
     facility = models.CharField(max_length=50, blank=True)
@@ -49,7 +55,6 @@ class OrderModel(models.Model):
     price = models.IntegerField(blank=True, null=True)
     ordered = models.BooleanField(default=False)
     description = models.CharField(max_length=100, blank=True)
-    
+
     def __str__(self):
         return f'カート生成日付:{self.created_on.strftime("%Y%m%d|%H:%M:%S")}'
-        

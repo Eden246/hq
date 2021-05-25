@@ -2,59 +2,51 @@
 {% block content %}
 {% include 'dashboard/top.html' %}
 <br>
-  <div class="row">
+<div class="row card text-center">
+  <h1>《設定時刻》</h1>
   
+  {% if year%}
+    <h2>{{ year }}年度｜{{ month }}月</h2>
+  {% else %}
+    <h2>現在時刻</h2>
+  {% endif %}
+      <br>
+    <div class="d-flex justify-content-center">
+    <form method="GET" style="max-width : 400px;">
+      <select class="form-control" name="year">
+        <option value="今年" selected>年度を選択してください</option>
+        <option value="2020">2020</option>
+        <option value="2021">2021</option>
+      </select>
+      <select class="form-control" name="month">
+        <option value="今月" selected>当月を選択してください</option>
+        <option value="4">４月</option>
+        <option value="5">５月</option>
+      </select>
+      <select class="form-control" name="category">
+        <option value="全体" selected>全体カテゴリー</option>
+        <option value="1">車いす</option>
+        <option value="2">手すり</option>
+      </select>
+      <br>
+      <button class="btn btn-info btn-sm">検索（基本設定：今月,　全体項目）</button>
+    </form>
+    </div>
+    <br><br>
+</div>
+  <div class="row">
     <div class="col-md-12 col-xl-4 mt-5">
-      <form method="GET">
-        <select class="form-control" name="year">
-          <option value="年度を選択してください" selected>年度を選択してください</option>
-          <option value="2020">2020</option>
-          <option value="2021">2021</option>
-        </select>
-        <select class="form-control" name="month">
-          <option value="当月を選択してください" selected>当月を選択してください</option>
-          <option value="4">４月</option>
-          <option value="5">５月</option>
-        </select>
-        <button class="btn btn-info btn-sm">検索（基本設定：今年今月）</button>
-      </form>
+
       <canvas class="mt-5" id="line-chart"></canvas>
     </div>
     <div class="col-md-12 col-xl-4 mt-5">
-      <form method="GET">
-        <select class="form-control" name="year">
-          <option value="年度を選択してください" selected>年度を選択してください</option>
-          <option value="2020">2020</option>
-          <option value="2021">2021</option>
-        </select>
-        <select class="form-control" name="month">
-          <option value="当月を選択してください" selected>当月を選択してください</option>
-          <option value="4">４月</option>
-          <option value="5">５月</option>
-        </select>
-        <button class="btn btn-info btn-sm">検索（基本設定：今年今月）</button>
-      </form>
       <canvas class="mt-5" id="pie-chart"></canvas>
     </div>
     <div class="col-md-12 col-xl-4 mt-5">
-      <form method="GET">
-        <select class="form-control" name="year">
-          <option value="年度を選択してください" selected>年度を選択してください</option>
-          <option value="2020">2020</option>
-          <option value="2021">2021</option>
-        </select>
-        <select class="form-control" name="month">
-          <option value="当月を選択してください" selected>当月を選択してください</option>
-          <option value="4">４月</option>
-          <option value="5">５月</option>
-        </select>
-        <button class="btn btn-info btn-sm">検索（基本設定：今年今月）</button>
-      </form>
       <canvas class="mt-5" id="bar-chart"></canvas>
     </div>
   </div>
   <br>
-
 
   <script>
  Chart.defaults.global.defaultFontColor = 'navy';
@@ -66,17 +58,16 @@ var LineChart = new Chart(ctx, {
   data: {
     labels: {{ labels|safe }},
     datasets: [
-    {label: "全体", fill: false, borderColor: 'rgb(148, 103, 189, 0.8)', data: {{ data|safe }},},
-    {label: "車いす", fill: false, borderColor: 'rgb(148, 103, 12, 0.8)',data: {{ data1|safe }},},
-    {label: "手すり",fill: false,borderColor: 'rgb(148, 10, 189, 0.8)',data: {{ data2|safe }},},
+      
+    {label: "取引件数", fill: true,backgroundColor: 'rgb(148, 10, 189, 0.3)', borderColor: 'rgb(148, 103, 189, 0.8)', data: {{ data|safe }},},
     ],
   },
   options: {
     responsive: true,
-    title: {display: true, text: '《 取引件数 》'},
+    title: {display: true, text: '《 日付別｜販売件数 》'},
 	  scales: {
-      xAxes: [{scaleLabel: {display: true, labelString: '日付',},}],
-		  yAxes: [{scaleLabel: {display: true, labelString: '取引件数'},ticks: {min: 0, stepSize: 5}}],
+      xAxes: [{scaleLabel: {display: true, labelString: '日付'}}],
+		  yAxes: [{scaleLabel: {display: true, labelString: '販売件数'},ticks: {min: 0, max:20, stepSize: 5}}],
 	  }
   }
 });
@@ -85,15 +76,22 @@ var ctx = document.getElementById("pie-chart").getContext('2d');
 var PieChart = new Chart(ctx, {
   type: 'pie',
   data:{
-    labels: ["車いす", "手すり"],
+    labels: {{ pie_label|safe }},
     datasets: [
-      {backgroundColor: ['rgb(148, 10, 189, 0.6)','rgb(148, 103, 12, 0.6)'], data: [5, 95], borderColor:	['black', 'black'],borderWidth: [2,2]}
+      {backgroundColor: ['rgb(148, 10, 189, 0.6)','rgb(148, 103, 12, 0.6)'], data: {{ pie_data|safe }}, borderColor:	['black', 'black'],borderWidth: [2,2]}
     ],
   },
   options: {
+    plugins: {
+      labels: {
+        render: "value",
+        fontColor: ['green', 'white', 'red'],
+        precision: 2
+      }
+    },
     responsive: true,
-    title: {display: true, text: '《 取引件数 》'},
-	  rotation: -0.8 * Math.PI
+    title: {display: true, text: '《 カテゴリー別｜販売金額 》'},
+	  rotation: -0.8 * Math.PI,
   }
 });
 
@@ -101,39 +99,30 @@ var ctx = document.getElementById("bar-chart").getContext("2d");
 var BarChart = new Chart(ctx, {
   type: 'bar',
   data:{
-		labels : [
-    "c-20",
-     "c-20",
-    "Real Madrid",    
-    "Bayern Munich",
-    "Manchester united",
-    "Porto",
-    "Juventus",
-    "c-20",
-    "c-20",
-    "c-20",
-    "c-20",
-    "Ajax",
-    "Marseille",
-    "Red Star Belgrade",
-    "PSV Eindhoven",
-    "Steaua Bucarest"
-    ],
+		labels : {{ bar_label|safe }}
+      ,
 		datasets : [
 			{
         label:"総金額",
 				backgroundColor : "rgb(148, 10, 189, 0.6)",
 				borderColor:'black',
-				data : [5,5,4,2,2,2,2,1,1,1,1,1,1,1,1,1]
+				data : {{ bar_data|safe }},
 			}
 		],
 	},
     options: {
+    plugins: {
+      labels: {
+        render: "value",
+        fontColor: ['green', 'navy', 'red'],
+        precision: 2
+      }
+    },
     responsive: true,
-    title: {display: true, text: '《 販売金額 》'},
+    title: {display: true, text: '《 品目別｜販売件数 》'},
 	  scales: {
-      xAxes: [{scaleLabel: {display: true, labelString: '日付',},}],
-		  yAxes: [{scaleLabel: {display: true, labelString: '取引件数'},ticks: {min: 0, stepSize: 5}}],
+      xAxes: [{scaleLabel: {display: true, labelString: '品目',},}],
+		  yAxes: [{scaleLabel: {display: true, labelString: '販売件数'},ticks: {min: 0, stepSize: 5}}],
 	  },
   }
 });

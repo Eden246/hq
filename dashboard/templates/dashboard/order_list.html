@@ -2,7 +2,9 @@
 {% block content %}
 {% include 'dashboard/top.html' %}
     <div class="row my-4">
-        <div class="col-xl-4"></div>
+        <div class="col-xl-4">
+            <canvas class="mt-5" id="pie-chart"></canvas>
+        </div>
         <div class="col-xl-8">
             <div class="card mx-auto" style="width:50%">
                 <h4 class="text-center">未完了・予約件数</h4>
@@ -35,4 +37,29 @@
             </table>
         </div>
     </div>
+
+<script>
+var ctx = document.getElementById("pie-chart").getContext('2d');
+var PieChart = new Chart(ctx, {
+  type: 'pie',
+  data:{
+    labels: {{ pie_label|safe }},
+    datasets: [
+      {backgroundColor: ['rgb(148, 10, 189, 0.6)','rgb(148, 103, 12, 0.6)'], data: {{ pie_data|safe }}, borderColor:	['black', 'black'],borderWidth: [2,2]}
+    ],
+  },
+  options: {
+    plugins: {
+      labels: {
+        render: "value",
+        fontColor: ['green', 'white', 'red'],
+        precision: 2
+      }
+    },
+    responsive: true,
+    title: {display: true, text: '《 カテゴリー別｜予約状況 》'},
+	  rotation: -0.8 * Math.PI,
+  }
+});
+</script>
 {% endblock content %}
