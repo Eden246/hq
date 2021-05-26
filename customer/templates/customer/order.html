@@ -3,6 +3,11 @@
 {% block content %}
 
 <style>
+.container {
+  padding:0px;
+  margin: 0px;
+  max-width:100%;
+}
 .checkbox-wrap {
   position: relative;
   padding-left: 35px;
@@ -68,6 +73,10 @@
 	background-color: #ffffff;
 	color: #a8c66c;
 }
+#priceFilterBtn:hover{
+  background-color: #fff;
+	color: #0074D9;
+}
 
 #slideOut {
   position: fixed;
@@ -118,26 +127,10 @@
   -o-transform: rotate(270deg); {% endcomment %}
 }
 
-section {
-  height: 100%;
-  width: 100%;
-  left: 300px;
-
-}
-
 .modal-body {
   height: 400px;
 }
 
-section {
-    display: table;
-    width: 100%;
-    height: 100%;
-}
- .intro {
-        display: table-cell;
-        vertical-align: middle;
-      }
 
 .overlay {
   position: fixed;
@@ -248,8 +241,6 @@ section {
   transition-timing-function: cubic-bezier(0.3, 0.5, 0.5, 0.5);
 }
 
-/* Display slideOut */
-
 .showSlideOut {
   top: 5% !important;
 }
@@ -262,6 +253,8 @@ section {
   display:none;
 }
     }
+
+
 </style>
 
 
@@ -298,57 +291,6 @@ $(function(){
     },2000);
 });
 </script>
-
-<form method="GET">
-  <div class="card mb-4">
-    <h5 class="card-header" style="background-color: #E0E9D6;">品名</h5>
-      <div class="list-group list-group-flush">
-        <li class="list-group-item">
-            <div class="form-group col-md-4">
-              <input class="form-control py-2 border-right-0 border" type="search" name="name" placeholder="品名を入力してください">
-            </div>
-        </li>
-      </div>
-  </div>
-  <div class="card mb-4">
-    <h5 class="card-header" style="background-color: #E0E9D6;">詳細条件</h5>
-      <div class="list-group list-group-flush">
-        <li class="list-group-item">
-            <div class="form-group col-md-4">
-              <input class="form-control py-2 border-right-0 border" type="search" name="detail" placeholder="詳細条件を入力してください">
-            </div>
-        </li>
-      </div>
-  </div>
-  <div class="card mb-4">
-    <h5 class="card-header" style="background-color: #E0E9D6;">品目</h5>
-      <div class="list-group list-group-flush">
-        <li class="list-group-item">
-            <div class="form-group col-md-4">
-              <select name="category" id="category" class="form-control">
-                <option selected>全ての品目</option>
-                {% for category in categories %}
-                  <option value="{{category}}">{{ category }}</option>
-                {% endfor %}
-              </select>
-            </div>
-        </li>
-      </div>
-  </div>
-  <div class="card mb-4">
-    <h5 class="card-header" style="background-color: #E0E9D6;">値段</h5>
-        <div class="list-group list-group-flush">
-          <li class="list-group-item">
-            <input type="range" value="10000"　id="rangeInput" oninput="maxPrice.value=this.value"　min="0" max="10000" style="width:80%">
-          </li>
-          <li class="list-group-item">
-            最高単価：<input type="number" value="10000" style="width:20%; font-size:20px;" onkeyup="rangeInput.value=this.value" id="maxPrice" name="maxPrice" min="0" max="10000">円
-            （限度額：１万円）
-            <button id="priceFilterBtn" class="btn btn-info btn-sm">検索</button>
-          </li>
-        </div>
-  </div>
-</form>
 
 
 
@@ -408,94 +350,128 @@ $(function(){
   {% else %}
   カートへなにも入っていません。
 {% endif %}
-
     </div>
   </div>
-
 </div>
 
-
-{% if items %}
-<a href="#header" class="back-to-top"><i class="fas fa-level-up-alt"></i></a>
-<div class="container mb-5">
-    <div class="row justify-content-center mt-1">
-        <form method="POST">
-            {% csrf_token %}
-            <section id="about-us" class="about-us padd-section">
-                {% for item in items %}
-                {% if item.quantity > 0 %}
-                <div class="container" data-aos="fade-up">
-                    <div class="row">
-                        <div class="col-md-6 col-sm-12">
-                            <div class="row">
-                                <div class="hit-the-floor pb-5">{{ item.name }}</div>
-                                    {% if item.image %}
-                                    <img class="rounded center-block" src="{{ item.image.url }}" style="width: 300px;"/>
-                                    {% endif %}
-                                    <div class="about-content" data-aos="fade-left" data-aos-delay="100">
-                                        <div class="form-group form-check">
-                                            <label class="checkbox-wrap form-check-label" id="onetarget">選択
-                                            <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-						                    <span class="checkmark"></span>
-						                    </label>
-                                            <h3>{{ item.price }}円（自己負担は1の場合/月額）</h3>
-                                            <ul class="list-unstyled">
-                                            <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
-                                            </ul>
-                                        </div>
-                                        <br><br>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<div class="container d-lg-flex">
+  <div class="row" style="min-width:400px">
+    <form method="GET">
+        <div class="card mb-4">
+            <h5 class="card-header" style="background-color: #E0E9D6;">品名</h5>
+            <div class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="form-group">
+                        <input class="form-control py-2 border-right-0 border" type="search" name="name" placeholder="品名を入力してください">
                     </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </section>
+                </li>
+            </div>
         </div>
-    </div>
-</div> 
-{% else %}
-<br><br><br>
-<div class="container text-center" data-aos="fade-up">
-申し訳ありません。
-<br><br>
-条件に一致している商品がありません。
-<br><br>条件をもう一度確認してください。
-</div>
-{% endif %}
-
-
-{% if items.has_other_pages %}
-  <ul class="pagination justify-content-center">
-    {% if items.has_previous %}
-      <li class="m-2"><a class="p-3" href="?page={{ items.previous_page_number }}">&laquo;</a></li>
-    {% else %}
-      <li class="m-2 disabled"><span class="p-3">&laquo;</span></li>
-    {% endif %}
-    {% for i in items.paginator.page_range %}
-      {% if items.number == i %}
-        <li class="m-2 active"><span class="p-3">{{ i }} <span class="sr-only">(current)</span></span></li>
+        <div class="card mb-4">
+            <h5 class="card-header" style="background-color: #E0E9D6;">詳細条件</h5>
+            <div class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="form-group">
+                        <input class="form-control py-2 border-right-0 border" type="search" name="detail" placeholder="詳細条件を入力してください">
+                    </div>
+                </li>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <h5 class="card-header" style="background-color: #E0E9D6;">品目</h5>
+            <div class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="form-group">
+                        <select name="category" id="category" class="form-control">
+                            <option selected>全ての品目</option>
+                            {% for category in categories %}
+                            <option value="{{category}}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </li>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <h5 class="card-header" style="background-color: #E0E9D6;">値段</h5>
+            <div class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <input type="range" value="10000"　id="rangeInput" oninput="maxPrice.value=this.value"　min="0" max="10000" style="width:80%">
+                </li>
+                <li class="list-group-item text-center">
+                    最高単価：<input type="number" value="10000" style="width:20%; font-size:20px;" onkeyup="rangeInput.value=this.value" id="maxPrice" name="maxPrice" min="0" max="10000">円
+                    （限度額：１万円）
+                    <button id="priceFilterBtn" class="btn btn-primary btn-sm mt-3">サーチ</button>
+                </li>
+            </div>
+        </div>
+    </form>
+  </div>
+  <section id="about-us" class="about-us padd-section" style="width:100%;">
+      {% if items %}
+      <form method="POST">
+          {% csrf_token %}
+          <div class="row d-flexflex-wrap" data-aos="fade-up">
+          {% for item in items %}
+          {% if item.quantity > 0 %}
+            <div class="col-xxl-3 col-lg-6 col-md-12 text-center">
+              <div class="hit-the-floor pb-5">{{ item.name }}</div>
+              {% if item.image %}<img class="rounded center-block" src="{{ item.image.url }}" style="width:300px; height:300px;">{% endif %}
+              <div class="form-group form-check" data-aos="fade-left">
+                  <label class="checkbox-wrap form-check-label" id="onetarget">選択
+                  <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                  <span class="checkmark"></span>
+                  </label>
+                  <h3>{{ item.price }}円（自己負担は1の場合/月額）</h3>
+                  <ul class="list-unstyled">
+                      <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
+                  </ul>
+              </div>
+            </div>
+          {% endif %}
+          {% endfor %}
+          </div>
+          {% if user.is_authenticated %}
+          <button type="submit" id="one" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートに入れる</button>
+          {% else %}
+          <a href="{% url 'login' %}" class="floating-btn">ログインして予約</a>
+          {% endif %}
+      </form>
       {% else %}
-        <li class="m-2"><a class="p-3" href="?page={{ i }}">{{ i }}</a></li>
+      <div class="text-center" data-aos="fade-up">
+          <br><br><br>
+          申し訳ありません。
+          <br><br>
+          条件に一致している商品がありません。
+          <br><br>条件をもう一度確認してください。
+      </div>
       {% endif %}
-    {% endfor %}
-    {% if items.has_next %}
+      {% if items.has_other_pages %}
+  <ul class="pagination justify-content-center">
+      {% if items.has_previous %}
+      <li class="m-2"><a class="p-3" href="?page={{ items.previous_page_number }}">&laquo;</a></li>
+      {% else %}
+      <li class="m-2 disabled"><span class="p-3">&laquo;</span></li>
+      {% endif %}
+      {% for i in items.paginator.page_range %}
+      {% if items.number == i %}
+      <li class="m-2 active"><span class="p-3">{{ i }} <span class="sr-only">(current)</span></span></li>
+      {% else %}
+      <li class="m-2"><a class="p-3" href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+      {% endfor %}
+      {% if items.has_next %}
       <li class="m-2"><a class="p-3" href="?page={{ items.next_page_number }}">&raquo;</a></li>
-    {% else %}
+      {% else %}
       <li class="m-2 disabled"><span>&raquo;</span></li>
-    {% endif %}
+      {% endif %}
   </ul>
-{% endif %}
-<br><br><br>
-{% if user.is_authenticated %}
-<button type="submit" id="one" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートに入れる</button>
-{% else %}
-<a href="{% url 'login' %}" class="floating-btn">ログインして予約</a>
-{% endif %}
-  
-</form>
+  {% endif %}
+  </section>
+</div>
+
+
+
 
 <script>
 $("input:checkbox").click(function() {

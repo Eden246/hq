@@ -7,33 +7,30 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import *
 from django.http.response import JsonResponse
-from django.db.models import Count
+from django.db.models import Count, F, Sum
 from django.db.models.functions import TruncDate
 import datetime
 
 
+@login_required
 def order_list(request):
-    today = datetime.date.today()
-
-    orders = OrderModel.objects.filter(ordered=True, is_paid=False)
-
+    orders = OrderModel.objects.filter(ordered=False, is_paid=False)
     total_revenue = 0
-
     for order in orders:
         total_revenue += order.price
-
     pie_data = []
     pie_label = []
 
-    qs = OrderModel.objects.filter(ordered=True, is_paid=False, created_on__month=today.month, created_on__year=today.year).values(
-        'items__items__category__name').exclude(items__items__name__isnull=True).annotate(count=Count('items__items')).values('items__items__category__name', 'count')
+    qs = OrderModel.objects.filter(ordered=False, is_paid=False).values(
+        'items__items__category').exclude(items__items__name__isnull=True).annotate(sum=Sum('items__quantity')).values('items__items__category__name', 'sum')
     for i in qs:
         pie_label.append(i['items__items__category__name'])
-        pie_data.append(i['count'])
+        pie_data.append(i['sum'])
 
     context = {
         'orders': orders,
         'total_orders': len(orders),
+        'total_revenue': total_revenue,
         'pie_label': pie_label,
         'pie_data': pie_data,
     }
@@ -84,15 +81,15 @@ def dashboard(request):
 
     if year != ' ' and year is not None and year != '今年' and month != ' ' and month is not None and month != '今月':
         qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year).values(
-            'items__items__category__name').exclude(items__items__name__isnull=True).annotate(items__items__price=Sum('items__items__price')).values('items__items__category__name', 'items__items__price')
+            'items__items__category').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__name', 'total_price')
 
     else:
         qs = OrderModel.objects.filter(created_on__month=today.month, created_on__year=today.year).values(
-            'items__items__category__name').exclude(items__items__name__isnull=True).annotate(items__items__price=Sum('items__items__price')).values('items__items__category__name', 'items__items__price')
+            'items__items__category').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__name', 'total_price')
 
     for i in qs:
         pie_label.append(i['items__items__category__name'])
-        pie_data.append(i['items__items__price'])
+        pie_data.append(i['total_price'])
 
     bar_data = []
     bar_label = []
