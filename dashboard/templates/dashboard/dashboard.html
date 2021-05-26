@@ -4,13 +4,11 @@
 <br>
 <div class="row card text-center">
   <h1>《設定時刻》</h1>
-  
   {% if year%}
-    <h2>{{ year }}年度｜{{ month }}月</h2>
+    <h2>年度:&nbsp;{{ year }}｜月:&nbsp;{{ month }}</h2>
   {% else %}
     <h2>現在時刻</h2>
   {% endif %}
-      <br>
     <div class="d-flex justify-content-center">
     <form method="GET" style="max-width : 400px;">
       <select class="form-control" name="year">
@@ -28,15 +26,12 @@
         <option value="1">車いす</option>
         <option value="2">手すり</option>
       </select>
-      <br>
       <button class="btn btn-info btn-sm">検索（基本設定：今月,　全体項目）</button>
     </form>
     </div>
-    <br><br>
 </div>
   <div class="row">
     <div class="col-md-12 col-xl-4 mt-5">
-
       <canvas class="mt-5" id="line-chart"></canvas>
     </div>
     <div class="col-md-12 col-xl-4 mt-5">
@@ -49,8 +44,9 @@
   <br>
 
   <script>
- Chart.defaults.global.defaultFontColor = 'navy';
+ Chart.defaults.global.defaultFontColor = '#0074D9';
  Chart.defaults.global.defaultFontSize = 18;
+Chart.defaults.global.defaultFontFamily = 'Kosugi Maru';
 
 var ctx = document.getElementById('line-chart').getContext('2d');
 var LineChart = new Chart(ctx, {
@@ -78,14 +74,13 @@ var PieChart = new Chart(ctx, {
   data:{
     labels: {{ pie_label|safe }},
     datasets: [
-      {backgroundColor: ['rgb(148, 10, 189, 0.6)','rgb(148, 103, 12, 0.6)'], data: {{ pie_data|safe }}, borderColor:	['black', 'black'],borderWidth: [2,2]}
+      {backgroundColor: ['rgb(148, 10, 189, 0.6)','#01FF70'], data: {{ pie_data|safe }}, borderColor:	['black', 'black'],borderWidth: [2,2]}
     ],
   },
   options: {
     plugins: {
       labels: {
         render: "value",
-        fontColor: ['green', 'white', 'red'],
         precision: 2
       }
     },
@@ -114,7 +109,6 @@ var BarChart = new Chart(ctx, {
     plugins: {
       labels: {
         render: "value",
-        fontColor: ['green', 'navy', 'red'],
         precision: 2
       }
     },
