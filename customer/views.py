@@ -47,7 +47,7 @@ class Order(View):
                     price += item.get_total_item_price
 
         page = request.GET.get('page', 1)
-        paginator = Paginator(items_list, 4)
+        paginator = Paginator(items_list.order_by('category__parent'), 4)
         items = paginator.page(page)
 
         context = {

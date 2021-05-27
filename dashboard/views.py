@@ -168,7 +168,7 @@ def item(request):
         form = ItemForm()
 
     context = {
-        'items': items,
+        'items': items.order_by('category__parent'),
         'form': form,
     }
     return render(request, 'dashboard/item.html', context)

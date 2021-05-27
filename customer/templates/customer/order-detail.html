@@ -1,40 +1,78 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+.container{
+    position: absolute;
+    top: 50%;   left: 50%;
+    transform: translate(-50%,-50%) ;
+    width: 400px;   height: 530px;
+    border-radius: 30px;
+    transition: .5s;
+}
+.container .front{
+    display: inline-block;
+    width: 100%;   height: 100%;
+    border-radius: 30px;
+    backface-visibility: hidden; 
+    transform: perspective(1000px) rotateY(0deg);
+    transition: .5s; 
+    box-shadow: 0 25px 15px rgb(0 0 0 / 40%)
+
+}
+.container:hover .front{
+    transform: perspective(1000px) rotateY(180deg);
+}
+.container .content{
+    position: absolute;
+    top: 0;  left: 0;
+    width: 100%;   height: 100%;
+    border-radius: 30px;
+    backface-visibility: hidden;  
+    transform: perspective(1000px) rotateY(-180deg);
+    background: #fff;
+    transition: .5s;
+    box-shadow: 0 25px 15px rgb(0 0 0 / 50%)
+
+}
+.container:hover .content{
+    transform: perspective(1000px) rotateY(0);
+} 
+.container .content h1{
+    color: #f00;
+    text-align: center;   line-height: 530px;
+}
+</style>
+
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-sm-12 text-center mt-3">
-                <h1>注文番号：{{order.pk}}</h1>
+            <div class="front">
+                <h2>注文番号：{{order.pk}}</h2>
+                <hr>
+                <h3>《顧客情報》</h3>
+                <h4>お名前：{{ order.name }}</h4>
+                <h4>メールアドレス：{{ order.email }}</h4>
+                <h4>電話番号：{{ order.phone }}</h4>
+                <h4>施設：{{ order.facility }}</h4>
+                <hr>
+                <h3>《予約情報》</h3>
+                {% for item in order.items.all %}
+                <h4>品名：{{ item }}</h4>
+                {% endfor %}
+                <h4>注文日付：{{ order.created_on }}</h4>
+                <h4>合計：{{ order.price }}円</h4>
             </div>
         </div>
-        <br>
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-sm-12 mt-5">
-                <h5　class="pt-3">顧客情報</h5>
-                <p><span style="font-weight:400;">お名前：</span>{{ order.name }}</p>
-                <p><span style="font-weight:400;">メールアドレス：</span>{{ order.email }}</p>
-                <p><span style="font-weight:400;">電話番号：</span>{{ order.phone }}</p>
-                <p><span style="font-weight:400;">施設：</span>{{ order.facility }}</p>
-                <h5 class="pt-3">《予約情報》</h5>
-                {% for item in order.items.all %}
-                <p><span style="font-weight:400;">品名：</span>{{ item }}</p>
-                {% endfor %}
-                <p><span style="font-weight:400;">注文日付：</span>{{ order.created_on }}</p>
-                <p><span style="font-weight:400;">内容：</span>{{ order.description }}</p>
-                <p><span style="font-weight:400;">合計：</span>{{ order.price }}円</p>
-            </div>
-            <div class="col-md-6 col-sm-12">
-                <p class="mt-3">
-                {% if order.is_paid %}
-                    <p><i style="color:green;" class="fa fa-check"></i><span class="pl-2">完了</span></p>
-                {% else %}
-                    <p><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
-                {% endif %}
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success" style="background-color: navy;">完了</button>
-                </form>
-                </p>
-            </div>
+        <div class="content text-center">
+            {% if order.is_paid %}
+                <p><i style="color:green;" class="fa fa-check"></i><span class="pl-2">完了</span></p>
+            {% else %}
+                <p><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success" style="background-color: navy;">完了</button>
+            </form>
+            </p>
         </div>
     </div>
 {% endblock content %}
