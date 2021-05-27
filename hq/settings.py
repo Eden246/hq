@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'customer',
     'dashboard',
     'crispy_forms',
+    'mptt',
+
 
 ]
 

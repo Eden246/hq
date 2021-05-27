@@ -2,6 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 {% include 'dashboard/top.html' %}
+{% load mptt_tags %}
     <div class="row my-4">
         <div class="col-xl-3">
             {% if messages %}
@@ -11,18 +12,21 @@
             </div>
             {% endfor %}
             {% endif %}
-            <div class="card p-3">
+            <div class="card p-3" data-aos="zoom-out-right" data-aos-delay="200">
                 <h2>新商品追加</h2>
                 <hr>
                 <form method="POST" enctype='multipart/form-data'>
                     {% csrf_token %}
                     {{ form | crispy }}
+                    {% for choice in drive_nodes.choices %}
+                        {{ choice }}
+                    {% endfor %}
                     <br>
                     <input class="btn btn-success btn-block" type="submit" value="Add">
                 </form>
             </div>
         </div>
-        <div class="col-xl-9">
+        <div class="col-xl-9" data-aos="slide-left" data-aos-delay="500">
             <table class="table bg-white">
                 <thead class="bg-info text-white">
                     <tr>
@@ -36,7 +40,7 @@
                     {% for item in items %}
                     <tr>
                         <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
-                        <td class="editable" data-id="{{ item.id}}"data-type="category">{{ item.category.all|join:', ' }}</td>
+                        <td class="d-flex">{{ item.category.parent }}|({{ item.category.name }})</td>
                         <td >
                         <a class="minus" href="{% url 'item_delete' item.pk %}"><i class="fa fa-minus"></i></a>
                         {{ item.quantity }}
@@ -100,5 +104,6 @@
     $(document).on('click', '.minus', function(){
     return confirm('在庫を減らしますか？「ゼロ：商品非表示」｜「ゼロ以下：削除」');
     })
+
     </script>
 {% endblock content %}

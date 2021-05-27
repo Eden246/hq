@@ -3,9 +3,16 @@
 {% include 'dashboard/top.html' %}
 
     <div class="row my-4">
-        <div class="col-md-4"></div>
+        <div class="col-md-4">
+        </div>
         <div class="col-md-8">
-            <table class="table bg-white">
+            <form class="d-flex" method="GET" action="{% url 'user' %}">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" name="query" value="{{ request.GET.query }}">
+                    <button class="remove-default-btn" type="submit"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+            <table class="table bg-white mt-3">
                 <thead class="bg-info text-white">
                     <tr>
                         <th scope="col">名前</th>

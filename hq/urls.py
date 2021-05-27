@@ -51,9 +51,6 @@ urlpatterns = [
     path('inbox/', ListThreads.as_view(), name='inbox'),
     path('inbox/<int:pk>', ThreadView.as_view(), name='thread'),
     path('inbox/<int:pk>/create-message', CreateMessage.as_view(), name='create-message'),
-    path('user-search/', UserSearch.as_view(), name='user-search'),
-    path('search/', TemplateView.as_view(template_name="user-search.html"), name='search'),
-    path('about/', TemplateView.as_view(template_name="about.html"), name='about'),
     path('order/', include('customer.urls')),
     path('dashboard/', include('dashboard.urls')),
 

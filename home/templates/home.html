@@ -2,43 +2,45 @@
 {% load static %}
 {% block content %}
 <!-- ======= Hero Section ======= -->
-    <br><br><br><br>
+<style>
+
+</style>
+
+<br><br><br><br><br><br><br><br>
     <div class="container text-center" data-aos="fade-in">
-    <br><br><br><br>
         <img src="{% static 'logo.jpg'%}" data-aos="zoom-out" data-aos-delay="100">
-    <br><br><br><br>
-        <section id="blog" class="padd-sectio">
-            <div class="container" data-aos="fade-up">
-            <div class="section-title text-center">
-                <h3 style="color: #71c55d;">《ウェブカタログ型》</h3>
-                <h2 class="border-bottom" style="color: #71c55d;">予約システム</h2>
-                <p class="separator">
-                    {% if user.is_authenticated %}
-                        {% if user.is_staff %}
-                        {{ user.username }}様！
-                        <br>今日もお疲れ様です！
+        <section id="blog" class="padd-sectio mt-5">
+            <div class="row m-auto mt-3" data-aos="fade-right"data-aos-delay="500">
+                <div class="section-title text-center">
+                    <h3 style="color: #71c55d;">《ウェブカタログ型》</h3>
+                    <h2 class="border-bottom" style="color: #71c55d;">予約システム</h2>
+                        {% if user.is_authenticated %}
+                            {% if user.is_staff %}
+                            {{ user.username }}様！
+                            <br>今日もお疲れ様です！
+                            {% else %}
+                            {{ user.username }}様！
+                            <br>いつもありがとうございます！
+                            {% endif %}
+                            <br><br>
                         {% else %}
-                        {{ user.username }}様！
-                        <br>いつもありがとうございます！
-                        {% endif %}
+                        <h3><a href="{% url "order" %}"><i class="fa fa-book"style="font-size: 1em;"></i>ウェブカタログを観る</a></h3>
                         <br><br>
-                        <a href="{% url 'order' %}" class="btn btn-warning">予約</a>&emsp;
-                    {% else %}
-                    <h3><a href="{% url "order" %}"><i class="fa fa-book"style="font-size: 1em;"></i>ウェブカタログを観る</a></h3>
-                    {% endif %}
-                </p>
-            </div>
-            <div class="row" data-aos="fade-up" data-aos-delay="100">
-                <div class="d-flex justify-content-center">
-                    {% if user.is_authenticated %}
-                    {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-warning">ログイン</a>
-                    <a href="{% url 'signup' %}" class="btn btn-success" style="background-color:navy;">会員登録</a>
-                    {% endif %}
+                        {% endif %}
+                        <a class="inbox-icon" href="{% url 'post' %}">|津営業所|</a>
                 </div>
-                <div class="nav-link inbox-icon-container text-center">
-                    <a href="{% url 'inbox'%}" class="inbox-icon btn btn-success"><i class="fa fa-comments" aria-hidden="true"></i>メッセージお問い合わせ</a>&nbsp;
-                </div>
+            <div class="row m-auto mt-0" data-aos="fade-up" data-aos-delay="300" style="width:250px;">
+                {% if user.is_authenticated %}
+                <a href="{% url 'order' %}" class="btn btn-warning">予約</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-warning">ログイン</a>
+                <a href="{% url 'signup' %}" class="btn btn-success" style="background-color:navy;">会員登録</a>
+                {% endif %}
+                {% if user.is_staff %}
+                <a href="{% url 'dashboard' %}" class="btn btn-danger">管理画面</a>
+                {% else %}
+                <a href="{% url 'inbox'%}" class="btn btn-success"><i class="fa fa-comments" aria-hidden="true"></i>メッセージ</a>
+                {% endif %}
             </div>
         </section>
     </div>

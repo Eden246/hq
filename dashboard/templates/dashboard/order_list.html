@@ -49,14 +49,19 @@ var PieChart = new Chart(ctx, {
   data:{
     labels: {{ pie_label|safe }},
     datasets: [
-      {backgroundColor: ['rgb(148, 10, 189, 0.6)','rgb(148, 103, 12, 0.6)'], data: {{ pie_data|safe }}, borderColor:	['black', 'black'],borderWidth: [2,2]}
+      {backgroundColor: ['rgb(148, 10, 189, 0.6)','rgb(148, 103, 12, 0.6)'],
+        borderColor:	['black', 'black'],borderWidth: [2,2], data: {{ pie_data|safe }}}
     ],
   },
   options: {
     plugins: {
+      datalabels: {
+        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
+        return `${label}\n${value}件`}
+      },
       labels: {
         render: "value",
-        precision: 2
+        precision: 2,
       }
     },
     responsive: true,

@@ -355,7 +355,7 @@ $(function(){
 </div>
 
 <div class="container d-lg-flex">
-  <div class="row" style="min-width:400px">
+  <div class="row" style="min-width:400px" data-aos="slide-right" data-aos-delay="500">
     <form method="GET">
         <div class="card mb-4">
             <h5 class="card-header" style="background-color: #E0E9D6;">品名</h5>
@@ -411,10 +411,10 @@ $(function(){
       {% if items %}
       <form method="POST">
           {% csrf_token %}
-          <div class="row d-flexflex-wrap" data-aos="fade-up">
+          <div class="row d-flex flex-wrap" data-aos="fade-up">
           {% for item in items %}
           {% if item.quantity > 0 %}
-            <div class="col-xxl-3 col-lg-6 col-md-12 text-center">
+            <div class="col-xxl-3 col-lg-6 col-md-12 text-center"  data-aos="zoom-up" data-aos-delay="500">
               <div class="hit-the-floor pb-5">{{ item.name }}</div>
               {% if item.image %}<img class="rounded center-block" src="{{ item.image.url }}" style="width:300px; height:300px;">{% endif %}
               <div class="form-group form-check" data-aos="fade-left">

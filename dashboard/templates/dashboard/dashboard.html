@@ -2,32 +2,32 @@
 {% block content %}
 {% include 'dashboard/top.html' %}
 <br>
-<div class="row card text-center">
+<div class="row card text-center" data-aos="slide-right" data-aos-delay="300">
   <h1>《設定時刻》</h1>
   {% if year%}
     <h2>年度:&nbsp;{{ year }}｜月:&nbsp;{{ month }}</h2>
   {% else %}
     <h2>現在時刻</h2>
   {% endif %}
-    <div class="d-flex justify-content-center">
-    <form method="GET" style="max-width : 400px;">
-      <select class="form-control" name="year">
-        <option value="今年" selected>年度を選択してください</option>
-        <option value="2020">2020</option>
-        <option value="2021">2021</option>
-      </select>
-      <select class="form-control" name="month">
-        <option value="今月" selected>当月を選択してください</option>
-        <option value="4">４月</option>
-        <option value="5">５月</option>
-      </select>
-      <select class="form-control" name="category">
-        <option value="全体" selected>全体カテゴリー</option>
-        <option value="1">車いす</option>
-        <option value="2">手すり</option>
-      </select>
-      <button class="btn btn-info btn-sm">検索（基本設定：今月,　全体項目）</button>
-    </form>
+    <div class="d-flex justify-content-center" >
+      <form method="GET" style="max-width : 400px;">
+        <select class="form-control" name="year">
+          <option value="今年" selected>年度を選択してください</option>
+          <option value="2020">2020</option>
+          <option value="2021">2021</option>
+        </select>
+        <select class="form-control" name="month">
+          <option value="今月" selected>当月を選択してください</option>
+          <option value="4">４月</option>
+          <option value="5">５月</option>
+        </select>
+        <select class="form-control" name="category">
+          <option value="全体" selected>全体カテゴリー</option>
+          <option value="6">車いす</option>
+          <option value="8">手すり</option>
+        </select>
+        <button class="btn btn-info btn-sm">検索（基本設定：今月,　全体項目）</button>
+      </form>
     </div>
 </div>
   <div class="row">
@@ -79,6 +79,10 @@ var PieChart = new Chart(ctx, {
   },
   options: {
     plugins: {
+      datalabels: {
+        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
+        return `${label}\n${value}円`}
+      },
       labels: {
         render: "value",
         precision: 2
@@ -107,6 +111,10 @@ var BarChart = new Chart(ctx, {
 	},
     options: {
     plugins: {
+      datalabels: {
+        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
+        return `${label}\n${value}件`}
+      },
       labels: {
         render: "value",
         precision: 2

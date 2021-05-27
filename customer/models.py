@@ -1,14 +1,15 @@
 from django.db import models
 from django.urls.base import reverse_lazy
 from django.contrib.auth.models import User
-
+from mptt.models import MPTTModel
+from mptt.fields import TreeForeignKey
 
 class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     image = models.ImageField(upload_to='menu_images/', blank=True)
     price = models.IntegerField()
-    category = models.ManyToManyField('Category', related_name='item')
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
 
     def __str__(self):
@@ -20,12 +21,15 @@ class MenuItem(models.Model):
         })
 
 
-class Category(models.Model):
+class Category(MPTTModel):
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
+    class MPTTMeta:
+        order_insertion_by = ['name']
 
 class OrderItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

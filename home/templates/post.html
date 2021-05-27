@@ -1,44 +1,145 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center mt-3">
-        <div class="col-12 border-bottom">
-            <h2>津営業所の便り</h2>
+
+<style>
+.infobox .inbox-icon {
+    color: white;
+}
+.infobox .inbox-icon:hover{
+    color: gold;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 100px;
+  width: 100px;
+  outline: black;
+  border-radius: 50%;
+  background-color: navy;
+}
+
+textarea{width:100%;}
+</style>
+
+<div id="carouselExampleIndicators" class="carousel slide mt-3 mb-0" data-bs-ride="carousel" style="width:95%;">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1">1</button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2">2</button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3">3</button>
+      </div>
+        <div class="carousel-inner">
+          <div class="carousel-item text-center active">
+            <h3>営業所</h3>
+            <img src="{% static 'store.jpg' %}" style="width:90%; max-width:1000px; height:300px;">
+          </div>
+          <div class="carousel-item text-center">
+            <h3>営業所</h3>
+            <img src="{% static 'store.jpg' %}" style="width:90%; max-width:1000px; height:300px;">
+          </div>
+          <div class="carousel-item text-center">
+            <h3>営業所</h3>
+            <img src="{% static 'store.jpg' %}" style="width:90%; max-width:1000px; height:300px;">
+          </div>
         </div>
-    </div>
-    
-    {% if user.is_staff %}
-    <div class="row justify-content-center mt-3 mb-5">
-        <div class="col-12 border-bottom">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <div class="col-md-4">
-                    <div class="d-grid">
-                        <button class="btn btn-success">作成</button>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true" ></span>
+      </button>
+</div>
+
+<div class="container m-auto" data-aos="fade-up">
+    <div class="row">
+        <div class="col-md-7" >
+            <iframe style="width:100%" height="400" src="https://www.youtube.com/embed/gw27xRe1lCY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <section id="team" class="padd-section text-center">
+                <div class="row justify-content-center">
+                    <div class="col-md-5">
+                        <div data-aos="zoom-in" data-aos-delay="100">
+                            <div class="team-block bottom">
+                                <img src="{% static 'ichiro.jpg' %}"  style="height:100%" class="img-responsive" alt="img">
+                                <div class="team-content">
+                                    <span>事業部長</span>
+                                    <h4>鈴木一郎</h4>
+                                    <h5>電話番号：080-9999-9999</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div data-aos="zoom-in" data-aos-delay="100">
+                            <div class="team-block bottom">
+                                <img src="{% static 'ichiro.jpg' %}"  style="height:100%" class="img-responsive" alt="img">
+                                <div class="team-content">
+                                    <span>事業部長</span>
+                                    <h4>鈴木一郎</h4>
+                                    <h5>電話番号：080-9999-9999</h5>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </form>
+            </section>
+        </div>
+        <div class="col-md-4 m-auto  mt-0">
+            <section id="contact" class="padd-section mt-0 pt-0 card">
+                <div class="info">
+                    <div class="infobox text-center mt-5" data-aos="slide-right" data-aos-delay="300">
+                        <a href="{% url 'inbox'%}" class="inbox-icon btn btn-success mb-5"><i class="fa fa-comments"></i>メッセージお問い合わせ</a>
+                    </div>
+                    <div>
+                        <i class="fa fa-map-marker"></i>
+                        <p>〒514-0821 三重県津市垂水686</p>
+	    		    	<div class="row text-center" data-aos="zoom-out-left" data-aos-delay="400">
+	    		    		<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3280.494899839942!2d136.50565131559392!3d34.692695391153926!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60040d37c278712d%3A0xa580041f55c6222c!2z44Op44Kk44OV44O744OG44Kv44OO44K144O844OT44K55rSl!5e0!3m2!1sen!2sjp!4v1620369577448!5m2!1sen!2sjp" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        		    	</div>
+	    		    	<br><br><br>
+                    </div>
+                    <div class="email">
+                        <i class="fa fa-envelope"></i>
+                        <p>so-kan@life-techno.jp</p>
+                    </div>
+                    <div>
+                        <i class="fa fa-phone"></i>
+                        <p>059-226-8219</p>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
-    {% endif %}
-{% for post in posts %}        
-    <div class="row justify-content-center mt-3">
-        <div class="col-12 border-bottom">
-            <p><strong>{{ post.client.facility }}<strong>&emsp;{{ post.date }}</p>
-            {% if post.image %}
-                <img style="width:500px" src="{{ post.image.url }}" class="post-image">
+
+    <div class="container-fluid" data-aos="slide-right" data-aos-delay="100">
+        <div class="row text-center">
+            <h2>《津営業所の便り》</h2>
+            <hr>
+            {% if user.is_staff %}
+            <div class="col-12 card">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button class="btn btn-success">作成</button>
+                </form>
+            </div>
+            <hr>
             {% endif %}
-            <p>{{ post.body }}</p>
-            <a href="{% url 'post_detail' post.pk %}">コメントを見る</a>
-            {% if request.user == post.user or  user.is_staff%}
-                <a href="{% url 'post_edit' post.pk %}"><i class="fa fa-edit"></i></a>
-                <a href="{% url 'post_delete' post.pk %}"><i class="fa fa-trash"></i></a>
-            {% endif %}
+            {% for post in posts %}
+            <div class="col-xl-4 col-lg-6 col-md-12" data-aos="slide-left" data-aos-delay="500">
+                {% if post.image %}
+                    <img style="max-width:300px; width:100%" src="{{ post.image.url }}">
+                {% endif %}
+                <p>作成日：{{ post.date }}</p>
+                <p>{{ post.body }}</p>
+                <a href="{% url 'post_detail' post.pk %}">コメントを見る</a>
+                {% if request.user == post.user or  user.is_staff%}
+                    <a href="{% url 'post_edit' post.pk %}"><i class="fa fa-edit"></i></a>
+                    <a href="{% url 'post_delete' post.pk %}"><i class="fa fa-trash"></i></a>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
     </div>
-{% endfor %}
+
 </div>
 
 {% endblock content %}

@@ -1,26 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<br><br><br><br><br><br>
 <div class="container">
-    <div class="row justify-content-center mt-3 mb-5">
+    <div class="row text-center">
         <div class="col-12">
             <form method="post">
                 {% csrf_token %}
-                <h5>本当に削除しますか？</h5>
-                <br><br>
-                <div class="row">
-                    <div class="col-3">
-                        <a href="{% url 'post'%}" class="btn btn-success">いいえ</a>
-                    </div>
-                    <div class="col-2">
-                        <button class="btn btn-danger">削除</button>
-                    </div>
-                    <div class="col-6">
-                    </div>
-                </div>
+                <h2>本当に削除しますか？</h2>
+                <a href="{% url 'post'%}" class="btn btn-success">いいえ</a>
+                <button class="btn btn-danger">削除</button>
             </form>
         </div>
     </div>
-
 </div>
 {% endblock content %}

@@ -279,22 +279,6 @@ class MessageNotification(View):
 
         return redirect('thread', pk=message_pk)
 
-class UserSearch(View,UserPassesTestMixin):
-    def get(self, request, *args, **kwargs):
-        query = self.request.GET.get('query')
-        client_list = Client.objects.filter(
-            Q(user__username__icontains=query)
-        )
-
-        context = {
-            'client_list': client_list,
-        }
-
-        return render(request, 'user-search.html', context)
-
-    def test_func(self):
-        post = self.get_object()
-        return self.request.user == self.request.user.is_staff or self.request.user.is_superuser
 
 class CommentReplyView(LoginRequiredMixin, View):
     def post(self, request, post_pk, pk,*args, **kwargs):

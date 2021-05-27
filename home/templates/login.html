@@ -1,15 +1,9 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% block content %}
-
 <style>
 .box {
-    width: 500px;
-    padding: 40px;
-
-    text-align: center;
     transition: 0.25s;
-    margin-top: 100px
 }
 
 .box input[type="text"],
@@ -43,11 +37,10 @@
     margin: 20px auto;
     text-align: center;
     border: 2px solid #2ecc71;
-    padding: 14px 40px;
+    padding: 7px 20px;
     outline: none;
     border-radius: 24px;
     transition: 0.25s;
-    font-family: 'Kosugi Maru', sans-serif;
     cursor: pointer
     
 }
@@ -57,18 +50,15 @@
     color: white;
 }
 </style>
-<div class="container">
-    <div class="row mt-5">
-            <form class="box" method="post">
-                {% csrf_token %}    
-                <h1><span style="color:#2ecc71;">ログイン</span></h1>
-                {% render_field form.username class="form-control" placeholder="お名前（空白なし）" %}
-                {% render_field form.password class="form-control" placeholder="暗証番号" %}
-                <input type="submit" name="" value="ログイン">
-                <p><a href="{% url "reset_password" %}">もしパスワードお忘れですか？</a></p>
-                <hr>
-                <a  href="{% url 'signup' %}" class="btn btn-success" style="background-color:navy;">会員登録</a>
-            </form>
-    </div>
-</div>
+<br><br><br><br><br><br><br><br><br><br><br><br>
+<form class="box text-center" method="post">
+    {% csrf_token %}    
+    <h1><span style="color:#2ecc71;">ログイン</span></h1>
+    {% render_field form.username class="form-control" placeholder="お名前（空白なし）" %}
+    {% render_field form.password class="form-control" placeholder="暗証番号" %}
+    <input type="submit" name="" value="ログイン">
+    <hr class="m-auto mb-3" style="width:400px; height:2px;">
+    <p><a href="{% url "reset_password" %}">もしパスワードお忘れですか？</a></p>
+    <a  href="{% url 'signup' %}" class="btn btn-success" style="background-color:navy;">会員登録</a>
+</form>
 {% endblock content %}

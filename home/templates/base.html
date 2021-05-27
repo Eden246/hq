@@ -21,19 +21,20 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <style>
-*, html, body {
+*, html{
     margin:0;
     padding:0;  
     font-family: 'Kosugi Maru', sans-serif;
 }
-      body {
-      }
+body {
       .remove-default-btn {
 	background-color: transparent;
 	border: none;
 	box-shadow: none;
 }
+}
 
+{% comment %} notification {% endcomment %}
 .edit-color {
 	color: #333;
 }
@@ -72,7 +73,6 @@
 
 .dropdown-content {
 	position: absolute;
-  left: -240px;
 	background-color: #f1f1f1;
 	min-width: 350px;
 	box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
@@ -88,7 +88,8 @@
 }
 
 .dropdown-content a:hover {
-	background-color: #ddd;
+	background-color:#06D85F;
+	color: #f1f1f1;
 }
 
 .dropdown-item-parent {
@@ -104,98 +105,15 @@
 	padding-right: 5px;
 	transition: 0.3s
 }
-
 .dropdown-item-close:hover {
 	color: rgb(180, 25, 25);
 	transition: 0.3s;
 	cursor: pointer;
 }
 
-.inbox-icon-container{
-  margin-right: 15px;
-}
-.inbox-icon {
-  color: #333;
-  transition: 0.5s;
-}
-.inbox-icon:hover {
-  transition: 0.5s;
-}
-
-
-@media (max-width: 900px) {
-.container {
-    display: inline-block;
-}
-form{
-    width:100%;
-}
-}
-.border-10{
-    border-style:solid;
-    border-width: 1px;
-}
-.border-bottom{
-    border-width: 2px;
-}
-.table {
-    font-size:15px;
-    text-align:center;
-    width:98%;
-    margin:auto;
-    text-align:center;
-}
-
-.table tr:nth-child(odd){
-    background-color: #BBCAE4
-}
-.table tr:nth-child(even){
-    background-color: #dae5f4
-}
-th{
-    background-color: #337ab7;
-    color:white;
-}
-.header{
-    color: #337ab7;
-    font-size: 40px;
-    text-align:center;
-    width: 100%;
-    text-shadow: 6px 6px 6px #c9c6c6;
-    display: block;
-    font-weight: boldder;
-}
-.header-0{
-    color: #337ab7;
-    font-size: 20px;
-    text-align:center;
-    width: 100%;
-    text-shadow: 6px 6px 6px #c9c6c6;
-    display: block;
-}
-.success{
-     list-style: none;
-     background-color: #2e6da4;
-     color: white;
-     box-shadow: 12px 12px 12px #e61c66;
- }
-
-.searchable-container{margin:20px 0 0 0}
-.searchable-container label.btn-default.active{background-color:#007ba7;color:#FFF}
-.searchable-container label.btn-default{width:90%; background-color:#71c55d; border:1px solid #efefef;margin:5px; box-shadow:5px 8px 8px 0 #ccc;}
-.searchable-container label .bizcontent{width:100%;}
-.searchable-container .btn-group{width:90%}
-.searchable-container .btn span.glyphicon{
-    opacity: 0;
-}
-.searchable-container .btn.active span.glyphicon {
-    opacity: 1;
-}
-
+{% comment %} nav border {% endcomment %}
 .gradient-border {
   --borderWidth: 3px;
-  background: #1D1F20;
-  position: relative;
   border-radius: var(--borderWidth);
 }
 .gradient-border:after {
@@ -211,7 +129,6 @@ th{
   animation: animatedgradient 3s ease alternate infinite;
   background-size: 300% 300%;
 }
-
 @keyframes animatedgradient {
 	0% {
 		background-position: 0% 50%;
@@ -223,67 +140,48 @@ th{
 		background-position: 0% 50%;
 	}
 }
-.nav-link {
-  font-size:15px;
-}
-
+{% comment %} end nav border {% endcomment %}
+{% comment %} mobilefont {% endcomment %}
 @media only screen and (max-width: 600px), only screen and (max-device-width: 600px) {
 .container-fluid h2 {
   font-size:20px;
 }
-    }
-
+}
+.inbox-icon {
+  font-size:18px
+}
+{% comment %} end mobilefont {% endcomment %}
+{% comment %} btn fontstlye {% endcomment %}
+.btn-success {
+    color: white;
+}
+.btn-success:hover{
+    color: gold;
+}
+.btn-danger {
+    color: white;
+}
+.btn-danger:hover{
+    color: gold;
+}
+{% comment %} end btn fontstlye {% endcomment %}
 </style>
   </head>
   <body>
-  <nav class="navbar navbar-light bg-light gradient-border">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light gradient-border">
     <div class="container-fluid">
-      <h2><a href="{% url 'home' %}">ライフテクノサービス</a>&emsp;<i style="font-size: 0.73em; color:gold;" class="fa fa-bell"></i>{% if user.is_authenticated %}
-          {% show_notifications %}
-        {% endif %}</h2>
-
+      <h2><a href="{% url 'home' %}">ライフテクノサービス</a>&emsp;<i style="font-size: 0.73em; color:gold;" class="fa fa-bell"></i>
+      {% if user.is_authenticated %}{% show_notifications %}{% endif %}</h2>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <div class="nav-link inbox-icon-container text-center">
-            <a class="inbox-icon" href="{% url 'home' %}">ホーム</a>
-          </div>
-          <div class="nav-link inbox-icon-container text-center">
-            <a class="inbox-icon" href="{% url 'about' %}">津営業所</a>
-          </div>
-          <div class="nav-link inbox-icon-container text-center">
-          <a class="inbox-icon" href="{% url 'post' %}">営業所の便り</a>
-          </div>
-
-          <div class="nav-link inbox-icon-container text-center">
-          <a class="inbox-icon" href="{% url 'order' %}">予約</a>
-          </div>
+        <div class="navbar-nav ms-auto">
           {% if user.is_authenticated %}
-          <div class="nav-link inbox-icon-container text-center">
-          <a class="inbox-icon" href="{% url 'logout' %}">ログアウト</a>
-          </div>
-            {% if user.is_staff %}
-          <div class="nav-link inbox-icon-container text-center">
-            <a class="inbox-icon" href="{% url 'dashboard' %}">管理画面</a>
-          </div>
-          <div class="nav-link inbox-icon-container text-center">
-            <a class="inbox-icon" href="{% url 'search' %}">ユーザー検索</a>
-          </div>
-            {% endif %}
+            <a class="inbox-icon" href="{% url 'logout' %}">|ログアウト|</a>
           {% else %}
-          <div class="nav-link inbox-icon-container text-center">
-            <a class="inbox-icon" href="{% url 'login' %}">ログイン</a>
-          </div>
-          <div class="nav-link inbox-icon-container text-center">
-            <a class="inbox-icon" href="{% url 'signup' %}">会員登録</a>
-          </div>
+            <a class="inbox-icon" href="{% url 'login' %}">|ログイン|</a>
           {% endif %}
-          <div class="nav-link inbox-icon-container text-center">
-            <a href="{% url 'inbox'%}" class="inbox-icon"><i class="fa fa-comments" aria-hidden="true"></i>お問い合わせ</a>
-          </div>
-
         </div>
       </div>
     </div>

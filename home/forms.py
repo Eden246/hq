@@ -20,7 +20,7 @@ class PostForm(forms.ModelForm):
         label='',
         widget=forms.Textarea(attrs={
             'rows':'5',
-            'placeholder':'内容を入力してください！'
+            'placeholder':'内容を入力してください'
             }))
 
     image = forms.ImageField(label='画像',required=False)

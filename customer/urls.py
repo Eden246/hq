@@ -7,5 +7,6 @@ urlpatterns = [
     path('<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('remove_from_cart/<int:pk>/', remove_from_cart, name='remove_from_cart'),
     path('cart/', CartView.as_view(), name='cart'),
-    path('notification/<int:notification_pk>/order/<int:order_pk>', OrderNotification.as_view(), name='order-notification'),
-] 
+    path('notification/<int:notification_pk>/order/<int:order_pk>',
+         OrderNotification.as_view(), name='order-notification'),
+]

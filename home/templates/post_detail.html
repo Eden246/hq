@@ -6,42 +6,25 @@
     margin-left:1rem;
 }
 </style>
-
-<div class="container">
-    <br>
-    <div class="row">
-        <div class="col-12">
-            <a href="{% url 'post'%}">戻る</a>
-        </div>
-    </div>
-    <br>
-
-    <div class="row justify-content-center mt-1">
+<br><br><br><br><br><br><br><br>
+    <div class="container text-center">
         <div class="col-12 border-bottom">
             <strong>{{ post.client.facility }}<strong>&emsp;{{ post.date }}</p>
             {% if post.image %}
             <img style="width:500px" src="{{ post.image.url }}" class="post-image">
             {% endif %}
-            <br><br>
             <h4>{{ post.body }}</h4>
-            <br><br>
         </div>
-    </div>
-    {% if user.is_authenticated %}
-    <div class="row justify-content-center mb-5">
-        <div class="col-12 border-bottom">
+        {% if user.is_authenticated %}
+        <div class="col-12 border-bottom mt-5">
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <div class="col-md-4">
-                    <div class="d-grid">
-                        <button class="btn btn-success"style="width:70%">コメント</button>
-                    </div>
-                </div>
+                <button class="btn btn-success"style="width: 200px;">コメント</button>
             </form>
         </div>
-    </div>
-    {% endif %}
+        <a href="{% url 'post'%}" class="btn btn-danger" style="width: 200px;">戻る</a>
+        {% endif %}
     {% for comment in comments %}
     {% if comment.is_parent %}
     <div class="row justify-content-center mt-3">
@@ -63,13 +46,12 @@
             <form method="post" action="{% url 'comment-reply' post.pk comment.pk%}">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <div class="d-grid col-6">
-                    <button class="btn btn-success"style="width:70%">コメント</button>
-                </div>
+                <button class="btn btn-success">コメント</button>
             </form>
         </div>
     </div>
     {% endif %}
+
     {% for child_comment in comment.children %}
     <div class="row justify-content-center mb-0 child-comment">
         <div class="col-12 border-bottom">
@@ -84,14 +66,13 @@
             {% if user.is_authenticated %}
             <button class="remove-default-btn" style="color:green;" onclick="commentReplyToggle('{{child_comment.pk}}')"><i class="fa fa-comment"></i>コメント</button>
             &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <hr>
             <div class="row justify-content-center d-none" id="{{child_comment.pk}}">
                 <div class="col-12 border-bottom">
                     <form method="post" action="{% url 'comment-reply' post.pk comment.pk%}">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <div class="d-grid col-6">
-                            <button class="btn btn-success"style="width:70%">コメント</button>
-                        </div>
+                        <button class="btn btn-success"style="width:70%">コメント</button>
                     </form>
                 </div>
             </div>
@@ -100,9 +81,7 @@
     </div>
     {% endfor %}
     {% endif %}
-    <br>
     {% endfor %}
-</div>
 
 <script>
 function commentReplyToggle(parent_id){
@@ -113,6 +92,5 @@ function commentReplyToggle(parent_id){
         row.classList.add('d-none');
     }
 }
-
 </script>
 {% endblock content %}
