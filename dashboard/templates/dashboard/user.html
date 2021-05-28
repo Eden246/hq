@@ -19,7 +19,7 @@
                         <th scope="col">メール</th>
                         <th scope="col">電話</th>
                         <th scope="col">住所</th>
-                        <th scope="col">限度額</th>
+                        <th scope="col">限度額残量</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,7 +29,7 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.client.phone }}</td>
                         <td>{{ user.client.facility }}</td>
-                        <td>{{ user.limit }}</td>
+                        <td>{{ user.limit }}円</td>
                     </tr>
                 {% endfor %}
                 </tbody>

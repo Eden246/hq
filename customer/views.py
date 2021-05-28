@@ -140,7 +140,7 @@ class CartView(View):
             items.append(item)
 
         user_limit, created = Limit.objects.get_or_create(user=request.user)
-        user_limit.limit += price
+        user_limit.limit -= price
         user_limit.save(update_fields=['limit'])
 
         body = (f'{facility}の{name}様、只今ご予約承りました！\n確認が終わる次第に津営業所の相談員がこちらの番号（{phone}）でご連絡差し上げます。\n'
@@ -166,13 +166,13 @@ class CartView(View):
         # # 閉じる
         # server.quit()
 
-        send_mail(
-            f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
-            body,
-            'ライフテクノサービス・レンタル事業部<so-kan@life-techno.jp>',
-            [email,'so-kan@life-techno.jp'],
-            fail_silently= False
-        )
+        # send_mail(
+        #     f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
+        #     body,
+        #     'ライフテクノサービス・レンタル事業部<so-kan@life-techno.jp>',
+        #     [email,'so-kan@life-techno.jp'],
+        #     fail_silently= False
+        # )
         staffs = User.objects.filter(groups__name__in=['staff'])
         for staff in staffs:
             notification = Notification.objects.create(

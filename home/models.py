@@ -5,7 +5,7 @@ from customer.models import *
 
 class Limit(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    limit = models.IntegerField(default=0)
+    limit = models.IntegerField(default=100000)
     def __str__(self):
         return f"{self.limit}"
 
