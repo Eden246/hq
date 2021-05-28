@@ -413,22 +413,21 @@ $(function(){
           {% csrf_token %}
           <div class="row d-flex flex-wrap" data-aos="fade-up">
           {% for item in items %}
-          {% if item.quantity > 0 %}
             <div class="col-xxl-3 col-lg-6 col-md-12 text-center"  data-aos="zoom-up" data-aos-delay="500">
               <div class="hit-the-floor pb-5">{{ item.name }}</div>
               {% if item.image %}<img class="rounded center-block" src="{{ item.image.url }}" style="width:300px; height:300px;">{% endif %}
               <div class="form-group form-check" data-aos="fade-left">
                   <label class="checkbox-wrap form-check-label" id="onetarget">選択
-                  <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-                  <span class="checkmark"></span>
+                    <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                    <span class="checkmark"></span>
                   </label>
                   <h3>{{ item.price }}円（自己負担は1の場合/月額）</h3>
                   <ul class="list-unstyled">
                       <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
                   </ul>
+                  <iframe style="width:100%" height="200" src="{{item.video_url}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               </div>
             </div>
-          {% endif %}
           {% endfor %}
           </div>
           {% if user.is_authenticated %}

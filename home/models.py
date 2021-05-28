@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from customer.models import *
 
+class Limit(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    limit = models.IntegerField(default=0)
+    def __str__(self):
+        return f"{self.limit}"
+
 class Client(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     facility = models.CharField(max_length=40)

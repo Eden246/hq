@@ -13,8 +13,9 @@ from django.contrib.auth.decorators import login_required
 
 class Order(View):
     def get(self, request, *args, **kwargs):
-        items_list = MenuItem.objects.all()
+        items_list = MenuItem.objects.filter(quantity__gt=0)
         categories = Category.objects.all()
+
         if request.user.is_authenticated:
             if OrderItem.objects.filter(user=request.user, ordered=False):
                 order_item = OrderItem.objects.filter(
@@ -137,6 +138,10 @@ class CartView(View):
         items =[]
         for item in order.items.all():
             items.append(item)
+
+        user_limit, created = Limit.objects.get_or_create(user=request.user)
+        user_limit.limit += price
+        user_limit.save(update_fields=['limit'])
 
         body = (f'{facility}の{name}様、只今ご予約承りました！\n確認が終わる次第に津営業所の相談員がこちらの番号（{phone}）でご連絡差し上げます。\n'
                 f'品目リスト：{items}\n合計：{price}\n'
