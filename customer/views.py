@@ -134,8 +134,12 @@ class CartView(View):
         )
         order.items.add(*item_ids)
 
+        items =[]
+        for item in order.items.all():
+            items.append(item)
+
         body = (f'{facility}の{name}様、只今ご予約承りました！\n確認が終わる次第に津営業所の相談員がこちらの番号（{phone}）でご連絡差し上げます。\n'
-                f'品目リスト：\n合計：{price}\n'
+                f'品目リスト：{items}\n合計：{price}\n'
                 )
         # import smtplib
         # from email.mime.text import MIMEText
@@ -157,13 +161,13 @@ class CartView(View):
         # # 閉じる
         # server.quit()
 
-        # send_mail(
-        #     f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
-        #     body,
-        #     'ライフテクノサービス・レンタル事業部<so-kan@life-techno.jp>',
-        #     [email,'so-kan@life-techno.jp'],
-        #     fail_silently= False
-        # )
+        send_mail(
+            f'{facility}の{name}様、ライフテクノサービス（津営業所）予約完了メール',
+            body,
+            'ライフテクノサービス・レンタル事業部<so-kan@life-techno.jp>',
+            [email,'so-kan@life-techno.jp'],
+            fail_silently= False
+        )
         staffs = User.objects.filter(groups__name__in=['staff'])
         for staff in staffs:
             notification = Notification.objects.create(
