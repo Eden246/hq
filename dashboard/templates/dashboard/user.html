@@ -1,12 +1,6 @@
 {% extends 'dashboard/base.html' %}
 {% block content %}
 {% include 'dashboard/top.html' %}
-<style>
-.red{
-    color:red;
-}
-</style>
-
     <div class="row my-4">
         <div class="col-md-4">
         </div>
@@ -30,17 +24,65 @@
                 <tbody>
                 {% for user in users %}
                     <tr>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.client.phone }}</td>
-                        <td>{{ user.client.facility }}</td>
-                        <td {% if user.limit.limit < 0 %} class="text-danger" {% endif %}>{{ user.limit.limit }}</td>
+                        <td class="editable" data-id="{{ item.id}}"data-type="name">{{ user.username }}</td>
+                        <td class="editable" data-id="{{ item.id}}"data-type="email">{{ user.email }}</td>
+                        <td class="editable" data-id="{{ item.id}}"data-type="phone">{{ user.client.phone }}</td>
+                        <td class="editable" data-id="{{ item.id}}"data-type="facility">{{ user.client.facility }}</td>
+                        <td {% if user.limit.limit < 0 %} style="color:red;" {% endif %} class="editable" data-id="{{ item.id}}"data-type="limit" >{{ user.limit.limit }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+<script>
+    $(document).ready(function(){
+        $(document).on("dblclick", ".editable", function(){
+            var value = $(this).text();
+            var input = "<input type='text' class='input-data' value='"+value+"' class='form-control'>";
+            $(this).html(input);
+            $('input',this).focus();
+            $(this).removeClass("editable");
+        })
+        $(document).on("blur", ".input-data", function(){
+            var value = $(this).val();
+            var td = $(this).parent("td");
+            $(this).remove();
+            td.html(value);
+            td.addClass("editable");
+            var type = td.data("type");
+            sendToServer(td.data("id"), value, type);
+        })
+        $(document).on("keypress", ".input-data", function(e){
+            var key = e.which;
+            if(key==13){
+                var value = $(this).val();
+                var td = $(this).parent("td");
+                $(this).remove();
+                td.html(value);
+                td.addClass("editable");
+                var type = td.data("type");
+                sendToServer(td.data("id"), value, type);
+            }
+        })
+        function sendToServer(id, value, type){
+            console.log(id);
+            console.log(value);
+            console.log(type);
+            $.ajax({
+                url:"http://127.0.0.1:8000/dashboard/item_save/","https://kangsm.pythonanywhere.com/dashboard//item_save/"
+                type: "POST",
+                data:{id:id, type:type, value:value},
+            })
+            .done(function(response){
+                console.log(response);
+            })
+            .fail(function(){
+                console.log("Error");
+            })
+        }
+    });
 </script>
 {% endblock content %}
     

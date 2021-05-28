@@ -15,6 +15,7 @@
                 <thead class="bg-info text-white">
                     <tr>
                         <th scope="col" style="width: 10px;">#</th>
+                        <th scope="col">お名前</th>
                         <th scope="col">施設名</th>
                         <th scope="col">電話番号</th>
                         <th scope="col">金額</th>
@@ -26,10 +27,11 @@
                 {% for order in orders %}                    
                     <tr>
                         <th scope="row">{{ order.pk }}</th>
+                        <td>{{ order.name }}</td>
                         <td>{{ order.facility }}</td>
                         <td>{{ order.phone }}</td>
                         <td>{{ order.price }}円</td>
-                        <td>{{ order.created_on  | date:"bd日af"}}</td>
+                        <td>{{ order.created_on | date:'Y-m-d H:i'}}</td>
                         <td><a href="{% url 'order-detail' order.pk %}"><i class="fa fa-edit"></i></a></td>
                     </tr>
                 {% endfor %}
