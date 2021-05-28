@@ -19,7 +19,7 @@
                 <p class="font-weight-bold pt-4">品名：{{ item }}</p>
             {% endfor %}
             <p class="font-weight-bold pt-4">合計：{{price}}円</p>
-            <p class="font-weight-bold pt-4">限度額残量：{{user.limit}}円</p>
+            <p {% if user.limit.limit < 0 %} class="text-danger" {% endif %} class="font-weight-bold pt-4">限度額残量：{{user.limit}}円</p>
         </div>
     </div>
 </div>

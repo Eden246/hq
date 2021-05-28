@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from customer.models import *
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from .forms import *
 from django.http.response import JsonResponse
@@ -12,7 +12,6 @@ from django.db.models.functions import TruncDate
 import datetime
 from django.db.models import Q
 from django.contrib.auth.models import User
-
 
 @login_required
 def order_list(request):
@@ -39,8 +38,10 @@ def order_list(request):
 
     return render(request, 'dashboard/order_list.html', context)
 
+def test_func(user):
+    return user.groups.filter(name='staff').exists()
 
-@login_required
+@user_passes_test(test_func, login_url="/login/")
 def dashboard(request):
     today = datetime.date.today()
     labels = []

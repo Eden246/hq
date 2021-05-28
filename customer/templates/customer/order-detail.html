@@ -53,7 +53,7 @@
                 <h4>メールアドレス：{{ order.email }}</h4>
                 <h4>電話番号：{{ order.phone }}</h4>
                 <h4>施設：{{ order.facility }}</h4>
-                <h4>限度額残量：{{ user.limit }}円</h4>
+                <h4 {% if user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ user.limit }}円</h4>
                 <hr>
                 <h3>《予約情報》</h3>
                 {% for item in order.items.all %}

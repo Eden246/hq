@@ -1,6 +1,11 @@
 {% extends 'dashboard/base.html' %}
 {% block content %}
 {% include 'dashboard/top.html' %}
+<style>
+.red{
+    color:red;
+}
+</style>
 
     <div class="row my-4">
         <div class="col-md-4">
@@ -29,12 +34,13 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.client.phone }}</td>
                         <td>{{ user.client.facility }}</td>
-                        <td>{{ user.limit }}円</td>
+                        <td {% if user.limit.limit < 0 %} class="text-danger" {% endif %}>{{ user.limit.limit }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+</script>
 {% endblock content %}
     
