@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.urls.base import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
 from django.contrib import messages
 
@@ -50,11 +50,18 @@ class PostView(View):
     def post(self, request, *args, **kwargs):
         posts = Post.objects.all().order_by('-date')
         form = PostForm(request.POST ,request.FILES)
+        files = request.FILES.getlist("image")
 
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
             post.client = request.user.client
+            post.save()
+
+            for f in files:
+                img = Image(image=f)
+                img.save()
+                post.image.add(img)
             post.save()
 
         context = {
@@ -63,6 +70,10 @@ class PostView(View):
         }
 
         return render(request, 'post.html', context)
+
+def post_json(request):
+    data = list(Post.objects.values())
+    return JsonResponse(data, safe=False)
 
 class PostDetailView(View):
     def get(self, request, pk, *args, **kwargs):

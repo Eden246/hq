@@ -3,7 +3,7 @@
 {% block content %}
 
 <style>
-.card {
+body {
 	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
 	background-size: 400% 400%;
 	animation: gradient 5s ease infinite;
@@ -21,52 +21,40 @@
 	}
 }
 </style>
-
-{% if user.is_authenticated %}
-<section id="contact" class="padd-section">
-<div class="container" data-aos="fade-down">
-    <div class="col-md-4 col-sm-12">
-        <h2 class="text-center">メッセージお問い合わせ</h2>
-		<br>
-        <form method="POST">
-            {% csrf_token %}
-            <p class="text-center">《専門相談員選択》</p>
-            {{ form }}
-            <div class="d-grid gap-2">
-                <button class="btn btn-success mt-3" type="submit">選択</button>
-            </div>
-        </form>
-    </div>
-</div>
 <br><br><br><br>
-
-
-
-
-<div class="container" data-aos="fade-right">
-    <div class="col-md-4">
-        <div class="p-3">
-            <h3 class="text-center" style="color:#2ecc40">メッセージ履歴</h3>
+{% if user.is_authenticated %}
+<div class="container m-auto text-center" data-aos="fade-down">
+    <div class="row m-auto" style="max-width : 400px">
+        <div class="col-12">
+            <h2 style="color:#2ecc40">メッセージお問い合わせ</h2>
+		    <br>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <button class="btn btn-success mt-3" type="submit">選択</button>
+            </form>
         </div>
-        {% for thread in threads.all %}
-        <div class="card col-12 shadow-sm text-center">
-            <div class="btn-group mt-2 mb-4" role="group" aria-label="actionButtons">
-                <a href="#" class="d-block btn btn-outline-light" download>お客様：{{ thread.user }}</a>
-                <a href="#" target="_blank" class="d-block btn btn-outline-light">相談員：{{ thread.receiver }}</a>
-            </div>
-            <a class="stretched-link" href="{% url 'thread' thread.pk %}"></a>
-        </div>
-	<hr style="  border-top: 10px dashed white; background-color: navy;">
-    {% endfor %}
+        <hr class="mt-5">
     </div>
-</div>
+    
+
+    <div class="row m-auto" style="max-width : 400px">
+        <div class="col-12">
+            <h3 class="m-3" style="color:#2ecc40">メッセージ履歴</h3>
+            {% for thread in threads.all %}
+                <div class="btn-group mt-2 mb-4" role="group" aria-label="actionButtons">
+                    <a href="{% url 'thread' thread.pk %}" class="d-block btn btn-outline-light">お客様：{{ thread.user }}</a>
+                    <a href="{% url 'thread' thread.pk %}" target="_blank" class="d-block btn btn-outline-light">相談員：{{ thread.receiver }}</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% else %}
-<div class="container">
     <div class="row justify-content-center mt-3 mb-5">
         <h2>ログインが必要です。</h2>
     </div>
-</div>
 {% endif %}
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" integrity="sha256-qM7QTJSlvtPSxVRjVWNM2OfTAz/3k5ovHOKmKXuYMO4=" crossorigin="anonymous"></script>
 {% endblock content %}

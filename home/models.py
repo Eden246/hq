@@ -16,7 +16,7 @@ class Post(models.Model):
     date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='images', blank=True, null=True)
+    image = models.ManyToManyField("Image", blank=True)
 
 class Comment(models.Model):
     comment = models.TextField()
@@ -57,3 +57,7 @@ class MessageModel(models.Model):
     body = models.CharField(max_length=1000)
     image = models.ImageField(upload_to='images', blank=True, null=True)
     it_read = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+
+class Image(models.Model):
+    image = models.ImageField(upload_to='images', blank=True, null=True)

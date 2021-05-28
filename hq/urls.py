@@ -36,6 +36,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name='login.html'),name='login'),
     path('logout/', LogoutView.as_view(template_name='logout.html'),name='logout'),
     path('post/', PostView.as_view(),name='post'),
+    path('post_json/', post_json, name='post_json'),
     path('post/<int:pk>', PostDetailView.as_view(), name='post_detail'),
     path('post/edit/<int:pk>', PostEditView.as_view(), name='post_edit'),
     path('post/delete/<int:pk>', PostDeleteView.as_view(), name='post_delete'),

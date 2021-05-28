@@ -23,11 +23,11 @@ class PostForm(forms.ModelForm):
             'placeholder':'内容を入力してください'
             }))
 
-    image = forms.ImageField(label='画像',required=False)
+    image = forms.ImageField(label='画像',required=False,widget=forms.ClearableFileInput(attrs={'multiple':True}))
 
     class Meta:
         model = Post
-        fields=['body','image']
+        fields=['body']
 
 class CommentForm(forms.ModelForm):
     comment = forms.CharField(
@@ -42,7 +42,7 @@ class CommentForm(forms.ModelForm):
 class ThreadForm(forms.Form):
     username = forms.fields.ChoiceField(label='',
         choices = (
-            ('鈴木一郎（営業所長）', '鈴木一郎'),
+            ('鈴木一郎', '鈴木一郎'),
         ),
         required=True,
         widget=forms.widgets.Select(attrs={'size':'5','style': 'width: 100%'})
