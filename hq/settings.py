@@ -27,7 +27,7 @@ SECRET_KEY = '#kaj33i2+e$(qx01j)9vd)1o81r-$vr+&yuyw=9!5str^8amjp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['life-tech-web.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -85,12 +85,8 @@ WSGI_APPLICATION = 'hq.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':'d7r3gc0ng85bno',
-        'USER':'sipxtnawdsdnyk',
-        'PASSWORD':'58b832a2690af26055fc7ce9c39bcf793434bd15110774345d005cf456d702bd',
-        'HOST':'ec2-23-22-191-232.compute-1.amazonaws.com',
-        'PORT':5432,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 # Password validation
