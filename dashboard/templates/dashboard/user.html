@@ -71,7 +71,7 @@
             console.log(value);
             console.log(type);
             $.ajax({
-                url:"https://kangsm.pythonanywhere.com/dashboard//item_save/"
+                url:"https://kangsm.pythonanywhere.com/dashboard/item_save/","http://127.0.0.1:8000/dashboard/item_save/"
                 type: "POST",
                 data:{id:id, type:type, value:value},
             })

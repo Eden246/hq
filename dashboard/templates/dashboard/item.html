@@ -56,7 +56,7 @@
 
     <script>
     $(document).ready(function(){
-        $(document).on("dblclick", ".editable", function(){
+        $(document).on("click", ".editable", function(){
             var value = $(this).text();
             var input = "<input type='text' class='input-data' value='"+value+"' class='form-control'>";
             $(this).html(input);
@@ -90,6 +90,17 @@
             console.log(type);
             $.ajax({
                 url:"http://127.0.0.1:8000/dashboard/item_save/",
+                type: "POST",
+                data:{id:id, type:type, value:value},
+            })
+            .done(function(response){
+                console.log(response);
+            })
+            .fail(function(){
+                console.log("Error");
+            })
+            $.ajax({
+                url:"https://kangsm.pythonanywhere.com/dashboard/item_save/",
                 type: "POST",
                 data:{id:id, type:type, value:value},
             })
