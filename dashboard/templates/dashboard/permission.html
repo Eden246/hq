@@ -1,0 +1,91 @@
+{% extends 'dashboard/base.html' %}
+{% load auth_extras %}
+{% block content %}
+{% include 'dashboard/top.html' %}
+    <div class="row my-4">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-8">
+            <table class="table bg-white mt-3">
+                <thead class="bg-info text-white">
+                    <tr>
+                        <th scope="col">名前</th>
+                        <th scope="col">日付</th>
+                        <th scope="col">内容</th>
+                        <th scope="col">オーダー</th>
+                        <th scope="col">承認結果</th>
+                        <th scope="col">コメント</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for permission in permissions %}
+                    <tr>
+                        <td >{{ permission.user.username }}</td>
+                        <td >{{ permission.date }}</td>
+                        <td >{{ permission.message }}</td>
+                        <td ><a href="{% url 'order-detail' permission.order.pk %}">{{ permission.order }}</a></td>
+                        <td >
+                        {% if request.user|has_group:"head" %}
+                            {% if permission.result == 0 %}
+                                <span class="alert alert-success p-1">承認</span>
+                            {% elif permission.result == 1 %}
+                                <span class="alert alert-danger p-1">不承認</span>
+                            {% else %}
+                                <a href="{% url 'approve' permission.pk %}"class="btn btn-primary p-2">承認</a>
+                                <a href="{% url 'disapprove' permission.pk %}" class="btn btn-danger p-2">不承認</a>
+                            {% endif %}
+                        {% else %}
+                            {% if permission.result == 0 %}
+                                <span class="alert alert-success p-1">承認</span>
+                            {% elif permission.result == 1 %}
+                                <span class="alert alert-danger p-1">不承認</span>
+                            {% else %}
+                                <span class="alert alert-info p-1">承認待ち</span>
+                            {% endif %}
+                        {% endif %}
+                        </td>
+                        {% if request.user|has_group:"head" %}
+                        <td class="editable" data-id="{{ permission.id}}"data-type="comment">{{ permission.comment }}</td>
+                        {% else %}
+                        <td>{{ permission.comment }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+<script>
+$(document).ready(function(){
+    $(document).on("click", ".editable", function(){
+        var value = $(this).text();
+        var input = "<input type='text' class='input-data' value='"+value+"' class='form-control'>";
+        $(this).html(input);
+        $('input',this).focus();
+        $(this).removeClass("editable");
+    })
+    $(document).on("blur", ".input-data", function(){
+        var value = $(this).val();
+        var td = $(this).parent("td");
+        $(this).remove();
+        td.html(value);
+        td.addClass("editable");
+        var type = td.data("type");
+        sendToServer(td.data("id"), value, type);
+    })
+    function sendToServer(id, value, type){
+        $.ajax({
+            url:"http://127.0.0.1:8000/dashboard/permission_save/",
+            type:"POST",
+            data:{id:id, type:type, value:value},
+        })
+        .done(function(response){
+            console.log(response)
+        })
+        .fail(function(){
+            console.log("Error")
+        })
+    }
+})
+</script>
+{% endblock content %}

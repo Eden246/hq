@@ -13,7 +13,6 @@ class MenuItem(models.Model):
     quantity = models.IntegerField(default=0)
     video_url = models.CharField(max_length=100, blank=True)
 
-
     def __str__(self):
         return self.name
 
@@ -57,10 +56,10 @@ class OrderModel(models.Model):
     email = models.CharField(max_length=50, blank=True)
     facility = models.CharField(max_length=50, blank=True)
     phone = models.CharField(max_length=50, blank=True)
-    is_paid = models.BooleanField(default=False)
     price = models.IntegerField(blank=True, null=True)
+    status = models.IntegerField(default=2)
     ordered = models.BooleanField(default=False)
     description = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return f'カート生成日付:{self.created_on.strftime("%Y%m%d|%H:%M:%S")}'
+        return f'{self.created_on.strftime("%Y%m%d")}｜{self.name}'

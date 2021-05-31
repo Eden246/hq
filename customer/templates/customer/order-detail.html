@@ -63,16 +63,19 @@
         </div>
     </div>
     <div class="content text-center">
-        {% if order.is_paid %}
-            <p><i style="color:green;" class="fa fa-check"></i><span class="pl-2">完了</span></p>
+    <br><br><br><br><br><br>
+        {% if order.status == 0 %}
+            <p class="alert alert-primary"><i style="color:green;" class="fa fa-check"></i><span class="pl-2">承認</span></p>
+        {% elif order.status == 1 %}
+            <p class="alert alert-danger"><i style="color:green;" class="fa fa-cog"></i><span class="pl-2">審査待ち</span></p>
         {% else %}
-            <p><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
-        {% endif %}
+            <p class="alert alert-info"><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-success" style="background-color: navy;">完了</button>
+            <input type='text' name='message' class='form-control'>
+            <button type="submit" class="btn btn-success" style="background-color: navy;">実績申請</button>
         </form>
-        </p>
+        {% endif %}
     </div>
 </div>
 {% endblock content %}

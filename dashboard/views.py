@@ -12,17 +12,48 @@ from django.db.models.functions import TruncDate
 import datetime
 from django.db.models import Q
 from django.contrib.auth.models import User
+from .models import *
+
+def permission(request):
+    permissions = Permission.objects.all()
+    context ={
+        'permissions':permissions
+    }
+    return render(request, 'dashboard/permission.html', context)
+
+def approve(request, pk):
+    permission = Permission.objects.get(pk=pk)
+    permission.result = 0
+    permission.save()
+    return redirect('permission')
+
+def disapprove(request, pk):
+    permission = Permission.objects.get(pk=pk)
+    permission.result = 1
+    permission.save()
+    return redirect('permission')
+
+@csrf_exempt
+def permission_save(request):
+    id = request.POST.get('id', '')
+    type = request.POST.get('type', '')
+    value = request.POST.get('value', '')
+    permission = Permission.objects.get(id=id)
+    if type == "comment":
+        permission.comment = value
+    permission.save()
+    return JsonResponse({"success": "Updated"})
 
 @login_required
 def order_list(request):
-    orders = OrderModel.objects.filter(ordered=False, is_paid=False)
+    orders = OrderModel.objects.filter(ordered=False, status=2)
     total_revenue = 0
     for order in orders:
         total_revenue += order.price
     pie_data = []
     pie_label = []
 
-    qs = OrderModel.objects.filter(ordered=False, is_paid=False).values(
+    qs = OrderModel.objects.filter(ordered=False, status=2).values(
         'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(sum=Sum('items__quantity')).values('items__items__category__parent__name', 'sum')
     for i in qs:
         pie_label.append(i['items__items__category__parent__name'])

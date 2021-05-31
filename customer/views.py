@@ -1,3 +1,4 @@
+from dashboard.models import Permission
 from django.shortcuts import get_object_or_404, render
 from django.views import View
 from .models import *
@@ -9,7 +10,9 @@ from django.shortcuts import redirect
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-
+from dashboard.models import *
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 class Order(View):
     def get(self, request, *args, **kwargs):
@@ -178,13 +181,11 @@ class CartView(View):
             notification = Notification.objects.create(
                 notification_type=4, from_user=request.user, to_user=staff, order=order)
 
-        context = {
-            'price': price,
-            'order': order,
-        }
+        return HttpResponseRedirect(reverse('confirmation', kwargs={'price':price, 'order_pk':order.pk}))
 
-        return render(request, 'customer/order_confirmation.html', context)
-
+def confirmation(request, price, order_pk):
+    order = OrderModel.objects.get(pk=order_pk)
+    return render(request, 'customer/order_confirmation.html', {'price':price, 'order':order})
 
 class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, pk, *args, **kwargs):
@@ -196,16 +197,19 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request, pk, *args, **kwargs):
         order = OrderModel.objects.get(pk=pk)
-        order.is_paid = True
+        message = request.POST.get('message')
+        permission = Permission.objects.create(
+            user=request.user,
+            message=message,
+            order=order,
+        )
+        order.status = 1
         order.save()
-        context = {
-            'order': order,
-        }
-        return render(request, 'customer/order-detail.html', context)
+        permission.save()
+        return HttpResponseRedirect(reverse_lazy("permission"))
 
     def test_func(self):
         return self.request.user.groups.filter(name='staff').exists()
-
 
 class OrderNotification(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, notification_pk, order_pk, *args, **kwargs):
