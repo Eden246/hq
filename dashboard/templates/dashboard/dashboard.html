@@ -1,43 +1,142 @@
 {% extends 'dashboard/base.html' %}
 {% block content %}
 {% include 'dashboard/top.html' %}
+<style>
+
+
+#fav-table th {
+  background-color:#155084;
+  border-bottom: 2px solid #E2B842;
+  color: #E2B842;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 0.25em;
+	}
+
+#fav-table  td {
+  background-color:#155084;
+  border-bottom: 2px solid #E2B842;
+  color: #E2B842;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+table {
+  background: #012B39;
+  border-radius: 0.25em;
+  border-collapse: collapse;
+  margin: 1em;
+}
+th {
+  border-bottom: 1px solid #364043;
+  color: #E2B842;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 0.5em 1em;
+}
+td {
+  border-bottom: 1px solid #364043;
+  color: #fff;
+  font-weight: 400;
+  padding: 0.65em 1em;
+}
+tbody tr {
+  transition: background 0.25s ease;
+}
+tbody tr:hover {
+  background: #014055;
+}
+</style>
+
 <br>
-<div class="row card text-center" data-aos="slide-right" data-aos-delay="300">
-  <h1>《設定時刻》</h1>
-  {% if year%}
-    <h2>年度:&nbsp;{{ year }}｜月:&nbsp;{{ month }}</h2>
-  {% else %}
-    <h2>現在時刻</h2>
-  {% endif %}
-    <div class="d-flex justify-content-center" >
-      <form method="GET" style="max-width : 400px;">
+<div class="row text-center justify-content-center d-flex">
+    <div class="col-lg-2 card">
+      <h4 class="badge bg-warning">30日以内実績</h4>
+      <table id="fav-table">
+        <thead>
+            <tr>
+                <th scope="col">お名前</th>
+                <th scope="col">対応物品数</th>
+                <th scope="col">合計</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+              <th scope="row">{{ user.username }}</th>
+              <td>{{ user.sum }}</td>
+              <td>{{ user.total_price }}</td>
+            </tr>
+              {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-lg-4 card">
+      <h4 class="badge bg-primary">最近予約</h4>
+      <table>
+        <thead>
+          <tr >
+            <th>予約時間</th>
+            <th>施設名</th>
+            <th>金額</th>
+            <th>担当者</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr>
+              <td >{{ order.created_on | date:'m-d H:i' }}</td>
+              <td >{{order.user.client.facility}}</td>
+              <td >{{order.price}}</td>
+              <td>
+              
+              {% if order.handler %}
+              {{ order.handler }}
+              {% else %}
+              <a href="{% url 'order-detail' order.pk %}"><i class="fa fa-edit"></i></a>
+              {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-lg-3 card">
+      <h1>《設定時刻》</h1>
+      {% if year == "指定なし" or not year %}
+      <sapn class="badge bg-danger" style="font-size:20px;">最近30日以内</sapn>
+      {% else %}
+      <sapn class="badge bg-danger" style="font-size:20px;">{{ year }}年{{ month }}月</sapn>
+      {% endif %}
+      <form method="GET">
         <select class="form-control" name="year">
-          <option value="今年" selected>年度を選択してください</option>
+          <option value="指定なし" selected>年度を選択してください</option>
           <option value="2020">2020</option>
           <option value="2021">2021</option>
         </select>
         <select class="form-control" name="month">
-          <option value="今月" selected>当月を選択してください</option>
+          <option value="指定なし" selected>当月を選択してください</option>
           <option value="4">４月</option>
           <option value="5">５月</option>
+          <option value="6">６月</option>
         </select>
         <select class="form-control" name="category">
-          <option value="全体" selected>全体カテゴリー</option>
+          <option value="指定なし" selected>全体カテゴリー</option>
           <option value="6">車いす</option>
           <option value="8">手すり</option>
         </select>
         <button class="btn btn-info btn-sm">検索（基本設定：今月,　全体項目）</button>
       </form>
     </div>
+    <div class="col-lg-2 card" >
+      <canvas id="pie-chart"></canvas>
+    </div>
 </div>
-  <div class="row">
-    <div class="col-md-12 col-xl-4 mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-12 col-lg-5 mt-3 card">
       <canvas class="mt-5" id="line-chart"></canvas>
     </div>
-    <div class="col-md-12 col-xl-4 mt-5">
-      <canvas class="mt-5" id="pie-chart"></canvas>
-    </div>
-    <div class="col-md-12 col-xl-4 mt-5">
+    <div class="col-md-12 col-lg-5 mt-3 card">
       <canvas class="mt-5" id="bar-chart"></canvas>
     </div>
   </div>
@@ -81,7 +180,7 @@ var PieChart = new Chart(ctx, {
     plugins: {
       datalabels: {
         formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
-        return `${label}\n${value}円`}
+        return `${value}円`}
       },
       labels: {
         render: "value",
@@ -113,7 +212,7 @@ var BarChart = new Chart(ctx, {
     plugins: {
       datalabels: {
         formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
-        return `${label}\n${value}件`}
+        return `${value}件`}
       },
       labels: {
         render: "value",
@@ -127,6 +226,10 @@ var BarChart = new Chart(ctx, {
 		  yAxes: [{scaleLabel: {display: true, labelString: '販売件数'},ticks: {min: 0, stepSize: 5}}],
 	  },
   }
+});
+
+$(document).ready(function() {
+    $('#fav-table').tablesorter({ theme : 'blue' });
 });
 </script>
 {% endblock content %}

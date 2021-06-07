@@ -102,29 +102,21 @@
 
 .slideOutTab {
   position: fixed;
-  height: 30px;
-  right: 0%;
-  width: 200px;
+  height: 50px;
+  line-height: 50px;
+  right: 20px;
+  width: 180px;
   bottom:80px;
-  color: gold;
+  color: #F6D55C;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
-  background: #06D85F;
-  border-radius: 15px 0px 0px 15px
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, .5);
+  background: #20639B;
+  border-radius: 15px 15px 15px 15px;
 }
 
 .slideOutTab:hover {
-	background-color: gold;
-	color: #a8c66c;
+	background-color: #173F5F;
   cursor: pointer;
-}
-
-.slideOutTab div {
-  text-align: center;
-  position: relative;
-  {% comment %} -webkit-transform: rotate(270deg);
-  -moz-transform: rotate(270deg);
-  -o-transform: rotate(270deg); {% endcomment %}
 }
 
 .modal-body {
@@ -285,33 +277,26 @@ $("#maxPrice").on('blur', function() {
     return false;
   }
 })
-$(function(){
-    setTimeout(function(){
-        $(".social-panel-container").animate({width:'toggle'},350);
-    },2000);
-});
 </script>
 
 
 
-<!-- // SlideOut -->
 <div id="slideOut" style="z-index: 2;">
-<!--   // Tab -->
-  <div class="slideOutTab">
-  <div class="p-10" ><i style="width:30px;" class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートを開く</div>
+{% if user.is_authenticated %}
+  <div class="slideOutTab text-center">
+    <i class="fa fa-angle-double-up m-0" style="font-size:40px;"></i>&emsp;カートを開く
   </div>
-
+{% endif %}
   <div class="modal-content">
-    <div class="modal-header">
-      <h4 class="modal-title">カート目録</h4>
+    <div class="modal-header" style="background-color:#173F5F">
+      <h4 class="modal-title" style="color:#F6D55C">カート目録</h4>
     </div>
-    <div class="modal-body">
-    
+    <div class="modal-body" style="background-color:#F6D55C">
 {% if order_item %}
 {% if user.is_authenticated %}
       <table class="table table-hover table-striped">
-        <thead>
-            <tr>
+        <thead  style="background-color:#20639B">
+            <tr style="color:#F6D55C">
                 <th scope="col">商品名</th>
                 <th scope="col">単価</th>
                 <th scope="col">数量</th>
@@ -321,7 +306,7 @@ $(function(){
         </thead>
         <tbody>
         {% for order in order_item %}
-          <tr>
+          <tr style="color:#20639B">
             <td>{{ order.items.name }}</td>
             <td>{{ order.items.price }}円</td>
             <td>{{ order.quantity }}</td>
@@ -331,8 +316,8 @@ $(function(){
           </tr>
         {% endfor %}
         </tbody>
-          <tfoot>
-            <tr>
+          <tfoot style="background-color:#ED553B">
+            <tr style="color:#F6D55C">
               <td>合計：</td>
               <td></td>
               <td></td>
@@ -357,10 +342,10 @@ $(function(){
 <div class="container d-lg-flex">
   <div class="row" style="min-width:400px" data-aos="slide-right" data-aos-delay="500">
     <form method="GET">
-        <div class="card mb-4">
-            <h5 class="card-header" style="background-color: #E0E9D6;">品名</h5>
+        <div class="card mb-4 mt-3">
+            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">品名</h5>
             <div class="list-group list-group-flush">
-                <li class="list-group-item">
+                <li class="list-group-item" style="background-color:#F6D55C;">
                     <div class="form-group">
                         <input class="form-control py-2 border-right-0 border" type="search" name="name" placeholder="品名を入力してください">
                     </div>
@@ -368,9 +353,9 @@ $(function(){
             </div>
         </div>
         <div class="card mb-4">
-            <h5 class="card-header" style="background-color: #E0E9D6;">詳細条件</h5>
+            <h5 class="card-header"  style="background-color: #173F5F;color:#F6D55C;">詳細条件</h5>
             <div class="list-group list-group-flush">
-                <li class="list-group-item">
+                <li class="list-group-item" style="background-color:#F6D55C;">
                     <div class="form-group">
                         <input class="form-control py-2 border-right-0 border" type="search" name="detail" placeholder="詳細条件を入力してください">
                     </div>
@@ -378,9 +363,9 @@ $(function(){
             </div>
         </div>
         <div class="card mb-4">
-            <h5 class="card-header" style="background-color: #E0E9D6;">品目</h5>
+            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">品目</h5>
             <div class="list-group list-group-flush">
-                <li class="list-group-item">
+                <li class="list-group-item" style="background-color:#F6D55C;">
                     <div class="form-group">
                         <select name="category" id="category" class="form-control">
                             <option selected>全ての品目</option>
@@ -393,9 +378,9 @@ $(function(){
             </div>
         </div>
         <div class="card mb-4">
-            <h5 class="card-header" style="background-color: #E0E9D6;">値段</h5>
+            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">値段</h5>
             <div class="list-group list-group-flush">
-                <li class="list-group-item">
+                <li class="list-group-item" style="background-color:#F6D55C;">
                     <input type="range" value="10000"　id="rangeInput" oninput="maxPrice.value=this.value"　min="0" max="10000" style="width:80%">
                 </li>
                 <li class="list-group-item text-center">
@@ -485,7 +470,6 @@ $("input:checkbox").click(function() {
 
 this.$slideOut = $('#slideOut');
 
-// Slideout show
 this.$slideOut.find('.slideOutTab').on('click', function() {
   $("#slideOut").toggleClass('showSlideOut');
 });

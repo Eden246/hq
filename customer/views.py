@@ -1,4 +1,3 @@
-from dashboard.models import Permission
 from django.shortcuts import get_object_or_404, render
 from django.views import View
 from .models import *
@@ -72,12 +71,12 @@ class Order(View):
             order_item.quantity += 1
             order_item.save()
             messages.info(request, "カートに追加されました。")
-            return redirect("order")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
         else:
             messages.info(request, "カートに追加されました。")
             OrderItem.objects.create(
                 user=request.user, items=menu_item, ordered=False).save()
-            return redirect("order")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required
@@ -121,6 +120,7 @@ class CartView(View):
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         facility = request.POST.get('facility')
+        license = request.POST.get('license')
 
         price = 0
         for item in order_item:
@@ -135,6 +135,7 @@ class CartView(View):
             phone=phone,
             facility=facility,
             price=price,
+            license=license,
         )
         order.items.add(*item_ids)
 
@@ -181,35 +182,11 @@ class CartView(View):
             notification = Notification.objects.create(
                 notification_type=4, from_user=request.user, to_user=staff, order=order)
 
-        return HttpResponseRedirect(reverse('confirmation', kwargs={'price':price, 'order_pk':order.pk}))
+        return HttpResponseRedirect(reverse('confirmation', kwargs={'order_pk':order.pk}))
 
-def confirmation(request, price, order_pk):
+def confirmation(request, order_pk):
     order = OrderModel.objects.get(pk=order_pk)
-    return render(request, 'customer/order_confirmation.html', {'price':price, 'order':order})
-
-class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, pk, *args, **kwargs):
-        order = OrderModel.objects.get(pk=pk)
-        context = {
-            'order': order
-        }
-        return render(request, 'customer/order-detail.html', context)
-
-    def post(self, request, pk, *args, **kwargs):
-        order = OrderModel.objects.get(pk=pk)
-        message = request.POST.get('message')
-        permission = Permission.objects.create(
-            user=request.user,
-            message=message,
-            order=order,
-        )
-        order.status = 1
-        order.save()
-        permission.save()
-        return HttpResponseRedirect(reverse_lazy("permission"))
-
-    def test_func(self):
-        return self.request.user.groups.filter(name='staff').exists()
+    return render(request, 'customer/order_confirmation.html', {'order':order})
 
 class OrderNotification(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request, notification_pk, order_pk, *args, **kwargs):

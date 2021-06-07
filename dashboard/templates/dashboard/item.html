@@ -3,67 +3,208 @@
 {% block content %}
 {% include 'dashboard/top.html' %}
 {% load mptt_tags %}
-    <div class="row my-4">
-        <div class="col-xl-3">
-            {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-#">
-                {{ message }}
+<style>
+table {
+  background: #012B39;
+  border-radius: 0.25em;
+  border-collapse: collapse;
+}
+th {
+  border-bottom: 1px solid #364043;
+  color: #E2B842;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 0.5em 1em;
+  text-align: left;
+}
+td {
+  color: #fff;
+  font-weight: 400;
+  padding: 0.65em 1em;
+}
+tbody tr {
+  transition: background 0.25s ease;
+}
+tbody tr:hover {
+  background: #014055;
+}
+</style>
+<div class="row justify-content-center my-4">
+<div class="col-lg-3">
+  <div class="card p-2">
+    <h2>在庫履歴</h2>
+    <a href="{% url 'item_csv' %}">csvファイル</a>
+    <hr>
+    <table class="table table-bordered table-hover" style="width:100%">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">登録者</th>
+          <th scope="col">タイプ</th>
+          <th scope="col">日付</th>
+          <th scope="col">品名</th>
+          <th scope="col">数量</th>
+          <th scope="col">確認書</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tracker in trackers %}
+        <tr>
+          <th scope="row">{{ tracker.id }}</th>
+          <th scope="row">{{ tracker.user }}</th>
+          <th scope="row">{{ tracker.type }}</th>
+          <td>{{ tracker.created_on }}</td>
+          <td>{{ tracker.name }}</td>
+          <td>{{ tracker.quantity }}</td>
+          <td>
+          {% if tracker.contract_image %}
+            <button type="button" class="alert alert-info" data-bs-toggle="modal" data-bs-target="#collapseExample{{tracker.pk}}"><i class='fas fa-stamp'></i></button>
+            <div class="modal fade" id="collapseExample{{tracker.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <img id="myImage" src="{{ tracker.contract_image.url }}" alt="Test" style="width:100%;">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                    </div>
+                </div>
+              </div>
             </div>
-            {% endfor %}
-            {% endif %}
-            <div class="card p-3" data-aos="zoom-out-right" data-aos-delay="200">
-                <h2>新商品追加</h2>
-                <hr>
-                <form method="POST" enctype='multipart/form-data'>
-                    {% csrf_token %}
-                    {{ form | crispy }}
-                    {% for choice in drive_nodes.choices %}
-                        {{ choice }}
-                    {% endfor %}
-                    <br>
-                    <input class="btn btn-success btn-block" type="submit" value="Add">
-                </form>
+          {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="col-lg-2">
+  <div class="card p-2">
+    <h2>在庫軽減履歴</h2>
+    <hr>
+    <table class="table table-bordered table-hover" style="width:100%">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">承認日付</th>
+          <th scope="col">品目</th>
+          <th scope="col">契約書</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for permission in permissions %}
+        <tr>
+          <th scope="row">{{ permission.id }}</th>
+          <td>{{ permission.date }}</td>
+          <td>{% for i in permission.order.items.all %}{{ i }}{% endfor %}</td>
+          <td>
+            <button type="button" class="alert alert-info" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class='fas fa-stamp'></i></button>
+            <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <img id="myImage" src="{{ permission.image.url }}" alt="Test" style="width:100%;">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                    </div>
+                </div>
+              </div>
             </div>
-        </div>
-        <div class="col-xl-9" data-aos="slide-left" data-aos-delay="500">
-            <table class="table bg-white">
-                <thead class="bg-info text-white">
-                    <tr>
-                        <th scope="col">お名前</th>
-                        <th scope="col">カテゴリー</th>
-                        <th scope="col">&nbsp;数量</th>
-                        <th scope="col">単価</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
-                        <td class="d-flex">{{ item.category.parent }}|({{ item.category.name }})</td>
-                        <td >
-                        <a class="minus" href="{% url 'item_delete' item.pk %}"><i class="fa fa-minus"></i></a>
-                        {{ item.quantity }}
-                        <a href="{% url 'item_add' item.pk %}"><i class="fa fa-plus"></i></a>
-                        </td>
-                        <td class="editable" data-id="{{ item.id}}"data-type="price">{{ item.price }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+  <div class="col-lg-3">
+      <div class="card p-3" data-aos="zoom-in" data-aos-delay="200">
+          <h2>新商品追加</h2>
+          <hr>
+          <form method="POST" enctype='multipart/form-data'>
+              {% csrf_token %}
+                {{ form0 | crispy }}
+                {{ form | crispy }}
+                {% for choice in drive_nodes.choices %}
+                    {{ choice }}
+                {% endfor %}
+              <br>
+              <input class="btn btn-success btn-block" type="submit" value="追加" name='save_new'>
+          </form>
+      </div>
+  </div>
+  <div class="col-lg-4" data-aos="fade-in" data-aos-delay="500">
+      <div class="form-group pt-3">
+          <form method="POST" enctype='multipart/form-data'>
+              <table id="fav-table">
+                  <thead>
+                      <tr>
+                          <th>選択</th>
+                          <th scope="col">ID
+                          <th scope="col">お名前</th>
+                          <th scope="col">製造会社</th>
+                          <th scope="col">タスコード</th>
+                          <th scope="col">カテゴリー</th>
+                          <th scope="col">&nbsp;数量</th>
+                          <th scope="col">単価</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in items %}
+                      <tr>
+                          <td><input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}"></td>
+                          <td >{{ item.id }}</td>
+                          <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
+                          <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
+                          <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
+                          <td class="d-flex">{{ item.category.parent }}|({{ item.category.name }})</td>
+                          <td >
+                              <a class="minus" href="{% url 'item_delete' item.pk %}"><i class="fa fa-minus"></i></a>
+                              {{ item.quantity }}
+                          </td>
+                          <td class="editable" data-id="{{ item.id}}"data-type="price">{{ item.price }}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+              <label for="type">追加タイプ（選択）</label>
+              <select name="type" id="type" class="form-control">
+                <option value="在庫追加" selected>在庫追加</option>
+                <option value="返品処理">返品処理</option>
+              </select>
+              <label for="quantity">数量</label>
+              <input required type="text" id="quantity_id" placeholder="数量を入力してください" class="form-control" name="quantity">
+              {% csrf_token %}
+              {{ form0 | crispy }}
+            <input class="btn btn-success btn-block" type="submit" value="追加" name='save_renew'>
+          </form>
+      </div>
+  </div>
+</div>
 
-    <script>
-    $(document).ready(function(){
-        $(document).on("click", ".editable", function(){
-            var value = $(this).text();
-            var input = "<input type='text' class='input-data' value='"+value+"' class='form-control'>";
-            $(this).html(input);
-            $('input',this).focus();
-            $(this).removeClass("editable");
-        })
-        $(document).on("blur", ".input-data", function(){
+<script>
+$(document).ready(function(){
+    $(document).on("click", ".editable", function(){
+        var value = $(this).text();
+        var input = "<input type='text' class='input-data' value='"+value+"' class='form-control'>";
+        $(this).html(input);
+        $('input',this).focus();
+        $(this).removeClass("editable");
+    })
+    $(document).on("blur", ".input-data", function(){
+        var value = $(this).val();
+        var td = $(this).parent("td");
+        $(this).remove();
+        td.html(value);
+        td.addClass("editable");
+        var type = td.data("type");
+        sendToServer(td.data("id"), value, type);
+    })
+    $(document).on("keypress", ".input-data", function(e){
+        var key = e.which;
+        if(key==13){
             var value = $(this).val();
             var td = $(this).parent("td");
             $(this).remove();
@@ -71,50 +212,50 @@
             td.addClass("editable");
             var type = td.data("type");
             sendToServer(td.data("id"), value, type);
-        })
-        $(document).on("keypress", ".input-data", function(e){
-            var key = e.which;
-            if(key==13){
-                var value = $(this).val();
-                var td = $(this).parent("td");
-                $(this).remove();
-                td.html(value);
-                td.addClass("editable");
-                var type = td.data("type");
-                sendToServer(td.data("id"), value, type);
-            }
-        })
-        function sendToServer(id, value, type){
-            console.log(id);
-            console.log(value);
-            console.log(type);
-            $.ajax({
-                url:"https://kangsm.pythonanywhere.com/dashboard/item_save/",
-                type: "POST",
-                data:{id:id, type:type, value:value},
-            })
-            .done(function(response){
-                console.log(response);
-            })
-            .fail(function(){
-                console.log("Error");
-            })
-            $.ajax({
-                url:"http://127.0.0.1:8000/dashboard/permission_save/",
-                type: "POST",
-                data:{id:id, type:type, value:value},
-            })
-            .done(function(response){
-                console.log(response);
-            })
-            .fail(function(){
-                console.log("Error");
-            })
         }
-    });
-    $(document).on('click', '.minus', function(){
-    return confirm('在庫を減らしますか？「ゼロ：商品非表示」｜「ゼロ以下：削除」');
     })
-
-    </script>
+    function sendToServer(id, value, type){
+        console.log(id);
+        console.log(value);
+        console.log(type);
+        $.ajax({
+            url:"https://kangsm.pythonanywhere.com/dashboard/item_save/",
+            type: "POST",
+            data:{id:id, type:type, value:value},
+        })
+        .done(function(response){
+            console.log(response);
+        })
+        .fail(function(){
+            console.log("Error");
+        })
+        $.ajax({
+            url:"http://127.0.0.1:8000/dashboard/item_save/",
+            type: "POST",
+            data:{id:id, type:type, value:value},
+        })
+        .done(function(response){
+            console.log(response);
+        })
+        .fail(function(){
+            console.log("Error");
+        })
+    }
+});
+$(document).on('click', '.minus', function(){
+return confirm('在庫を減らしますか？「ゼロ：商品非表示」｜「ゼロ以下：削除」');
+})
+$(document).ready(function() {
+    $('#fav-table').tablesorter({ theme : 'blue' });
+});
+$("input:checkbox").click(function() {
+    if ($(this).is(":checked")) {
+        var group = "input:checkbox[name='" + $(this).attr("name") + "']";
+        $(group).prop("checked", false);
+        $(this).prop("checked", true);
+    } else {
+        $(this).prop("checked", false);
+    }
+});
+</script>
 {% endblock content %}

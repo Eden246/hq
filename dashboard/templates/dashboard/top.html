@@ -1,61 +1,153 @@
-   <style>
-   .card-body:hover {
-    box-shadow: 0 0 25px 0 rgba(20, 27, 201, .05);
-    cursor: pointer;
-    background-image: linear-gradient(-45deg, rgba(20, 27, 201, .05) 0%, #44a2f6 100%)
+{% load crispy_forms_tags %}
+{% load auth_extras %}
+<style>
+ .container {
+	 margin: 0 auto;
+	 max-width: 980px;
 }
-   </style>
-   
+ .panel {
+	 box-sizing: border-box;
+	 position: relative;
+	 display: inline-block;
+	 width: 300px;
+	 height: 160px;
+	 margin: 10px;
+	 font-size: 32px;
+	 font-weight: 600;
+	 color: #fff;
+	 overflow: hidden;
+	 border-radius: 8px;
+}
+ .panel a {
+	 position: relative;
+	 display: block;
+	 padding: 12px 25px 25px 25px;
+	 color: #fff;
+	 text-decoration: none;
+	 z-index: 2;
+}
+ .panel a span {
+	 display: block;
+	 font-size: 96px;
+	 font-weight: 700;
+	 line-height: 96px;
+}
+ .panel:after {
+	 position: absolute;
+	 font-family: FontAwesome;
+	 color: #000000;
+	 z-index: 1;
+	 transition: all .5s;
+	 line-height: normal;
+}
+ .panel.post {
+	 background-color: #b8aa0e;
+}
+ .panel.post:after {
+	 content: "\f15c";
+	 font-size: 200px;
+	 color: #a5980d;
+	 top: 45px;
+	 right: 60px;
+	 -webkit-transform: rotate(45deg);
+	 transform: rotate(45deg);
+}
+ .panel.post:hover:after {
+	 top: 8px;
+}
+ .panel.comment {
+	 background-color: #0377c0;
+}
+ .panel.comment:after {
+	 content: "\f08d";
+	 font-size: 180px;
+	 color: #036bac;
+	 top: 30px;
+	 right: 35px;
+}
+ .panel.comment:hover:after {
+	 top: -5px;
+}
+ .panel.page {
+	 background-color: #279824;
+}
+ .panel.page:after {
+	 content: "\f075";
+	 font-size: 160px;
+	 color: #238820;
+	 top: 62px;
+	 right: 39px;
+}
+ .panel.page:hover:after {
+	 top: 24px;
+}
+ .panel.user {
+	 background-color: #fc1c3e;
+}
+ .panel.user:after {
+	 content: "\f007";
+	 font-size: 200px;
+	 color: #ec0326;
+	 top: 45px;
+	 right: 35px;
+}
+ .panel.user:hover:after {
+	 top: 7px;
+}
+ .panel:hover:after {
+	 transition: all .5s;
+}
+ 
+</style>
     <div class="row">
-        <div class="col-md-4 mt-4">
-            <div class="card" data-aos="slide-right" data-aos-delay="50">
+        <div class="col-lg-4 mt-4">
+            <div class="card" data-aos="flip-left">
                 <div class="card-header bg-info text-white">
                     アナウンサー
+                    {% if request.user|has_group:"head" %}
+                    <button type="button" class="btn btn-primary p-2" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-edit"></i></button>
+                    {% endif %}
                 </div>
                 <div class="card-body">
-                    <marquee behavior="" direction="">
-                        <h3 class="my-4">伊賀ケアホームベット3台</h3>
+                    <marquee behavior="" direction="" scrollamount="10">
+                        <h3 class="mx-auto">{{ text.first }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.second }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.third }}</h3>
                     </marquee>
                 </div>
             </div>
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST">
+                        {% csrf_token %}
+                            <div class="modal-body">
+                                {{ text_form | crispy }}
+                            </div>
+                            <div class="modal-footer">
+                                <input class="alert alert-danger" type="submit" value="Update">
+                                <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-8 mt-4">
-            <div class="card" data-aos="slide-left" data-aos-delay="50">
+        <div class="col-lg-8 mt-4">
+            <div class="card" data-aos="fade-down" data-aos-delay="100">
                 <div class="card-header bg-info text-white">
                     ダッシュボード
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <a class="text-decoration-none text-dark" href="{% url 'permission' %}" style="active">
-                                <div class="card my-card shadow">
-                                    <div class="card-body text-center">
-                                        <h4>顧客情報 <i class="fas fa-users"></i></h4>
-                                        <h3></h3>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a class="text-decoration-none text-dark" href="{% url 'item' %}">
-                                <div class="card my-card shadow">
-                                    <div class="card-body text-center">
-                                        <h4>在庫管理 <i class="fas fa-box"></i></h4>
-                                        <h3></h3>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-md-4">
-                            <a class="text-decoration-none text-dark" href="{% url 'order_list' %}">
-                                <div class="card my-card shadow">
-                                    <div class="card-body text-center">
-                                        <h4>予約状況 <i class="fas fa-shipping-fast"></i></h4>
-                                        <h3></h3>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
+                    <div class="panel post">
+                        <a href="{% url 'order_list'%}"><span>{{ order_count }}</span>予約・貸出</a>
+                    </div>
+                    <div class="panel comment">
+                        <a href="{% url 'permission'%}"><span>{{ permission_count }}</span>承認状況</a>
+                    </div>
+                    <div class="panel page">
+                        <a href="{% url 'item'%}"><span>5</span>在庫管理</a>
+                    </div>
+                    <div class="panel user">
+                        <a href="javascript:void();"><span>4 </span>Users</a>
                     </div>
                 </div>
             </div>

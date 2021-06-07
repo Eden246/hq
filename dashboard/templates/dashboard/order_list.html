@@ -1,18 +1,124 @@
 {% extends 'dashboard/base.html' %}
+{% load auth_extras %}
+{% load crispy_forms_tags %}
 {% block content %}
 {% include 'dashboard/top.html' %}
+<style>
+#fav-table table { 
+	width: 750px; 
+	border-collapse: collapse; 
+	margin:50px auto;
+	}
+
+/* Zebra striping */
+#fav-table tr:nth-of-type(odd) { 
+	background: #eee; 
+	}
+
+#fav-table th { 
+	background-color: #3498db; 
+	color: white; 
+	font-weight: bold; 
+	}
+
+#fav-table td, th { 
+	padding: 10px; 
+	border: 1px solid #ccc; 
+	text-align: left; 
+	font-size: 18px;
+	}
+canvas{
+
+  width:500px !important;
+  height:300px !important;
+
+}
+</style>
+
     <div class="row my-4">
-        <div class="col-xl-4">
-            <canvas class="mt-5" id="pie-chart"></canvas>
+        <div class="col-xl-6">
+          <h2>貸出リスト</h2>
+          <hr>
+          <table id="fav-table">
+              <thead>
+                  <tr>
+                      <th scope="col">ID
+                      <th scope="col">利用者</th>
+                      <th scope="col">ケアマネジャー</th>
+                      <th scope="col">始日</th>
+                      <th scope="col">終了日</th>
+                      <th scope="col">品目</th>
+                      <th scope="col">合計</th>
+                      <th scope="col">担当者</th>
+                      <th scope="col">返品</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for permission in permissions %}
+                  <tr>
+                      <td>{{ permission.id }}</td>
+                      <td>{{ permission.order.name }}</td>
+                      <td>{{ permission.order.user }}</td>
+                      <td>{{ permission.order.facility }}</td>
+                      <td>{{ permission.date }}</td>
+                      <td>
+                      {% for item in permission.order.items.all %}
+                          ({{ item }})
+                      {% endfor %}
+                      </td>
+                      <td>{{ permission.order.price }}円</td>
+                      <td>{{ permission.user }}</td>
+                      <td>
+
+                      {% if request.user|has_group:"head" %}
+                          {% if permission.result == 1%}
+                          <button href="#{{permission.pk}}" type="button" class="btn btn-primary p-2" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fas fa-edit"></i></button>
+                          <form method="POST" enctype='multipart/form-data'>
+                              <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                      <div class="modal-content">
+                                          <form method="post" enctype="multipart/form-data" action="{% url 'image' permission.pk %}">
+                                          {% csrf_token %}
+                                              <div class="modal-body">
+                                              {{ form0 | crispy }}
+                                              <input type="hidden" name="permission_pk" value="{{ permission.pk }}">
+                                              </div>
+                                              <div class="modal-footer">
+                                                  <input class="alert alert-danger" type="submit" value="登録" name="came_back">
+                                                  <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                              </div>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                          {% else %}
+                          <span class="alert alert-danger p-1">返品済み</span>
+                          {% endif %}
+                      {% else %}
+                          {% if permission.result == 1 %}
+                          <span class="alert alert-danger p-1">貸出中</span>
+                          </form>
+                          {% else %}
+                          <span class="alert alert-danger p-1">返品済み</span>
+                          {% endif %}
+                      {% endif %}
+                      </td>
+
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
         </div>
-        <div class="col-xl-8 text-center mt-5">
+        <div class="col-xl-6 text-center mt-5">
             <div class="d-flex justify-content-center">
                 <h2>予約件数:&emsp;<h2 style="color:#ad0003;">{{ total_orders }}件</h2></h2>&emsp;&emsp;
                 <h2>予約総額:&emsp;<h2 style="color:#ad0003;">{{ total_revenue }}円</h2></h2>
             </div>
             <hr>
-            <table class="table bg-white table-hover table-striped">
-                <thead class="bg-info text-white">
+            <canvas class="mt-5" id="pie-chart"></canvas>
+            <table id="fav-table">
+                <thead>
                     <tr>
                         <th scope="col" style="width: 10px;">#</th>
                         <th scope="col">お名前</th>
@@ -42,7 +148,7 @@
 
 <script>
 Chart.defaults.global.defaultFontColor = '#0074D9';
-Chart.defaults.global.defaultFontSize = 18;
+Chart.defaults.global.defaultFontSize = 40;
 Chart.defaults.global.defaultFontFamily = 'Kosugi Maru';
 
 var ctx = document.getElementById("pie-chart").getContext('2d');
@@ -70,6 +176,10 @@ var PieChart = new Chart(ctx, {
     title: {display: true, text: '《 カテゴリー別｜予約状況 》'},
 	  rotation: -0.8 * Math.PI,
   }
+});
+
+$(document).ready(function() {
+    $('#fav-table').tablesorter();
 });
 </script>
 {% endblock content %}

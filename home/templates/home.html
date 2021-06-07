@@ -6,14 +6,15 @@
 
 </style>
 
-<br><br><br><br><br><br><br><br>
+<br><br><br><br>
     <div class="container text-center" data-aos="fade-in">
         <img src="{% static 'logo.jpg'%}" data-aos="zoom-out" data-aos-delay="100">
         <section id="blog" class="padd-sectio mt-5">
             <div class="row m-auto mt-3" data-aos="fade-right"data-aos-delay="500">
                 <div class="section-title text-center">
                     <h3 style="color: #71c55d;">《ウェブカタログ型》</h3>
-                    <h2 class="border-bottom" style="color: #71c55d;">予約システム</h2>
+                    <h2 style="color: #71c55d;">予約システム</h2>
+                    <hr>
                         {% if user.is_authenticated %}
                             {% if user.is_staff %}
                             {{ user.username }}様！

@@ -1,60 +1,101 @@
 {% extends 'dashboard/base.html' %}
 {% load auth_extras %}
+{% load crispy_forms_tags %}
 {% block content %}
 {% include 'dashboard/top.html' %}
-    <div class="row my-4">
-        <div class="col-md-4">
-        </div>
-        <div class="col-md-8">
-            <table class="table bg-white mt-3">
-                <thead class="bg-info text-white">
-                    <tr>
-                        <th scope="col">名前</th>
-                        <th scope="col">日付</th>
-                        <th scope="col">内容</th>
-                        <th scope="col">オーダー</th>
-                        <th scope="col">承認結果</th>
-                        <th scope="col">コメント</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for permission in permissions %}
-                    <tr>
-                        <td >{{ permission.user.username }}</td>
-                        <td >{{ permission.date }}</td>
-                        <td >{{ permission.message }}</td>
-                        <td ><a href="{% url 'order-detail' permission.order.pk %}">{{ permission.order }}</a></td>
-                        <td >
-                        {% if request.user|has_group:"head" %}
-                            {% if permission.result == 0 %}
-                                <span class="alert alert-success p-1">承認</span>
-                            {% elif permission.result == 1 %}
-                                <span class="alert alert-danger p-1">不承認</span>
-                            {% else %}
-                                <a href="{% url 'approve' permission.pk %}"class="btn btn-primary p-2">承認</a>
-                                <a href="{% url 'disapprove' permission.pk %}" class="btn btn-danger p-2">不承認</a>
-                            {% endif %}
+<div class="row my-4">
+    <div class="col-md-12">
+    <form method="POST">
+    {% csrf_token %}
+    始日：<input type="date" name="fromdate">
+    終日：<input type="date" name="todate">
+    <input type="submit" value="検索" name="save_date">
+    </form>
+        <table class="table bg-white mt-3">
+            <thead class="bg-info text-white">
+                <tr>
+                    <th scope="col">名前</th>
+                    <th scope="col">承認申請日付</th>
+                    <th scope="col">内容</th>
+                    <th scope="col">オーダー</th>
+                    <th scope="col">コメント</th>
+                    <th scope="col">申請書</th>
+                    <th scope="col">契約書</th>
+                    <th scope="col">承認結果</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for permission in permissions %}
+                <tr>
+                    <td >{{ permission.order.handler }}</td>
+                    <td >{{ permission.date }}</td>
+                    <td >{{ permission.message }}</td>
+                    <td ><a href="{% url 'order-detail' permission.order.id %}">{{ permission.order }}</a></td>
+                    {% if request.user|has_group:"head" %}
+                    <td class="editable" data-id="{{ permission.id}}"data-type="comment">{{ permission.comment }}</td>
+                    {% else %}
+                    <td>{{ permission.comment }}</td>
+                    {% endif %}
+                    <td>
+                    {% if permission.result == 0 or permission.result == 1 %}
+                    <a href="{% url 'paper' permission.order.pk %}" class="btn btn-info p-1"><i class="fa fa-edit"></i></a>
+                    {% endif %}
+                    </td>
+                    <td>
+                    {% if request.user|has_group:"head" and permission.result == 0 %}
+                    <button href="#{{permission.pk}}" type="button" class="btn btn-primary p-2" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fas fa-edit"></i></button>
+                    {% elif permission.result == 1 %}
+                        <span class="alert alert-danger p-1">契約済み</span>
+                    {% endif %}
+                    <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" enctype="multipart/form-data" action="{% url 'image' permission.pk %}">
+                                {% csrf_token %}
+                                    <div class="modal-body">
+                                        {{ form1 | crispy }}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input class="alert alert-danger" type="submit" value="登録">
+                                        <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    </td>
+                    <td >
+                    {% if request.user|has_group:"head" %}
+                        {% if permission.result == 0 %}
+                            <span class="alert alert-success p-1">承認</span>
+                        {% elif permission.result == 1 %}
+                            <span class="alert alert-danger p-1">貸出中</span>
+                        {% elif permission.result == 2 %}
+                            <span class="alert alert-danger p-1">終了</span>
                         {% else %}
-                            {% if permission.result == 0 %}
-                                <span class="alert alert-success p-1">承認</span>
-                            {% elif permission.result == 1 %}
-                                <span class="alert alert-danger p-1">不承認</span>
-                            {% else %}
-                                <span class="alert alert-info p-1">承認待ち</span>
-                            {% endif %}
+                            <a href="{% url 'approve' permission.pk %}"class="btn btn-primary p-2">承認</a>
+                            <a href="{% url 'disapprove' permission.pk %}" class="btn btn-danger p-2">不承認</a>
                         {% endif %}
-                        </td>
-                        {% if request.user|has_group:"head" %}
-                        <td class="editable" data-id="{{ permission.id}}"data-type="comment">{{ permission.comment }}</td>
+                    {% else %}
+                        {% if permission.result == 0 %}
+                            <span class="alert alert-success p-1">承認</span>
+                        {% elif permission.result == 1 %}
+                            <span class="alert alert-danger p-1">貸出中</span>
+                        {% elif permission.result == 2 %}
+                            <span class="alert alert-danger p-1">終了</span>
                         {% else %}
-                        <td>{{ permission.comment }}</td>
+                            <span class="alert alert-info p-1">承認待ち</span>
                         {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
+
+
 <script>
 $(document).ready(function(){
     $(document).on("click", ".editable", function(){

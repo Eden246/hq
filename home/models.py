@@ -11,8 +11,8 @@ class Limit(models.Model):
 
 class Client(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    facility = models.CharField(max_length=40)
     phone = models.CharField(max_length=40)
+    facility = models.CharField(max_length=100)
 
     def __str__(self):
         return f"{self.user}+{self.facility}"

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base.html' %}
 {% block content %}
 <style>
 .container{
@@ -41,6 +41,9 @@
     text-align: center;   line-height: 530px;
 }
 </style>
+<div class="row text-center">
+    <a class="btn btn-warning" href="{{request.META.HTTP_REFERER}}">戻る</a>
+</div>
 
 <div class="container">
     <div class="row justify-content-center">
@@ -48,11 +51,12 @@
             <h2>注文番号：{{order.pk}}</h2>
             <hr>
             <h3>《顧客情報》</h3>
-            <h4>お名前：{{ order.name }}</h4>
-            <h4>メールアドレス：{{ order.email }}</h4>
-            <h4>電話番号：{{ order.phone }}</h4>
-            <h4>施設：{{ order.facility }}</h4>
-            <h4 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h4>
+            <h5>利用者：{{ order.name }}</h5>
+            <h5>ケアマネジャー：{{ order.user }}</h5>
+            <h5>メールアドレス：{{ order.email }}</h5>
+            <h5>電話番号：{{ order.phone }}</h5>
+            <h5>施設：{{ order.facility }}</h5>
+            <h5 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h5>
             <hr>
             <h3>《予約情報》</h3>
             {% for item in order.items.all %}
@@ -63,17 +67,24 @@
         </div>
     </div>
     <div class="content text-center">
-    <br><br><br><br><br><br>
+    <br><br><br>
         {% if order.status == 0 %}
             <p class="alert alert-primary"><i style="color:green;" class="fa fa-check"></i><span class="pl-2">承認</span></p>
+            <div class="card">
+                <h4 class="border">《承認内容》</h4>
+                <span class="badge bg-primary mx-auto mt-3" style="font-size: 1.2em;">担当者：{{ order.handler.first }}</span>
+                <span class="badge bg-danger mx-auto mt-3" style="font-size: 1.2em;">承認日付：{{ order.permit_day }}</span>
+                <span class="badge rounded-pill bg-secondary mx-auto mt-3" style="font-size: 1em;">承認者：{{ order.permitter }}</span>
+            </div>
+
         {% elif order.status == 1 %}
             <p class="alert alert-danger"><i style="color:green;" class="fa fa-cog"></i><span class="pl-2">審査待ち</span></p>
         {% else %}
             <p class="alert alert-info"><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
         <form method="post">
             {% csrf_token %}
-            <input type='text' name='message' class='form-control'>
-            <button type="submit" class="btn btn-success" style="background-color: navy;">実績申請</button>
+            <input type='text' name='message' class='form-control' placeholder='追加したい内容がある場合'>
+            <button type="submit" class="btn btn-success mt-3" style="background-color: navy;">担当申請</button>
         </form>
         {% endif %}
     </div>

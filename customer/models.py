@@ -4,6 +4,15 @@ from django.contrib.auth.models import User
 from mptt.models import MPTTModel
 from mptt.fields import TreeForeignKey
 
+class Tracker(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, blank=True, null=True)
+    quantity = models.IntegerField(default=0, blank=True, null=True)
+    category = models.ForeignKey('Category', related_name="tracker_category" ,on_delete=models.CASCADE, blank=True, null=True)
+    created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    contract_image = models.ImageField(upload_to='contract_images/')
+    type = models.CharField(max_length=100, default='在庫追加')
+
 class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -20,7 +29,6 @@ class MenuItem(models.Model):
         return reverse_lazy("remove-from-cart", kwargs={
             'pk': self.pk
         })
-
 
 class Category(MPTTModel):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='children')
@@ -52,14 +60,17 @@ class OrderModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     items = models.ManyToManyField(
         'OrderItem')
+    license = models.CharField(max_length=100, blank=True)
     name = models.CharField(max_length=50, blank=True)
     email = models.CharField(max_length=50, blank=True)
     facility = models.CharField(max_length=50, blank=True)
     phone = models.CharField(max_length=50, blank=True)
     price = models.IntegerField(blank=True, null=True)
     status = models.IntegerField(default=2)
-    ordered = models.BooleanField(default=False)
     description = models.CharField(max_length=100, blank=True)
+    permitter = models.ForeignKey(User, related_name='permitter', on_delete=models.CASCADE, blank=True, null=True)
+    permit_day = models.DateTimeField(blank=True, null=True)
+    handler = models.ForeignKey(User, related_name="handler", on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return f'{self.created_on.strftime("%Y%m%d")}｜{self.name}'
+        return f'{self.created_on.strftime("%Y%m%d")}｜{self.name}|{self.price}円'

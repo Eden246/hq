@@ -1,0 +1,178 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block title %}《鈴木一郎様、レンタル申請書》{% endblock %}
+{% block content %}
+<style>
+.container {
+	margin:0 auto;
+  height:290mm;
+  width:210mm;
+	font-size:10px;
+	line-height: 17px;
+	color:#000;
+}
+.entry {
+	display: block;
+	padding-top:55px;
+	clear: both;
+	margin-left:4px;
+}
+div.content {
+	clear: both;
+	padding:0;
+	margin:0;
+	overflow: hidden;
+	display:block;
+	padding-top:32px;
+}
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+}
+td, th {
+  border: 1;
+  border-left: 1px solid #eee;
+  background: #e5e5e5;
+  padding: 10px 25px;
+}
+.table th{
+  white-space: nowrap;
+  color: #fff;
+  background-color: #666699;
+  padding: 9px 25px;
+  margin-left: -25px;
+  line-height: normal;
+}
+tbody tr:nth-child(even) td{
+  background: #f7f7f7;
+}
+
+@media print {
+body {-webkit-print-color-adjust: exact;}
+.nav { 
+   display: none; 
+}
+.btn {
+  display:none;
+}
+}
+</style>
+
+<div class="container mt-5">
+<a class="btn btn-warning" href="{{request.META.HTTP_REFERER}}">戻る</a>
+<a class="btn btn-primary" onclick="window.print()">印刷</a>
+  <div class="border border-dark p-2 mb-3" id="paper">
+    <h2 class="text-center border mt-3 mb-3">レンタル申請書</h2>
+    <table class="table">
+      <tr>
+          <td scope="col" rowspan="4"><img src='{% static 'ichiro.jpg' %}' style="width:3cm;height:4cm;"></td>
+          <th scope="col">お名前</th>
+          <td scope="col">{{ order.name }}</td>
+          <th scope="col">ライセンス番号</th>
+          <td scope="col"colspan="2">{{ order.license }}</td>
+      </tr>
+      <tr>
+          <th>特異事項</th>
+          <td colspan="6"></td>
+      </tr>
+      <tr>
+          <th>ご利用施設</th>
+          <td colspan="6">{{ order.facility }}</td>
+      </tr>
+      <tr>
+          <th>メールアドレス</th>
+          <td>{{ order.email }}</td>
+          <th>お電話番号</th>
+          <td colspan="2">{{ order.phone }}</td>
+      </tr>
+      <tr>
+        <th class="text-center" colspan='6'>申請内訳</th>
+      </tr>
+      <tr>
+          <td>使用期間</td>
+          <td>カテゴリー</td>
+          <td>品目</td>
+          <td>数量</td>
+          <td style="width: 60px;">月額</td>
+          <td>タスコード</td>
+      </tr>
+      
+      {% for item in order.items.all  %}
+      <tr>
+          <td>令和２年３月１２日</td>
+          <td>{{ item.items.category.parent }}|({{ item.items.category }})</td>
+          <td>{{ item.items.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.get_total_item_price }}</td>
+          <td>C23928</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td class="text-center" colspan='3'></td>
+        <th class="text-center">合計/月額</th>
+        <td class="text-center text-danger" colspan='2'>{{ order.price }}円</td>
+      </tr>
+      <tr>
+      <th class="text-center" colspan='6'>ご利用履歴</th>
+      </tr>
+      <tr>
+          <td>開始日</td>
+          <td>終了日</td>
+          <td>品目</td>
+          <td>ケアマネジャー</td>
+          <td style="width: 50px;">総額</td>
+          <td>相談員</td>
+      </tr>
+      
+      {% if permissions %}
+      {% for permission in permissions %}
+        <tr>
+            <td>{{ permission.date }}</td>
+            <td></td>
+            <td>
+            {% for i in permission.order.items.all %}
+            ({{ i }})
+            {% endfor %}
+            </td>
+            <td>{{ permission.order.user }}</td>
+            <td>{{ permission.order.price}}</td>
+            <td>{{ permission.order.handler.first }}</td>
+        </tr>
+      {% endfor %}
+      {% else %}
+        <tr>
+            <td class="text-center" colspan='6'>利用履歴なし</td>
+        </tr>
+      {% endif %}
+      <tr>
+        <th class="text-center" colspan='6'>署名欄</th>
+      </tr>
+      <tr>
+        <td class="text-center">- 利用者 -</td>
+        <td class="text-center">- ケアマネジャー -</td>
+        <td class="text-center">- 相談員 -</td>
+        <td class="text-center">- 営業所長 -</td>
+        <th class="text-center" colspan='2'>書類作成日</th>
+      </tr>
+      <tr class="text-center">
+          <td>{{ order.name }}</td>
+          <td>{{ order.user }}</td>
+          <td>{{ order.handler.first }}</td>
+          <td>{{ order.permitter }}</td>
+          <td class="text-danger" colspan='2'>{{ order.permit_day }}</td>
+      </tr>
+      <tr>
+          <td rowspan='2'></td>
+          <td rowspan='2'></td>
+          <td rowspan='2'></td>
+          <td rowspan='2'></td>
+          <th class="text-center" colspan='2'>年間限度額</th>
+      </tr>
+      <tr>
+          <td class="text-center text-danger" colspan='2'>{{ order.user.limit }}円</td>
+      </tr>
+    </table>
+  </div>
+</div>
+{% endblock content %}
