@@ -16,6 +16,134 @@ from django.contrib.auth.models import User
 from .models import *
 from django.http import HttpResponseRedirect
 
+def chart(request):
+    today = datetime.date.today()
+    labels = []
+    data = []
+    year = request.GET.get('year')
+    month = request.GET.get('month')
+    category = request.GET.get('category')
+
+    if year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category != '指定なし':
+        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year, items__items__category__parent=category).annotate(create=TruncDate(
+            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
+        for i in qs:
+            labels.append(i['create'].strftime('%Y/%m/%d'))
+            data.append(i['count'])
+
+    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category == '指定なし':
+        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year).annotate(create=TruncDate(
+            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
+        for i in qs:
+            labels.append(i['create'].strftime('%Y/%m/%d'))
+            data.append(i['count'])
+
+    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
+        qs = OrderModel.objects.filter(created_on__year=year, items__items__category__parent=category).annotate(create=TruncDate(
+            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
+        for i in qs:
+            labels.append(i['create'].strftime('%Y/%m/%d'))
+            data.append(i['count'])
+
+    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category == '指定なし':
+        qs = OrderModel.objects.filter(created_on__year=year).annotate(create=TruncDate(
+            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
+        for i in qs:
+            labels.append(i['create'].strftime('%Y/%m/%d'))
+            data.append(i['count'])
+
+
+    elif year != ' ' and year is not None and year == '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
+        qs = OrderModel.objects.filter(created_on__year=today.year, items__items__category__parent=category).annotate(create=TruncDate(
+            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
+        for i in qs:
+            labels.append(i['create'].strftime('%Y/%m/%d'))
+            data.append(i['count'])
+
+    else:
+        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(create=TruncDate(
+            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
+        for i in qs:
+            labels.append(i['create'].strftime('%Y/%m/%d'))
+            data.append(i['count'])
+
+    pie_data = []
+    pie_label = []
+
+    if year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし':
+        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year).values(
+            'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
+
+    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし':
+        qs = OrderModel.objects.filter(created_on__year=year).values(
+            'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
+
+    else:
+        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).values(
+            'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
+
+    for i in qs:
+        pie_label.append(i['items__items__category__parent__name'])
+        pie_data.append(i['total_price'])
+
+    bar_data = []
+    bar_label = []
+
+    if year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category == '指定なし':
+        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year).values(
+            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
+        for i in qs:
+            bar_label.append(i['items__items__name'])
+            bar_data.append(i['items__quantity'])
+
+    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category != '指定なし':
+        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year, items__items__category__parent=category).values(
+            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
+        for i in qs:
+            bar_label.append(i['items__items__name'])
+            bar_data.append(i['items__quantity'])
+
+    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category == '指定なし':
+        qs = OrderModel.objects.filter(created_on__year=year).values(
+            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
+        for i in qs:
+            bar_label.append(i['items__items__name'])
+            bar_data.append(i['items__quantity'])
+
+    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
+        qs = OrderModel.objects.filter(created_on__year=today.year, items__items__category__parent=category).values(
+            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
+        for i in qs:
+            bar_label.append(i['items__items__name'])
+            bar_data.append(i['items__quantity'])
+
+    elif year != ' ' and year is not None and year == '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
+        qs = OrderModel.objects.filter(created_on__year=today.year, items__items__category__parent=category).values(
+            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
+        for i in qs:
+            bar_label.append(i['items__items__name'])
+            bar_data.append(i['items__quantity'])
+
+    else:
+        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).values(
+            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
+
+        for i in qs:
+            bar_label.append(i['items__items__name'])
+            bar_data.append(i['items__quantity'])
+
+    context = {
+        'labels': labels,
+        'data': data,
+        'pie_label': pie_label,
+        'pie_data': pie_data,
+        'bar_label': bar_label,
+        'bar_data': bar_data,
+        'year': year,
+        'month': month,
+    }
+    return render(request, 'dashboard/chart.html', context)
+
 def paper(request, pk):
     order = OrderModel.objects.get(pk=pk)
     permissions = Permission.objects.filter(order__name=order.name).exclude(order__handler=None)
@@ -81,12 +209,39 @@ def image(request, pk):
             )
     # return render(request, 'dashboard/image.html', {'i':items})
     return HttpResponseRedirect(reverse_lazy("permission"))
+    
+def image(request, pk):
+    permission = Permission.objects.get(pk=pk)
+    form = ImageForm(request.POST or None, request.FILES or None,  instance=permission)
+    if form.is_valid():
+        edit = form.save(commit=False)
+        edit.save()
+        permission.result = 1
+        permission.save()
+        for i in permission.order.items.all():
+            permission_quantity = i.quantity
+            menu_item = MenuItem.objects.get(pk=i.items.pk)
+            menu_item.quantity -= permission_quantity
+            menu_item.save()
+            Tracker.objects.create(
+                name = menu_item.name,
+                quantity = permission_quantity,
+                user = request.user,
+                type= "貸出",
+                category = menu_item.category,
+                contract_image = form.cleaned_data['image']
+            )
+    # return render(request, 'dashboard/image.html', {'i':items})
+    return HttpResponseRedirect(reverse_lazy("permission"))
 
 def permission(request):
     if request.method == 'POST':
-        start = request.POST.get('fromdate')
-        end = request.POST.get('todate')
-        permissions = Permission.objects.filter(date__lte=end, date__gt=start)
+        start = request.POST.get('fromdate', None)
+        end = request.POST.get('todate', None)
+        if start and end:
+            permissions = Permission.objects.filter(date__lte=end, date__gt=start)
+        else:
+            permissions = Permission.objects.all()
     else:
         permissions = Permission.objects.all()
 
@@ -221,122 +376,6 @@ def test_func(user):
 
 @user_passes_test(test_func, login_url="/login/")
 def dashboard(request):
-    today = datetime.date.today()
-    labels = []
-    data = []
-
-    year = request.GET.get('year')
-    month = request.GET.get('month')
-    category = request.GET.get('category')
-
-    if year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category != '指定なし':
-        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year, items__items__category__parent=category).annotate(create=TruncDate(
-            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
-        for i in qs:
-            labels.append(i['create'].strftime('%Y/%m/%d'))
-            data.append(i['count'])
-
-    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category == '指定なし':
-        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year).annotate(create=TruncDate(
-            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
-        for i in qs:
-            labels.append(i['create'].strftime('%Y/%m/%d'))
-            data.append(i['count'])
-
-    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
-        qs = OrderModel.objects.filter(created_on__year=year, items__items__category__parent=category).annotate(create=TruncDate(
-            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
-        for i in qs:
-            labels.append(i['create'].strftime('%Y/%m/%d'))
-            data.append(i['count'])
-
-    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category == '指定なし':
-        qs = OrderModel.objects.filter(created_on__year=year).annotate(create=TruncDate(
-            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
-        for i in qs:
-            labels.append(i['create'].strftime('%Y/%m/%d'))
-            data.append(i['count'])
-
-
-    elif year != ' ' and year is not None and year == '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
-        qs = OrderModel.objects.filter(created_on__year=today.year, items__items__category__parent=category).annotate(create=TruncDate(
-            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
-        for i in qs:
-            labels.append(i['create'].strftime('%Y/%m/%d'))
-            data.append(i['count'])
-
-    else:
-        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(create=TruncDate(
-            'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
-        for i in qs:
-            labels.append(i['create'].strftime('%Y/%m/%d'))
-            data.append(i['count'])
-
-    pie_data = []
-    pie_label = []
-
-    if year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし':
-        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year).values(
-            'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
-
-    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし':
-        qs = OrderModel.objects.filter(created_on__year=year).values(
-            'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
-
-    else:
-        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).values(
-            'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
-
-    for i in qs:
-        pie_label.append(i['items__items__category__parent__name'])
-        pie_data.append(i['total_price'])
-
-    bar_data = []
-    bar_label = []
-
-    if year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category == '指定なし':
-        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year).values(
-            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
-        for i in qs:
-            bar_label.append(i['items__items__name'])
-            bar_data.append(i['items__quantity'])
-
-    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month != '指定なし' and category != ' ' and category is not None and category != '指定なし':
-        qs = OrderModel.objects.filter(created_on__month=month, created_on__year=year, items__items__category__parent=category).values(
-            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
-        for i in qs:
-            bar_label.append(i['items__items__name'])
-            bar_data.append(i['items__quantity'])
-
-    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category == '指定なし':
-        qs = OrderModel.objects.filter(created_on__year=year).values(
-            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
-        for i in qs:
-            bar_label.append(i['items__items__name'])
-            bar_data.append(i['items__quantity'])
-
-    elif year != ' ' and year is not None and year != '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
-        qs = OrderModel.objects.filter(created_on__year=today.year, items__items__category__parent=category).values(
-            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
-        for i in qs:
-            bar_label.append(i['items__items__name'])
-            bar_data.append(i['items__quantity'])
-
-    elif year != ' ' and year is not None and year == '指定なし' and month != ' ' and month is not None and month == '指定なし' and category != ' ' and category is not None and category != '指定なし':
-        qs = OrderModel.objects.filter(created_on__year=today.year, items__items__category__parent=category).values(
-            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
-        for i in qs:
-            bar_label.append(i['items__items__name'])
-            bar_data.append(i['items__quantity'])
-
-    else:
-        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).values(
-            'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
-
-        for i in qs:
-            bar_label.append(i['items__items__name'])
-            bar_data.append(i['items__quantity'])
-
     orders = OrderModel.objects.all().order_by('-created_on')[:5]
     users = User.objects.filter(permission__date__lte=datetime.datetime.today(), permission__date__gt=datetime.datetime.today()-datetime.timedelta(days=30), permission__result=1).annotate(total_price=Sum(F('permission__order__items__items__price')*F('permission__order__items__quantity'))).annotate(sum=Sum('permission__order__items__quantity')).values('username', 'sum', 'total_price').order_by('-total_price')[:5]
     text = Text.objects.first()
@@ -346,22 +385,15 @@ def dashboard(request):
     order_count = OrderModel.objects.filter(status=2).count()
     permission_count = Permission.objects.all().count()
 
-    return render(request, 'dashboard/dashboard.html', {
-        'labels': labels,
-        'data': data,
-        'pie_label': pie_label,
-        'pie_data': pie_data,
-        'bar_label': bar_label,
-        'bar_data': bar_data,
-        'year': year,
-        'month': month,
+    context = {
         'orders': orders,
         'users': users,
         'text':text,
         'text_form': text_form,
         'order_count': order_count,
         'permission_count':permission_count,
-    })
+    }
+    return render(request, 'dashboard/dashboard.html', context)
 
 
 @login_required

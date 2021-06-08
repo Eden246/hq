@@ -4,6 +4,7 @@
 {% include 'dashboard/top.html' %}
 {% load mptt_tags %}
 <style>
+{% comment %} table {% endcomment %}
 table {
   background: #012B39;
   border-radius: 0.25em;
@@ -30,7 +31,7 @@ tbody tr:hover {
 }
 </style>
 <div class="row justify-content-center my-4">
-<div class="col-lg-3">
+<div class="col-lg-4">
   <div class="card p-2">
     <h2>在庫履歴</h2>
     <a href="{% url 'item_csv' %}">csvファイル</a>
@@ -58,7 +59,7 @@ tbody tr:hover {
           <td>{{ tracker.quantity }}</td>
           <td>
           {% if tracker.contract_image %}
-            <button type="button" class="alert alert-info" data-bs-toggle="modal" data-bs-target="#collapseExample{{tracker.pk}}"><i class='fas fa-stamp'></i></button>
+            <button type="button" class="alert alert-info p-2" data-bs-toggle="modal" data-bs-target="#collapseExample{{tracker.pk}}" style="width:100%"><i class="fas fa-stamp"></i></button>
             <div class="modal fade" id="collapseExample{{tracker.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -72,46 +73,6 @@ tbody tr:hover {
               </div>
             </div>
           {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-<div class="col-lg-2">
-  <div class="card p-2">
-    <h2>在庫軽減履歴</h2>
-    <hr>
-    <table class="table table-bordered table-hover" style="width:100%">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">承認日付</th>
-          <th scope="col">品目</th>
-          <th scope="col">契約書</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for permission in permissions %}
-        <tr>
-          <th scope="row">{{ permission.id }}</th>
-          <td>{{ permission.date }}</td>
-          <td>{% for i in permission.order.items.all %}{{ i }}{% endfor %}</td>
-          <td>
-            <button type="button" class="alert alert-info" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class='fas fa-stamp'></i></button>
-            <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <img id="myImage" src="{{ permission.image.url }}" alt="Test" style="width:100%;">
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
-                    </div>
-                </div>
-              </div>
-            </div>
           </td>
         </tr>
         {% endfor %}

@@ -1,0 +1,163 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+{% include 'dashboard/top.html' %}
+
+<div class="row justify-content-center mt-3">
+    <div class="card mb-3 col-lg-3 text-center">
+        <h1>《設定時刻》</h1>
+        {% if year == "指定なし" or not year %}
+        <sapn class="badge bg-danger" style="font-size:20px;">最近30日以内</sapn>
+        {% else %}
+        <sapn class="badge bg-danger" style="font-size:20px;">{{ year }}年{{ month }}月</sapn>
+        {% endif %}
+        <form method="GET">
+            <select class="form-control" name="year">
+                <option value="指定なし" selected>年度を選択してください</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+            </select>
+            <select class="form-control" name="month">
+                <option value="指定なし" selected>当月を選択してください</option>
+                <option value="4">４月</option>
+                <option value="5">５月</option>
+                <option value="6">６月</option>
+            </select>
+            <select class="form-control" name="category">
+                <option value="指定なし" selected>全体カテゴリー</option>
+                <option value="6">車いす</option>
+                <option value="8">手すり</option>
+            </select>
+            <button class="btn btn-info btn-sm">検索（基本設定：今月,　全体項目）</button>
+        </form>
+    </div>
+    <div class="card mb-3 col-lg-4">
+        <div class="card-header"><i class="fas fa-chart-pie"></i>カテゴリー別・販売金額</div>
+        <div class="card-body">
+            <canvas id="pie-chart"></canvas>
+        </div>
+    </div>
+    <div class="card col-lg-8 m-auto">
+        <div class="card-header"><i class="fa fa-area-chart"></i>日付別・販売件数</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-8 my-auto">
+                    <canvas id="line-chart"></canvas>
+                </div>
+                <div class="col-sm-4 text-center my-auto">
+                    <div class="h4 text-primary">34,693円</div>
+                    <div class="small text-muted">総売上</div>
+                    <hr>
+                    <div class="h4 text-warning">10倍</div>
+                    <div class="small text-muted">介護保険金</div>
+                    <hr>
+                    <div class="h4 text-success">346,930円</div>
+                    <div class="small text-muted">実際利益</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card col-lg-8 m-auto mt-3">
+        <div class="card-header"><i class="fas fa-chart-bar"></i>品目別・販売件数</div>
+        <div class="card-body">
+            <canvas class="mt-5" id="bar-chart"></canvas>
+        </div>
+    </div>
+
+<script>
+ Chart.defaults.global.defaultFontColor = '#0074D9';
+ Chart.defaults.global.defaultFontSize = 18;
+Chart.defaults.global.defaultFontFamily = 'Kosugi Maru';
+
+var ctx = document.getElementById('line-chart').getContext('2d');
+var LineChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: {{ labels|safe }},
+    datasets: [
+        {
+        lineTension: 0.3,
+        backgroundColor: "rgba(2,117,216,0.2)",
+        borderColor: "rgba(2,117,216,1)",
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(2,117,216,1)",
+        pointBorderColor: "rgba(255,255,255,0.8)",
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "rgba(2,117,216,1)",
+        pointHitRadius: 20,
+        pointBorderWidth: 2,
+        label: "取引件数", fill: true,backgroundColor: 'rgb(148, 10, 189, 0.3)', borderColor: 'rgb(148, 103, 189, 0.8)', data: {{ data|safe }},
+        },
+    ],
+  },
+  options: {
+    responsive: true,
+    title: {display: true, text: '《 日付別｜販売件数 》'},
+	  scales: {
+      xAxes: [{scaleLabel: {display: true, labelString: '日付'}}],
+		  yAxes: [{scaleLabel: {display: true, labelString: '販売件数'},ticks: {min: 0, stepSize: 5}}],
+	  }
+  }
+});
+
+var ctx = document.getElementById("pie-chart").getContext('2d');
+var PieChart = new Chart(ctx, {
+  type: 'pie',
+  data:{
+    labels: {{ pie_label|safe }},
+    datasets: [
+      {backgroundColor: ['rgb(148, 10, 189, 0.6)','#01FF70'], data: {{ pie_data|safe }}, borderColor:	['black', 'black'],borderWidth: [2,2]}
+    ],
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
+        return `${value}円`}
+      },
+      labels: {
+        render: "value",
+        precision: 2
+      }
+    },
+    responsive: true,
+    title: {display: true, text: '《 カテゴリー別｜販売金額 》'},
+	  rotation: -0.8 * Math.PI,
+  }
+});
+
+var ctx = document.getElementById("bar-chart").getContext("2d");
+var BarChart = new Chart(ctx, {
+  type: 'bar',
+  data:{
+		labels : {{ bar_label|safe }}
+      ,
+		datasets : [
+			{
+        label:"総金額",
+				backgroundColor : "rgb(148, 10, 189, 0.6)",
+				borderColor:'black',
+				data : {{ bar_data|safe }},
+			}
+		],
+	},
+    options: {
+    plugins: {
+      datalabels: {
+        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
+        return `${value}件`}
+      },
+      labels: {
+        render: "value",
+        precision: 2
+      }
+    },
+    responsive: true,
+    title: {display: true, text: '《 品目別｜販売件数 》'},
+	  scales: {
+      xAxes: [{scaleLabel: {display: true, labelString: '品目',},}],
+		  yAxes: [{scaleLabel: {display: true, labelString: '販売件数'},ticks: {min: 0, stepSize: 5}}],
+	  },
+  }
+});
+</script>
+{% endblock content %}

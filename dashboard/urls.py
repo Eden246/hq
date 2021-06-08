@@ -16,4 +16,5 @@ urlpatterns = [
     path('item/delete/<int:pk>/', item_delete, name='item_delete'),
     path('item_save/', item_save, name='item_save'),
     path('paper/<int:pk>/', paper, name='paper'),
+    path('chart/', chart, name='chart'),
 ]

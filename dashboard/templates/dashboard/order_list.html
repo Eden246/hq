@@ -4,182 +4,353 @@
 {% block content %}
 {% include 'dashboard/top.html' %}
 <style>
-#fav-table table { 
-	width: 750px; 
-	border-collapse: collapse; 
-	margin:50px auto;
-	}
-
-/* Zebra striping */
-#fav-table tr:nth-of-type(odd) { 
-	background: #eee; 
-	}
-
-#fav-table th { 
-	background-color: #3498db; 
-	color: white; 
-	font-weight: bold; 
-	}
-
-#fav-table td, th { 
-	padding: 10px; 
-	border: 1px solid #ccc; 
-	text-align: left; 
-	font-size: 18px;
-	}
 canvas{
-
   width:500px !important;
   height:300px !important;
-
 }
+#fav-table th {
+  color:#448aff;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 0.25em;
+	}
+#fav-table1 th {
+  color:#448aff;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 0.25em;
+	}
+button.edit
+{
+    background:#337ab7;
+    color:#fff;
+    border-radius:2px;
+    border:none;
+}
+button.edit:hover {
+    background:#E85A4F;
+}
+tr.row-content
+{
+    color:#6c7173;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd)
+{
+    background:#F0F2F2 !important; 
+}
+
+.wrapper {
+	margin: auto;
+	margin-top: 20px;
+}
+
+.tab-wrapper {
+	text-align: center;
+	display: block;
+	margin: auto;
+	max-width: 1000px;
+}
+
+.tabs {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+}
+
+.tab-link {
+    height: 50px;
+	margin: 0 1%;
+	list-style: none;
+	padding: 10px 40px;
+	color: #aaa;
+	cursor: pointer;
+	font-weight: 700;
+	transition: all ease 0.5s;
+	border-bottom: solid 3px rgba(255, 255, 255, 0);
+	letter-spacing: 1px;
+}
+
+.tab-link:hover {
+	color: #999;
+	border-color: #999;
+}
+
+.tab-link.active {
+	color: #333;
+	border-color: #333;
+}
+
+.tab-link:nth-of-type(1).active {
+	color: #1790D2;
+	border-color: #1790D2;
+}
+
+.tab-link:nth-of-type(2).active {
+	color: #EE6534;
+	border-color: #EE6534;
+}
+
+.tab-link:nth-of-type(3).active {
+	color: #EEC63B;
+	border-color: #EEC63B;
+}
+
+.tab-content {
+	display: none;
+	text-align: center;
+	color: #888;
+	font-weight: 300;
+	font-size: 15px;
+	opacity: 0;
+	transform: translateY(15px);
+	animation: slide 0.5s ease 1 forwards;
+}
+
+.tab-content.active {
+	display: block;
+}
+
+@keyframes slide {
+	100% {
+		opacity: 1;
+		transform: none;
+	}
+}
+.modal-backdrop {display: none;}
 </style>
-
-    <div class="row my-4">
-        <div class="col-xl-6">
-          <h2>貸出リスト</h2>
-          <hr>
-          <table id="fav-table">
-              <thead>
-                  <tr>
-                      <th scope="col">ID
-                      <th scope="col">利用者</th>
-                      <th scope="col">ケアマネジャー</th>
-                      <th scope="col">始日</th>
-                      <th scope="col">終了日</th>
-                      <th scope="col">品目</th>
-                      <th scope="col">合計</th>
-                      <th scope="col">担当者</th>
-                      <th scope="col">返品</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for permission in permissions %}
-                  <tr>
-                      <td>{{ permission.id }}</td>
-                      <td>{{ permission.order.name }}</td>
-                      <td>{{ permission.order.user }}</td>
-                      <td>{{ permission.order.facility }}</td>
-                      <td>{{ permission.date }}</td>
-                      <td>
-                      {% for item in permission.order.items.all %}
-                          ({{ item }})
-                      {% endfor %}
-                      </td>
-                      <td>{{ permission.order.price }}円</td>
-                      <td>{{ permission.user }}</td>
-                      <td>
-
-                      {% if request.user|has_group:"head" %}
-                          {% if permission.result == 1%}
-                          <button href="#{{permission.pk}}" type="button" class="btn btn-primary p-2" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fas fa-edit"></i></button>
-                          <form method="POST" enctype='multipart/form-data'>
-                              <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                  <div class="modal-dialog">
-                                      <div class="modal-content">
-                                          <form method="post" enctype="multipart/form-data" action="{% url 'image' permission.pk %}">
-                                          {% csrf_token %}
-                                              <div class="modal-body">
-                                              {{ form0 | crispy }}
-                                              <input type="hidden" name="permission_pk" value="{{ permission.pk }}">
-                                              </div>
-                                              <div class="modal-footer">
-                                                  <input class="alert alert-danger" type="submit" value="登録" name="came_back">
-                                                  <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
-                                              </div>
-                                          </form>
-                                      </div>
-                                  </div>
-                              </div>
-                          </form>
-                          {% else %}
-                          <span class="alert alert-danger p-1">返品済み</span>
-                          {% endif %}
-                      {% else %}
-                          {% if permission.result == 1 %}
-                          <span class="alert alert-danger p-1">貸出中</span>
-                          </form>
-                          {% else %}
-                          <span class="alert alert-danger p-1">返品済み</span>
-                          {% endif %}
-                      {% endif %}
-                      </td>
-
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table>
-        </div>
-        <div class="col-xl-6 text-center mt-5">
-            <div class="d-flex justify-content-center">
-                <h2>予約件数:&emsp;<h2 style="color:#ad0003;">{{ total_orders }}件</h2></h2>&emsp;&emsp;
-                <h2>予約総額:&emsp;<h2 style="color:#ad0003;">{{ total_revenue }}円</h2></h2>
+<div class="wrapper">
+    <div class="tab-wrapper">
+        <ul class="tabs">
+            <li class="tab-link active" data-tab="1">予約リスト</li>
+            <li class="tab-link" data-tab="2">貸出リスト</li>
+            <li class="tab-link" data-tab="3">承認リスト</li>
+        </ul>
+    </div>
+    <div class="content-wrapper">
+        <div id="tab-1"class="tab-content active">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="d-flex justify-content-center">
+                        <h2>
+                            予約件数:&emsp;
+                            <h2 style="color:#ad0003;">{{ total_orders }}件</h2>
+                        </h2>
+                        &emsp;&emsp;
+                        <h2>
+                            予約総額:&emsp;
+                            <h2 style="color:#ad0003;">{{ total_revenue }}円</h2>
+                        </h2>
+                    </div>
+                    <hr>
+                    <table class="table table-striped text-center" id="fav-table1">
+                        <thead>
+                            <tr class="row-name">
+                                <th>ID</th>
+                                <th>状況</th>
+                                <th>利用者</th>
+                                <th>ケアマネジャー</th>
+                                <th>Eメール</th>
+                                <th>電話番号</th>
+                                <th>施設</th>
+                                <th>品目</th>
+                                <th>予約日</th>
+                                <th>合計</th>
+                                <th>担当者</th>
+                                <th>返品</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}                    
+                            <tr class="row-content">
+                                <td>{{ order.pk }}</td>
+                                <td><span class="badge bg-primary">予約中</span></td>
+                                <td>{{ order.name }}</td>
+                                <td>{{ order.user }}</td>
+                                <td>{{ order.email }}</td>
+                                <td>{{ order.phone }}</td>
+                                <td>{{ order.facility }}</td>
+                                <td>
+                                    {% for item in order.items.all %}
+                                    ({{ item }})
+                                    {% endfor %}
+                                </td>
+                                <td>{{ order.created_on | date:'Y-m-d H:i' }}</td>
+                                <td>{{ order.price }}円</td>
+                                <td>
+                                    {% if order.handler %}
+                                    {{ order.handler }}
+                                    {% else %}
+                                    未定
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button href="#{{order.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{order.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>返品</button>
+                                </td>
+                            </tr>
+                            <div class="modal fade" id="collapseExample{{order.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="modal-body">
+                                                <h2>注文番号：{{order.pk}}</h2>
+                                                <hr>
+                                                <h3>《顧客情報》</h3>
+                                                <h5>利用者：{{ order.name }}</h5>
+                                                <h5>ケアマネジャー：{{ order.user }}</h5>
+                                                <h5>メールアドレス：{{ order.email }}</h5>
+                                                <h5>電話番号：{{ order.phone }}</h5>
+                                                <h5>施設：{{ order.facility }}</h5>
+                                                <h5 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h5>
+                                                <hr>
+                                                <h3>《予約情報》</h3>
+                                                {% for item in order.items.all %}
+                                                <h4>品名：{{ item }}</h4>
+                                                {% endfor %}
+                                                <h4>注文日付：{{ order.created_on }}</h4>
+                                                <h4>合計：{{ order.price }}円</h4>
+                                                {% if order.status == 0 %}
+                                                <p class="alert alert-primary"><i style="color:green;" class="fa fa-check"></i><span class="pl-2">承認</span></p>
+                                                <h4 class="border">《承認内容》</h4>
+                                                <span class="badge bg-primary mx-auto mt-3" style="font-size: 1.2em;">担当者：{{ order.handler.first }}</span>
+                                                <span class="badge bg-danger mx-auto mt-3" style="font-size: 1.2em;">承認日付：{{ order.permit_day }}</span>
+                                                <span class="badge rounded-pill bg-secondary mx-auto mt-3" style="font-size: 1em;">承認者：{{ order.permitter }}</span>
+                                                {% elif order.status == 1 %}
+                                                <p class="alert alert-danger"><i style="color:green;" class="fa fa-cog"></i><span class="pl-2">審査待ち</span></p>
+                                                {% else %}
+                                                <p class="alert alert-info"><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
+                                                <form method="post">
+                                                    {% csrf_token %}
+                                                    <input type='text' name='message' class='form-control' placeholder='追加したい内容がある場合'>
+                                                    <button type="submit" class="btn btn-success mt-3" style="background-color: navy;">担当申請</button>
+                                                </form>
+                                                {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <input class="alert alert-danger" type="submit" value="登録" name="came_back">
+                                                <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                </div>
+                <div id="tab-2"class="tab-content">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <div class="d-flex justify-content-center">
+                                <h2>
+                                    予約件数:&emsp;
+                                    <h2 style="color:#ad0003;">{{ total_orders }}件</h2>
+                                </h2>
+                                &emsp;&emsp;
+                                <h2>
+                                    予約総額:&emsp;
+                                    <h2 style="color:#ad0003;">{{ total_revenue }}円</h2>
+                                </h2>
+                            </div>
+                            <hr>
+                            <table class="table table-striped text-center" id="fav-table">
+                                <thead>
+                                    <tr class="row-name">
+                                        <th>ID</th>
+                                        <th>状況</th>
+                                        <th>利用者</th>
+                                        <th>ケアマネジャー</th>
+                                        <th>Eメール</th>
+                                        <th>電話番号</th>
+                                        <th>始日</th>
+                                        <th>終了日</th>
+                                        <th>品目</th>
+                                        <th>合計</th>
+                                        <th>担当者</th>
+                                        <th>返品</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for permission in permissions %}
+                                    <tr class="row-content">
+                                        <td>{{ permission.id }}</td>
+                                        <td><span class="badge bg-danger">貸出中</span></td>
+                                        <td>{{ permission.order.name }}</td>
+                                        <td>{{ permission.order.user }}</td>
+                                        <td>{{ permission.order.email }}</td>
+                                        <td>{{ permission.order.phone }}</td>
+                                        <td>{{ permission.order.facility }}</td>
+                                        <td>
+                                            {% for item in permission.order.items.all %}
+                                            ({{ item }})
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ permission.date }}</td>
+                                        <td>{{ permission.order.price }}円</td>
+                                        <td>{{ permission.user }}</td>
+                                        <td>
+                                            {% if request.user|has_group:"head" %}
+                                            {% if permission.result == 1%}
+                                            <button href="#{{permission.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>返品</button>
+                                            <form method="POST" enctype='multipart/form-data'>
+                                                {% csrf_token %}
+                                                <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-body">
+                                                                {{ form0 | crispy }}
+                                                                <input type="hidden" name="permission_pk" value="{{ permission.pk }}">
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <input class="alert alert-danger" type="submit" value="登録" name="came_back">
+                                                                <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            {% else %}
+                                            <span class="alert alert-danger p-1">返品済み</span>
+                                            {% endif %}
+                                            {% else %}
+                                            {% if permission.result == 1 %}
+                                            <span class="alert alert-danger p-1">貸出中</span>
+                                            </form>
+                                            {% else %}
+                                            <span class="alert alert-danger p-1">返品済み</span>
+                                            {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-3"class="tab-content">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <hr>
-            <canvas class="mt-5" id="pie-chart"></canvas>
-            <table id="fav-table">
-                <thead>
-                    <tr>
-                        <th scope="col" style="width: 10px;">#</th>
-                        <th scope="col">お名前</th>
-                        <th scope="col">施設名</th>
-                        <th scope="col">電話番号</th>
-                        <th scope="col">金額</th>
-                        <th scope="col">予約時間</th>
-                        <th scope="col">詳細</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for order in orders %}                    
-                    <tr>
-                        <th scope="row">{{ order.pk }}</th>
-                        <td>{{ order.name }}</td>
-                        <td>{{ order.facility }}</td>
-                        <td>{{ order.phone }}</td>
-                        <td>{{ order.price }}円</td>
-                        <td>{{ order.created_on | date:'Y-m-d H:i'}}</td>
-                        <td><a href="{% url 'order-detail' order.pk %}"><i class="fa fa-edit"></i></a></td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
         </div>
     </div>
+</div>
 
 <script>
-Chart.defaults.global.defaultFontColor = '#0074D9';
-Chart.defaults.global.defaultFontSize = 40;
-Chart.defaults.global.defaultFontFamily = 'Kosugi Maru';
-
-var ctx = document.getElementById("pie-chart").getContext('2d');
-var PieChart = new Chart(ctx, {
-  type: 'pie',
-  data:{
-    labels: {{ pie_label|safe }},
-    datasets: [
-      {backgroundColor: ['rgb(148, 10, 189, 0.6)','rgb(148, 103, 12, 0.6)'],
-        borderColor:	['black', 'black'],borderWidth: [2,2], data: {{ pie_data|safe }}}
-    ],
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
-        return `${label}\n${value}件`}
-      },
-      labels: {
-        render: "value",
-        precision: 2,
-      }
-    },
-    responsive: true,
-    title: {display: true, text: '《 カテゴリー別｜予約状況 》'},
-	  rotation: -0.8 * Math.PI,
-  }
-});
-
 $(document).ready(function() {
     $('#fav-table').tablesorter();
+});
+$(document).ready(function() {
+    $('#fav-table1').tablesorter();
+});
+$('.tab-link').click( function() {
+	var tabID = $(this).attr('data-tab');
+	$(this).addClass('active').siblings().removeClass('active');
+	$('#tab-'+tabID).addClass('active').siblings().removeClass('active');
 });
 </script>
 {% endblock content %}

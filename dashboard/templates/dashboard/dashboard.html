@@ -1,8 +1,9 @@
 {% extends 'dashboard/base.html' %}
+{% load crispy_forms_tags %}
+{% load auth_extras %}
 {% block content %}
 {% include 'dashboard/top.html' %}
 <style>
-
 
 #fav-table th {
   background-color:#155084;
@@ -50,6 +51,38 @@ tbody tr:hover {
 
 <br>
 <div class="row text-center justify-content-center d-flex">
+  <div class="col-lg-6">
+      <div class="card" data-aos="flip-left">
+          <div class="card-header bg-info text-white">
+              アナウンサー
+              {% if request.user|has_group:"head" %}
+              <button type="button" class="btn btn-primary p-2" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-edit"></i></button>
+              {% endif %}
+          </div>
+          <div class="card-body">
+              <marquee behavior="" direction="" scrollamount="10">
+                  <h3 class="mx-auto">{{ text.first }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.second }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.third }}</h3>
+              </marquee>
+          </div>
+      </div>
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <form method="POST">
+                  {% csrf_token %}
+                      <div class="modal-body">
+                          {{ text_form | crispy }}
+                      </div>
+                      <div class="modal-footer">
+                          <input class="alert alert-danger" type="submit" value="Update">
+                          <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">Close</button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="row text-center justify-content-center d-flex mt-3">
     <div class="col-lg-2 card">
       <h4 class="badge bg-warning">30日以内実績</h4>
       <table id="fav-table">
@@ -71,7 +104,7 @@ tbody tr:hover {
         </tbody>
       </table>
     </div>
-    <div class="col-lg-4 card">
+    <div class="col-lg-5 card">
       <h4 class="badge bg-primary">最近予約</h4>
       <table>
         <thead>
@@ -89,7 +122,6 @@ tbody tr:hover {
               <td >{{order.user.client.facility}}</td>
               <td >{{order.price}}</td>
               <td>
-              
               {% if order.handler %}
               {{ order.handler }}
               {% else %}
@@ -102,132 +134,13 @@ tbody tr:hover {
       </table>
     </div>
     <div class="col-lg-3 card">
-      <h1>《設定時刻》</h1>
-      {% if year == "指定なし" or not year %}
-      <sapn class="badge bg-danger" style="font-size:20px;">最近30日以内</sapn>
-      {% else %}
-      <sapn class="badge bg-danger" style="font-size:20px;">{{ year }}年{{ month }}月</sapn>
-      {% endif %}
-      <form method="GET">
-        <select class="form-control" name="year">
-          <option value="指定なし" selected>年度を選択してください</option>
-          <option value="2020">2020</option>
-          <option value="2021">2021</option>
-        </select>
-        <select class="form-control" name="month">
-          <option value="指定なし" selected>当月を選択してください</option>
-          <option value="4">４月</option>
-          <option value="5">５月</option>
-          <option value="6">６月</option>
-        </select>
-        <select class="form-control" name="category">
-          <option value="指定なし" selected>全体カテゴリー</option>
-          <option value="6">車いす</option>
-          <option value="8">手すり</option>
-        </select>
-        <button class="btn btn-info btn-sm">検索（基本設定：今月,　全体項目）</button>
-      </form>
-    </div>
-    <div class="col-lg-2 card" >
-      <canvas id="pie-chart"></canvas>
-    </div>
-</div>
-  <div class="row justify-content-center">
-    <div class="col-md-12 col-lg-5 mt-3 card">
-      <canvas class="mt-5" id="line-chart"></canvas>
-    </div>
-    <div class="col-md-12 col-lg-5 mt-3 card">
-      <canvas class="mt-5" id="bar-chart"></canvas>
+      <h4 class="badge bg-danger">近日返品リスト</h4>
     </div>
   </div>
+</div>
   <br>
 
   <script>
- Chart.defaults.global.defaultFontColor = '#0074D9';
- Chart.defaults.global.defaultFontSize = 18;
-Chart.defaults.global.defaultFontFamily = 'Kosugi Maru';
-
-var ctx = document.getElementById('line-chart').getContext('2d');
-var LineChart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: {{ labels|safe }},
-    datasets: [
-      
-    {label: "取引件数", fill: true,backgroundColor: 'rgb(148, 10, 189, 0.3)', borderColor: 'rgb(148, 103, 189, 0.8)', data: {{ data|safe }},},
-    ],
-  },
-  options: {
-    responsive: true,
-    title: {display: true, text: '《 日付別｜販売件数 》'},
-	  scales: {
-      xAxes: [{scaleLabel: {display: true, labelString: '日付'}}],
-		  yAxes: [{scaleLabel: {display: true, labelString: '販売件数'},ticks: {min: 0, max:20, stepSize: 5}}],
-	  }
-  }
-});
-
-var ctx = document.getElementById("pie-chart").getContext('2d');
-var PieChart = new Chart(ctx, {
-  type: 'pie',
-  data:{
-    labels: {{ pie_label|safe }},
-    datasets: [
-      {backgroundColor: ['rgb(148, 10, 189, 0.6)','#01FF70'], data: {{ pie_data|safe }}, borderColor:	['black', 'black'],borderWidth: [2,2]}
-    ],
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
-        return `${value}円`}
-      },
-      labels: {
-        render: "value",
-        precision: 2
-      }
-    },
-    responsive: true,
-    title: {display: true, text: '《 カテゴリー別｜販売金額 》'},
-	  rotation: -0.8 * Math.PI,
-  }
-});
-
-var ctx = document.getElementById("bar-chart").getContext("2d");
-var BarChart = new Chart(ctx, {
-  type: 'bar',
-  data:{
-		labels : {{ bar_label|safe }}
-      ,
-		datasets : [
-			{
-        label:"総金額",
-				backgroundColor : "rgb(148, 10, 189, 0.6)",
-				borderColor:'black',
-				data : {{ bar_data|safe }},
-			}
-		],
-	},
-    options: {
-    plugins: {
-      datalabels: {
-        formatter: (value, context) =>{const label = context.chart.data.labels[context.dataIndex]
-        return `${value}件`}
-      },
-      labels: {
-        render: "value",
-        precision: 2
-      }
-    },
-    responsive: true,
-    title: {display: true, text: '《 品目別｜販売件数 》'},
-	  scales: {
-      xAxes: [{scaleLabel: {display: true, labelString: '品目',},}],
-		  yAxes: [{scaleLabel: {display: true, labelString: '販売件数'},ticks: {min: 0, stepSize: 5}}],
-	  },
-  }
-});
-
 $(document).ready(function() {
     $('#fav-table').tablesorter({ theme : 'blue' });
 });
