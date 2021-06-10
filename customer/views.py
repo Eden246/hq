@@ -121,6 +121,10 @@ class CartView(View):
         phone = request.POST.get('phone')
         facility = request.POST.get('facility')
         license = request.POST.get('license')
+        location_selecter = request.POST.get('location_selecter')
+        limit = request.POST.get('limit')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
 
         price = 0
         for item in order_item:
@@ -136,6 +140,10 @@ class CartView(View):
             facility=facility,
             price=price,
             license=license,
+            location_selecter=location_selecter,
+            limit=limit,
+            start_date=start_date,
+            end_date=end_date,
         )
         order.items.add(*item_ids)
 
@@ -186,6 +194,7 @@ class CartView(View):
 
 def confirmation(request, order_pk):
     order = OrderModel.objects.get(pk=order_pk)
+    order.chars_diff = order.limit - order.price
     return render(request, 'customer/order_confirmation.html', {'order':order})
 
 class OrderNotification(LoginRequiredMixin, UserPassesTestMixin, View):

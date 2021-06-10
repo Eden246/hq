@@ -56,7 +56,7 @@
             <h5>メールアドレス：{{ order.email }}</h5>
             <h5>電話番号：{{ order.phone }}</h5>
             <h5>施設：{{ order.facility }}</h5>
-            <h5 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h5>
+            <h5 {% if order.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.limit }}円</h5>
             <hr>
             <h3>《予約情報》</h3>
             {% for item in order.items.all %}

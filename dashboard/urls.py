@@ -7,6 +7,7 @@ urlpatterns = [
     path('', dashboard, name='dashboard'),
     path('user/', user, name='user'),
     path('image/<int:pk>/', image, name='image'),
+    path('return_image/<int:pk>/', return_image, name='return_image'),
     path('permission/', permission, name='permission'),
     path('permission/approve/<int:pk>/', approve, name='approve'),
     path('permission/disapprove/<int:pk>/', disapprove, name='disapprove'),

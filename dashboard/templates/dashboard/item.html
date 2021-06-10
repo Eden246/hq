@@ -115,16 +115,13 @@ tbody tr:hover {
                   <tbody>
                       {% for item in items %}
                       <tr>
-                          <td><input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}"></td>
+                          <td><input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}" id="onetarget"></td>
                           <td >{{ item.id }}</td>
                           <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
                           <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
                           <td class="editable" data-id="{{ item.id}}"data-type="name">{{ item.name }}</td>
                           <td class="d-flex">{{ item.category.parent }}|({{ item.category.name }})</td>
-                          <td >
-                              <a class="minus" href="{% url 'item_delete' item.pk %}"><i class="fa fa-minus"></i></a>
-                              {{ item.quantity }}
-                          </td>
+                          <td >{{ item.quantity }}</td>
                           <td class="editable" data-id="{{ item.id}}"data-type="price">{{ item.price }}</td>
                       </tr>
                       {% endfor %}
@@ -139,7 +136,7 @@ tbody tr:hover {
               <input required type="text" id="quantity_id" placeholder="数量を入力してください" class="form-control" name="quantity">
               {% csrf_token %}
               {{ form0 | crispy }}
-            <input class="btn btn-success btn-block" type="submit" value="追加" name='save_renew'>
+            <input class="btn btn-success btn-block" id="one" type="submit" value="追加" name='save_renew'>
           </form>
       </div>
   </div>
@@ -149,7 +146,7 @@ tbody tr:hover {
 $(document).ready(function(){
     $(document).on("click", ".editable", function(){
         var value = $(this).text();
-        var input = "<input type='text' class='input-data' value='"+value+"' class='form-control'>";
+        var input = "<input type='text' class='input-data' value='"+value+"' class='form-control' style='width:60px;'>";
         $(this).html(input);
         $('input',this).focus();
         $(this).removeClass("editable");
@@ -216,6 +213,13 @@ $("input:checkbox").click(function() {
         $(this).prop("checked", true);
     } else {
         $(this).prop("checked", false);
+    }
+});
+$("#one").click(function(){
+    if($('#onetarget input:checked').length == 0)
+    {
+        alert('品目を選択してください。');
+        return false;
     }
 });
 </script>

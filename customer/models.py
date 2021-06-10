@@ -71,6 +71,10 @@ class OrderModel(models.Model):
     permitter = models.ForeignKey(User, related_name='permitter', on_delete=models.CASCADE, blank=True, null=True)
     permit_day = models.DateTimeField(blank=True, null=True)
     handler = models.ForeignKey(User, related_name="handler", on_delete=models.CASCADE, blank=True, null=True)
+    location_selecter = models.IntegerField(blank=True)
+    limit = models.IntegerField(default=0)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
 
     def __str__(self):
         return f'{self.created_on.strftime("%Y%m%d")}｜{self.name}|{self.price}円'

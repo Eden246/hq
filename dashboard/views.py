@@ -173,8 +173,7 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, View):
             user=request.user,
         )
         permission.save()
-        
-        return HttpResponseRedirect(reverse_lazy("permission"))
+        return HttpResponseRedirect(reverse_lazy("order_list"))
 
     def test_func(self):
         return self.request.user.groups.filter(name='staff').exists()
@@ -208,31 +207,30 @@ def image(request, pk):
                 contract_image = form.cleaned_data['image']
             )
     # return render(request, 'dashboard/image.html', {'i':items})
-    return HttpResponseRedirect(reverse_lazy("permission"))
+    return HttpResponseRedirect(reverse_lazy("order_list"))
     
-def image(request, pk):
+def return_image(request, pk):
     permission = Permission.objects.get(pk=pk)
     form = ImageForm(request.POST or None, request.FILES or None,  instance=permission)
     if form.is_valid():
         edit = form.save(commit=False)
         edit.save()
-        permission.result = 1
+        permission.result = 2
         permission.save()
         for i in permission.order.items.all():
             permission_quantity = i.quantity
             menu_item = MenuItem.objects.get(pk=i.items.pk)
-            menu_item.quantity -= permission_quantity
+            menu_item.quantity += permission_quantity
             menu_item.save()
             Tracker.objects.create(
                 name = menu_item.name,
                 quantity = permission_quantity,
                 user = request.user,
-                type= "貸出",
+                type= "返品",
                 category = menu_item.category,
                 contract_image = form.cleaned_data['image']
             )
-    # return render(request, 'dashboard/image.html', {'i':items})
-    return HttpResponseRedirect(reverse_lazy("permission"))
+    return HttpResponseRedirect(reverse_lazy("order_list"))
 
 def permission(request):
     if request.method == 'POST':
@@ -245,11 +243,9 @@ def permission(request):
     else:
         permissions = Permission.objects.all()
 
-    text = Text.objects.first()
     form1 = ImageForm()
     context ={
         'permissions':permissions,
-        'text':text,
         'form1':form1,
     }
     return render(request, 'dashboard/permission.html', context)
@@ -264,7 +260,7 @@ def approve(request, pk):
     order.permitter = request.user
     order.permit_day = today
     order.save()
-    return redirect('permission')
+    return redirect('order_list')
 
 def disapprove(request, pk):
     permission = Permission.objects.get(pk=pk)
@@ -272,7 +268,7 @@ def disapprove(request, pk):
     order = OrderModel.objects.get(pk=permission.order.pk)
     order.status = 2
     order.save()
-    return redirect('permission')
+    return redirect('order_list')
 
 def back(request, pk):
     permission = Permission.objects.get(pk=pk)
@@ -292,7 +288,7 @@ def back(request, pk):
             contract_image = form0.cleaned_data['contract_image']
         )
 
-    return redirect('permission')
+    return redirect('order_list')
 
 def not_back(request, pk):
     pk = request.POST.get('pk', '')
@@ -301,7 +297,7 @@ def not_back(request, pk):
     order = OrderModel.objects.get(pk=permission.order.pk)
     order.status = 2
     order.save()
-    return redirect('permission')
+    return redirect('order_list')
 
 @csrf_exempt
 def permission_save(request):
@@ -328,46 +324,65 @@ def order_list(request):
         pie_label.append(i['items__items__category__parent__name'])
         pie_data.append(i['sum'])
 
-    text = Text.objects.first()
-    text_form= TextForm(request.POST or None, instance = text)
-    if text_form.is_valid():
-        text_form.save()
-
     if request.method == 'POST':
-        form0 = TrackerImageForm(request.POST, request.FILES)
-        permission_pk = request.POST.get('permission_pk')
-        permission = Permission.objects.get(pk=permission_pk)
-        permission.result = 2
-        permission.save()
-        order = OrderModel.objects.get(pk=permission.order.pk)
-        order.status = 0
-        order.save()
-        form0 = TrackerImageForm(request.POST, request.FILES)
-        if form0.is_valid():
-            for i in order.items.all():
-                Tracker.objects.create(
-                    user=request.user,
-                    name=i.items.name,
-                    type= "返品",
-                    quantity = i.quantity,
-                    category = i.items.category,
-                    contract_image = form0.cleaned_data['contract_image']
-                )
+        if 'order_permit' in request.POST:
+            order_pk = request.POST.get('order_pk')
+            order = OrderModel.objects.get(pk=order_pk)
+            order.status = 1
+            order.handler = request.user
+            order.save()
+            message = request.POST.get('message', None)
+            permission = Permission.objects.create(
+                message=message,
+                order=order,
+                user=request.user,
+            )
+
+        if 'return_permit' in request.POST:
+            permission_pk = request.POST.get('permission_pk')
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+            permission = Permission.objects.get(pk=permission_pk)
+            permission.result = 2
+            permission.start_date = start_date
+            permission.end_date = end_date
+            permission.save()
+            order = OrderModel.objects.get(pk=permission.order.pk)
+            order.status = 0
+            order.save()
+            form0 = TrackerImageForm(request.POST, request.FILES)
+        else:
+            form0 = TrackerImageForm()
     else:
-         form0 = TrackerImageForm()
+        form0 = TrackerImageForm()
 
     permissions = Permission.objects.filter(result=1)
+
+    permission_revenue = 0
+    for permission in permissions:
+        permission_revenue += permission.order.price
+
+    unpermission = Permission.objects.filter(result=0) | Permission.objects.filter(result=3)
+    uncharged = Permission.objects.filter(result=3)
+    uncontract = Permission.objects.filter(result=0)
+    form1 = ImageForm()
+
     context = {
         'orders': orders,
         'total_orders': len(orders),
         'total_revenue': total_revenue,
+        'total_permissions': len(permissions),
+        'permission_revenue': permission_revenue,
+        'uncharged': len(uncharged),
+        'uncontract': len(uncontract),
         'pie_label': pie_label,
         'pie_data': pie_data,
-        'text':text,
-        'text_form':text_form,
         'form0':form0,
+        'form1':form1,
         'permissions':permissions,
+        'unpermission':unpermission,
     }
+
 
     return render(request, 'dashboard/order_list.html', context)
 
@@ -376,8 +391,8 @@ def test_func(user):
 
 @user_passes_test(test_func, login_url="/login/")
 def dashboard(request):
-    orders = OrderModel.objects.all().order_by('-created_on')[:5]
-    users = User.objects.filter(permission__date__lte=datetime.datetime.today(), permission__date__gt=datetime.datetime.today()-datetime.timedelta(days=30), permission__result=1).annotate(total_price=Sum(F('permission__order__items__items__price')*F('permission__order__items__quantity'))).annotate(sum=Sum('permission__order__items__quantity')).values('username', 'sum', 'total_price').order_by('-total_price')[:5]
+    orders = OrderModel.objects.all().order_by('-created_on')[:10]
+    users = User.objects.filter(permission__date__lte=datetime.datetime.today(), permission__date__gt=datetime.datetime.today()-datetime.timedelta(days=30), permission__result=1).annotate(total_price=Sum(F('permission__order__items__items__price')*F('permission__order__items__quantity'))).annotate(sum=Sum('permission__order__items__quantity')).values('username', 'sum', 'total_price').order_by('-total_price')[:10]
     text = Text.objects.first()
     text_form = TextForm(request.POST or None, instance = text)
     if text_form.is_valid():
@@ -427,12 +442,8 @@ def item_csv(request):
 @login_required
 def item(request):
     items = MenuItem.objects.all()
-    trackers = Tracker.objects.all()
+    trackers = Tracker.objects.all().order_by('-created_on')
     permissions = Permission.objects.filter(result=1).order_by('-date')
-    text = Text.objects.first()
-    text_form = TextForm(request.POST or None, instance = text)
-    if text_form.is_valid():
-        text_form.save()
     if request.method == 'POST':
         if 'save_new' in request.POST:
             form0 = TrackerImageForm(request.POST, request.FILES)
@@ -474,8 +485,6 @@ def item(request):
         'items': items.order_by('category__parent'),
         'form': form,
         'form0': form0,
-        'text':text,
-        'text_form':text_form,
         'permissions':permissions,
         'trackers':trackers
     }

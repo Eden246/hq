@@ -20,6 +20,12 @@ canvas{
   font-weight: 600;
   border-radius: 0.25em;
 	}
+#fav-table2 th {
+  color:#448aff;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 0.25em;
+	}
 button.edit
 {
     background:#337ab7;
@@ -118,6 +124,15 @@ tr.row-content
 		transform: none;
 	}
 }
+button:hover span{
+  color:gold;
+  transition: all 0.4s;
+}
+.btn-primary:hover {
+  color:gold;
+  transition: all 0.4s;
+}
+
 .modal-backdrop {display: none;}
 </style>
 <div class="wrapper">
@@ -132,7 +147,7 @@ tr.row-content
         <div id="tab-1"class="tab-content active">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
-                    <div class="d-flex justify-content-center">
+                    <div class="d-flex justify-content-center mt-3">
                         <h2>
                             予約件数:&emsp;
                             <h2 style="color:#ad0003;">{{ total_orders }}件</h2>
@@ -144,6 +159,10 @@ tr.row-content
                         </h2>
                     </div>
                     <hr>
+                    <form method="get">
+                        {{ filter.form | crispy }}
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
                     <table class="table table-striped text-center" id="fav-table1">
                         <thead>
                             <tr class="row-name">
@@ -153,12 +172,12 @@ tr.row-content
                                 <th>ケアマネジャー</th>
                                 <th>Eメール</th>
                                 <th>電話番号</th>
-                                <th>施設</th>
+                                <th>使用場所</th>
+                                <th>使用住所</th>
                                 <th>品目</th>
                                 <th>予約日</th>
                                 <th>合計</th>
                                 <th>担当者</th>
-                                <th>返品</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -170,7 +189,20 @@ tr.row-content
                                 <td>{{ order.user }}</td>
                                 <td>{{ order.email }}</td>
                                 <td>{{ order.phone }}</td>
-                                <td>{{ order.facility }}</td>
+                                <td>
+                                {% if order.location_selecter == 1 %}
+                                自宅
+                                {% else %}
+                                施設
+                                {% endif %}
+                                </td>
+                                <td>
+                                    {% if order.location_selecter == 1 %}
+                                        {{order.facility }}
+                                    {% else %}
+                                        {{ order.user.client.facility }}
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {% for item in order.items.all %}
                                     ({{ item }})
@@ -182,11 +214,8 @@ tr.row-content
                                     {% if order.handler %}
                                     {{ order.handler }}
                                     {% else %}
-                                    未定
+                                    <button href="#{{order.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{order.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>未定</button>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    <button href="#{{order.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{order.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>返品</button>
                                 </td>
                             </tr>
                             <div class="modal fade" id="collapseExample{{order.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -196,24 +225,41 @@ tr.row-content
                                             <div class="modal-body">
                                                 <h2>注文番号：{{order.pk}}</h2>
                                                 <hr>
-                                                <h3>《顧客情報》</h3>
-                                                <h5>利用者：{{ order.name }}</h5>
-                                                <h5>ケアマネジャー：{{ order.user }}</h5>
-                                                <h5>メールアドレス：{{ order.email }}</h5>
-                                                <h5>電話番号：{{ order.phone }}</h5>
-                                                <h5>施設：{{ order.facility }}</h5>
-                                                <h5 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h5>
+                                                <h2>《顧客情報》</h2>
+                                                <br>
+                                                <h4>利用者：{{ order.name }}</h4>
+                                                <h4>ケアマネジャー：{{ order.user }}</h4>
+                                                <h4 style="text-transform: lowercase;">メールアドレス：{{ order.email }}</h4>
+                                                <h4>電話番号：{{ order.phone }}</h4>
+                                                <h4>使用場所:
+                                                {% if order.location_selecter == 1%}
+                                                    自宅
+                                                {% else %}
+                                                    施設
+                                                {% endif %}
+                                                </h4>
+                                                <h4>使用住所:
+                                                {% if order.location_selecter == 1%}
+                                                    {{ order.facility }}
+                                                {% else %}
+                                                    {{ order.user.client.facility }}
+                                                {% endif %}
+                                                </h4>
+                                                <h4 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h4>
                                                 <hr>
-                                                <h3>《予約情報》</h3>
+                                                <h2>《予約情報》</h2>
+                                                <br>
                                                 {% for item in order.items.all %}
                                                 <h4>品名：{{ item }}</h4>
                                                 {% endfor %}
                                                 <h4>注文日付：{{ order.created_on }}</h4>
-                                                <h4>合計：{{ order.price }}円</h4>
+                                                <hr>
+                                                <h4 class="text-danger">合計：{{ order.price }}円</h4>
+                                                <hr>
                                                 {% if order.status == 0 %}
                                                 <p class="alert alert-primary"><i style="color:green;" class="fa fa-check"></i><span class="pl-2">承認</span></p>
                                                 <h4 class="border">《承認内容》</h4>
-                                                <span class="badge bg-primary mx-auto mt-3" style="font-size: 1.2em;">担当者：{{ order.handler.first }}</span>
+                                                <span class="badge bg-primary mx-auto mt-3" style="font-size: 1.2em;">担当者：{{ order.handler }}</span>
                                                 <span class="badge bg-danger mx-auto mt-3" style="font-size: 1.2em;">承認日付：{{ order.permit_day }}</span>
                                                 <span class="badge rounded-pill bg-secondary mx-auto mt-3" style="font-size: 1em;">承認者：{{ order.permitter }}</span>
                                                 {% elif order.status == 1 %}
@@ -222,13 +268,13 @@ tr.row-content
                                                 <p class="alert alert-info"><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
                                                 <form method="post">
                                                     {% csrf_token %}
+                                                    <input type="hidden" name="order_pk" value="{{ order.pk }}">
                                                     <input type='text' name='message' class='form-control' placeholder='追加したい内容がある場合'>
-                                                    <button type="submit" class="btn btn-success mt-3" style="background-color: navy;">担当申請</button>
+                                                    <input class="btn btn-primary" type="submit" value="担当申請" name='order_permit' style="background-color:navy;">
                                                 </form>
                                                 {% endif %}
                                             </div>
                                             <div class="modal-footer">
-                                                <input class="alert alert-danger" type="submit" value="登録" name="came_back">
                                                 <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
                                             </div>
                                         </div>
@@ -240,17 +286,17 @@ tr.row-content
                     </div>
                 </div>
                 <div id="tab-2"class="tab-content">
-                    <div class="row justify-content-center">
+                    <div class="row justify-content-center mt-3">
                         <div class="col-lg-10">
                             <div class="d-flex justify-content-center">
                                 <h2>
-                                    予約件数:&emsp;
-                                    <h2 style="color:#ad0003;">{{ total_orders }}件</h2>
+                                    貸出中:&emsp;
+                                    <h2 style="color:#ad0003;">{{ total_permissions }}件</h2>
                                 </h2>
                                 &emsp;&emsp;
                                 <h2>
-                                    予約総額:&emsp;
-                                    <h2 style="color:#ad0003;">{{ total_revenue }}円</h2>
+                                    総月額:&emsp;
+                                    <h2 style="color:#ad0003;">{{ permission_revenue }}円</h2>
                                 </h2>
                             </div>
                             <hr>
@@ -263,9 +309,10 @@ tr.row-content
                                         <th>ケアマネジャー</th>
                                         <th>Eメール</th>
                                         <th>電話番号</th>
-                                        <th>始日</th>
-                                        <th>終了日</th>
+                                        <th>使用場所</th>
+                                        <th>使用住所</th>
                                         <th>品目</th>
+                                        <th>貸出登録日付</th>
                                         <th>合計</th>
                                         <th>担当者</th>
                                         <th>返品</th>
@@ -280,7 +327,20 @@ tr.row-content
                                         <td>{{ permission.order.user }}</td>
                                         <td>{{ permission.order.email }}</td>
                                         <td>{{ permission.order.phone }}</td>
-                                        <td>{{ permission.order.facility }}</td>
+                                        <td>
+                                        {% if permission.order.location_selecter == 1 %}
+                                            自宅
+                                        {% else %}
+                                            施設
+                                        {% endif %}
+                                        </td>
+                                        <td>
+                                        {% if permission.order.location_selecter == 1 %}
+                                            {{ permission.order.facility }}
+                                        {% else %}
+                                            {{ permission.user.client.facility }}
+                                        {% endif %}
+                                        </td>
                                         <td>
                                             {% for item in permission.order.items.all %}
                                             ({{ item }})
@@ -290,20 +350,24 @@ tr.row-content
                                         <td>{{ permission.order.price }}円</td>
                                         <td>{{ permission.user }}</td>
                                         <td>
-                                            {% if request.user|has_group:"head" %}
                                             {% if permission.result == 1%}
                                             <button href="#{{permission.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>返品</button>
-                                            <form method="POST" enctype='multipart/form-data'>
-                                                {% csrf_token %}
                                                 <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
+                                                            <form method="post" enctype="multipart/form-data" action="{% url 'return_image' permission.pk %}">
+                                                            {% csrf_token %}
                                                             <div class="modal-body">
                                                                 {{ form0 | crispy }}
+                                                                <br>
+                                                                <label for="start_date">使用日</label>
+                                                                <input required type="date" id="start_date" class="form-control" name="start_date">
+                                                                <label for="end_date">使用終了日</label>
+                                                                <input required type="date" id="end_date" class="form-control" name="end_date">
                                                                 <input type="hidden" name="permission_pk" value="{{ permission.pk }}">
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <input class="alert alert-danger" type="submit" value="登録" name="came_back">
+                                                                <input class="alert alert-danger" type="submit" value="登録" name="return_permit">
                                                                 <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
                                                             </div>
                                                         </div>
@@ -312,14 +376,6 @@ tr.row-content
                                             </form>
                                             {% else %}
                                             <span class="alert alert-danger p-1">返品済み</span>
-                                            {% endif %}
-                                            {% else %}
-                                            {% if permission.result == 1 %}
-                                            <span class="alert alert-danger p-1">貸出中</span>
-                                            </form>
-                                            {% else %}
-                                            <span class="alert alert-danger p-1">返品済み</span>
-                                            {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -332,6 +388,125 @@ tr.row-content
                 <div id="tab-3"class="tab-content">
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
+                            <div class="d-flex justify-content-center">
+                                <h2>
+                                    担当未定:&emsp;
+                                    <h2 style="color:#ad0003;">{{ uncharged }}件</h2>
+                                </h2>
+                                &emsp;&emsp;
+                                <h2>
+                                    契約未定:&emsp;
+                                    <h2 style="color:#ad0003;">{{ uncontract }}件</h2>
+                                </h2>
+                            </div>
+                            <hr>
+                            <table class="table table-striped text-center" id="fav-table2">
+                                <thead>
+                                    <tr class="row-name">
+                                        <th>ID</th>
+                                        <th>状況</th>
+                                        <th>申請日付</th>
+                                        <th>利用者</th>
+                                        <th>ケアマネジャー</th>
+                                        <th>Eメール</th>
+                                        <th>電話番号</th>
+                                        <th>使用場所</th>
+                                        <th>使用住所</th>
+                                        <th>品目</th>
+                                        <th>合計</th>
+                                        <th>申請者</th>
+                                        <th>メッセージ</th>
+                                        <th>申請書</th>
+                                        <th>契約書</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for permission in unpermission %}
+                                    <tr class="row-content">
+                                        <td>{{ permission.id }}</td>
+                                        <td >
+                                        {% if request.user|has_group:"head" %}
+                                            {% if permission.result == 0 %}
+                                                <span class="badge bg-warning">承認</span>
+                                            {% elif permission.result == 1 %}
+                                                <span class="badge bg-danger">貸出中</span>
+                                            {% elif permission.result == 2 %}
+                                                <span class="badge bg-secondary">終了</span>
+                                            {% else %}
+                                                <a href="{% url 'approve' permission.pk %}"class="badge bg-warning">承認</a>
+                                                <a href="{% url 'disapprove' permission.pk %}" class="badge bg-secondary">不承認</a>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if permission.result == 0 %}
+                                                <span class="badge bg-warning">承認</span>
+                                            {% elif permission.result == 1 %}
+                                                <span class="badge bg-danger">貸出中</span>
+                                            {% elif permission.result == 2 %}
+                                                <span class="badge bg-secondary">終了</span>
+                                            {% else %}
+                                                <span class="badge bg-info">承認待ち</span>
+                                            {% endif %}
+                                        {% endif %}
+                                        </td>
+                                        <td>{{ permission.date }}</td>
+                                        <td >{{ permission.order.name }}</td>
+                                        <td >{{ permission.order.user }}</td>
+                                        <td>{{ permission.order.email }}</td>
+                                        <td>{{ permission.order.phone }}</td>
+                                        <td>
+                                        {% if permission.order.location_selecter == 1 %}
+                                            自宅
+                                        {% else %}
+                                            施設
+                                        {% endif %}
+                                        </td>
+                                        <td>
+                                        {% if permission.order.location_selecter == 1 %}
+                                            {{ permission.order.facility }}
+                                        {% else %}
+                                            {{ permission.user.client.facility }}
+                                        {% endif %}
+                                        </td>
+                                        <td>
+                                            {% for item in permission.order.items.all %}
+                                            ({{ item }})
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ permission.order.price }}円</td>
+                                        <td>{{ permission.user }}</td>
+                                        <td>{{ permission.message }}</td>
+                                        <td>
+                                        {% if permission.result == 0 or permission.result == 1 %}
+                                        <a href="{% url 'paper' permission.order.pk %}" class="btn btn-info p-1"><i class="fa fa-edit"></i></a>
+                                        {% endif %}
+                                        </td>
+                                        <td>
+                                        {% if request.user|has_group:"head" and permission.result == 0 %}
+                                        <button href="#{{permission.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fas fa-edit" aria-hidden="true"></i>登録</button>
+                                        {% elif permission.result == 1 %}
+                                            <span class="alert alert-danger p-1">契約済み</span>
+                                        {% endif %}
+                                        <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form method="post" enctype="multipart/form-data" action="{% url 'image' permission.pk %}">
+                                                    {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            {{ form1 | crispy }}
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <input class="alert alert-danger" type="submit" value="登録">
+                                                            <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -346,6 +521,9 @@ $(document).ready(function() {
 });
 $(document).ready(function() {
     $('#fav-table1').tablesorter();
+});
+$(document).ready(function() {
+    $('#fav-table2').tablesorter();
 });
 $('.tab-link').click( function() {
 	var tabID = $(this).attr('data-tab');

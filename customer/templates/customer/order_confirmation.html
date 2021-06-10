@@ -297,7 +297,7 @@ ol.progtrckr li.progtrckr-todo:before {
         <strong>お名前:</strong>{{ order.name }}<br />
         <strong>電話番号:</strong>{{ order.phone }}<br />
         <strong>メールアドレス:</strong>{{ order.email }}<br />
-        <strong>施設住所:</strong>{{ order.facility }}<br />
+        <strong>住所:</strong>{{ order.facility }}<br />
     </div>
     <div class="orderinfo">
         <p>予約者情報: </p>
@@ -356,14 +356,14 @@ ol.progtrckr li.progtrckr-todo:before {
     <div class="payment">
     <h3>- 確認 -</h3>
         <strong>合計: </strong>{{ order.price }}円<br />
-        <strong> 限度額残量：</strong>{{ order.user.limit }}円<br />
+        <strong> 限度額残高：</strong>{{ order.chars_diff}}円<br />
         <strong> 決済方式:</strong>相談後決定<br />
     </div>
     <div class="spacing">
         <hr>
     </div>
     <div class="footer">
-        If any of the above information is incorrect, you must inform us as soon as possible using info@dwcreative.uk. Failure to do so will result in your order being dispatched as above. Orders are accepted up to 5pm every working day. if they arrive with DW Creative Design studio after this time, they are considered to have arrived the next day. There may be a delay if you have opted in for a printed proof to be sent to yourself or there is a delay with your payment. We aim to notify our customers of all delays where possible. Once your order has been dispatched, you will recieve an email of estimated delivery date and tracking number if applicable. For full terms and conditions please visit www.dwcreative.uk
+        状況により遅れる場合もございます。
     </div>
 
 </div>

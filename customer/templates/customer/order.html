@@ -24,17 +24,14 @@
   cursor: pointer; }
 
 .checkmark {
-  position: absolute;
-  top: 0;
-  left: 0; }
+  position: relative;
+}
 
 .checkmark:after {
   content: "\f1db";
   font-family: "FontAwesome";
-  position: absolute;
   color: rgba(0, 0, 0, 0.3);
   font-size: 20px;
-  margin-top: -4px;
   -webkit-transition: 0.3s;
   -o-transition: 0.3s;
   transition: 0.6s; }
@@ -175,7 +172,7 @@
 
 .social-panel-container {
 	position: fixed;
-	up: 80px;
+	top: 100%;
   z-index: 1;
 }
 
@@ -245,8 +242,125 @@
   display:none;
 }
     }
+{% comment %}  {% endcomment %}
+#sidebar-blog {
+  color: teal;
+  padding:5px;
+  border: 3px solid #fff;
+  box-shadow: inset 5px 5px 30px teal, 0 5px 15px #06D85F;
+}
+#sidebar-blog:hover {
+	box-shadow: 5px 10px 30px #191970;
+}
+.callout {
+	 position: relative;
+	 width: 100%;
+   height:100%;
+	 max-width: 400px;
+	 align-items: center;
+	 justify-content: center;
+	 flex-flow: column;
+	 text-align: center;
+   margin: 10px;
+   padding: 1px;
+}
+ .callout:before, .callout:after, .callout > :last-child:before, .callout > :last-child:after {
+	 position: absolute;
+	 width: 31px;
+	 height: 23px;
+	 border-color: #191970;
+	 border-style: solid;
+	 content: ' ';
+}
+ .callout:before {
+	 top: -1px;
+	 left: -1px;
+	 border-width: 3px 0 0 3px;
+}
+ .callout:after {
+	 top: -1px;
+	 right: -1px;
+	 border-width: 3px 3px 0 0;
+}
+ .callout :last-child:before {
+	 bottom: -8px;
+	 right: -8px;
+	 border-width: 0 3px 3px 0;
+}
+ .callout :last-child:after {
+	 bottom: -8px;
+	 left: -8px;
+	 border-width: 0 0 3px 3px;
+}
+{% comment %} flip_button {% endcomment %}
+.action-button
+{
+	/*position: relative;*/
+	padding: 5px 20px;
+  margin: 0px 10px 10px 0px;
+  /*float: left;*/
+	border-radius: 10px;
+	color: #FFF;
+	text-decoration: none;	
+}
+.action-button:hover {
+  padding: 10px 30px;
+  transition: 0.3s ease-in-out;
 
+}
+.action-button:hover span{
+  color: yellowgreen;
+  transition: 0.3s
+}
+.action-button:active
+{
+  transition: 0.01s
+	transform: translate(0px,5px);
+  -webkit-transform: translate(0px,5px);
+	border-bottom: 1px solid;
+} 
+.blue
+{
+	background-color: #3498DB;
+	border-bottom: 7px solid #2980B9;
+	text-shadow: 0px -2px #2980B9;
+}
+.card {
+	-webkit-transition: 0.6s;
+	transition: 0.6s;
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+}
 
+.card .front, .card .back {
+	height: inherit;
+	width: inherit;
+	overflow: hidden;
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	border-radius: 2px;
+	box-shadow: 0px 1px 2px rgba(0,0,0, 0.2);
+}
+
+.card .front .flipButton, .card .back .flipButton {
+	/* Add the Flip button */
+	cursor: pointer;
+	text-align: center;
+  color:#fff;
+}
+.card .front {
+	z-index: 2;
+}
+.card .back {
+  width: 100%;
+  position: absolute;
+	-webkit-transform: rotateY(180deg);
+	transform: rotateY(180deg);
+}
+.card.flip {
+	-webkit-transform: rotateY(180deg);
+	transform: rotateY(180deg);
+}
 </style>
 
 
@@ -255,7 +369,7 @@
 {% if messages %}
 <div class="social-panel-container">
 	<div  class="social-panel">
-		<p><i class="fa fa-message"></i>メッセージ</a></p>
+		<p><i class="fas fa-envelope"></i>メッセージ</p>
     {% for message in messages %}
     <br>
     <h4 id="message_container" class="{{ message.tags }} slide">{{ message }}</h4>
@@ -265,6 +379,14 @@
 {% endif %}
 
 <script>
+$(".social-panel-container").show().animate({top: (window.innerHeight / 8 - 50) + "px"}, 1000).fadeOut(3000);
+
+jQuery(document).ready(function($){
+  $( ".flipButton" ).click(function() {
+    $( this ).closest(".card").toggleClass( "flip" );
+  });
+});
+
 $("#maxPrice").on('blur', function() {
   var _min = $(this).attr('min');
   var _max = $(this).attr('max');
@@ -326,9 +448,7 @@ $("#maxPrice").on('blur', function() {
             </tr>
           </tfoot>
         </table>
-      <div class="container text-center" style="position: absolute; bottom: 10px;">
-        <a href="{% url 'cart' %}"><i style="font-size: 3rem;" class="fa fa-book mr-2"></i>予約確認</a>
-      </div>
+        <a href="{% url 'cart' %}"class="action-button shadow animate blue m-3" style="color:#F6D55C"><span><i class="fa fa-book mr-2"></i>予約確認</span></a>
   {% else %}
     ログインが必要です。
   {% endif %}
@@ -392,28 +512,47 @@ $("#maxPrice").on('blur', function() {
         </div>
     </form>
   </div>
-  <section id="about-us" class="about-us padd-section" style="width:100%;">
+  <section id="about-us" class="about-us padd-section p-0 " style="width:100%;">
       {% if items %}
       <form method="POST">
           {% csrf_token %}
-          <div class="row d-flex flex-wrap" data-aos="fade-up">
-          {% for item in items %}
-            <div class="col-xxl-3 col-lg-6 col-md-12 text-center"  data-aos="zoom-up" data-aos-delay="500">
-              <div class="hit-the-floor pb-5">{{ item.name }}</div>
-              {% if item.image %}<img class="rounded center-block" src="{{ item.image.url }}" style="width:300px; height:300px;">{% endif %}
-              <div class="form-group form-check" data-aos="fade-left">
-                  <label class="checkbox-wrap form-check-label" id="onetarget">選択
-                    <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
-                    <span class="checkmark"></span>
-                  </label>
-                  <h3>{{ item.price }}円（自己負担は1の場合/月額）</h3>
-                  <ul class="list-unstyled">
-                      <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
-                  </ul>
-                  <iframe style="width:100%" height="200" src="{{item.video_url}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div class="row d-flex flex-wrap p-3">
+              {% for item in items %}
+              <div class="col-xxl-3 col-lg-6 col-md-12 text-center callout" id="sidebar-blog" data-aos="fade-up">
+                  <div class="card m-0 p-0">
+                      <div class="front">
+                          <div class="flipButton action-button shadow animate blue arrow">裏面へ</div>
+                          <label class="checkbox-wrap form-check-label p-0 m-0" id="onetarget">
+                          <input onclick="selectOnlyThis(this.id)" type="checkbox" name="items[]" class="form-check-input" value="{{ item.pk }}">
+                          <span class="checkmark"></span>
+                          選択
+                          </label>
+                          <div class="hit-the-floor pb-5">{{ item.name }}</div>
+                          {% if item.image %}
+                          <img class="rounded center-block" src="{{ item.image.url }}" style="width:300px; height:300px;">{% endif %}
+                          <h3 class="mt-3" data-aos="fade-left">{{ item.price }}円（月額）</h3>
+                          <hr>
+                          <span class="alert alert-primary p-1">{{ item.category.parent }}</span>
+                          <span class="alert alert-danger p-1">({{ item.category }})</span>
+                      </div>
+                      <div class="back">
+                          <div class="flipButton action-button shadow animate blue arrow">表面へ</div>
+                          現在在庫量
+                          <h3 class="mt-3" data-aos="fade-left">{{ item.quantity }}</h3>
+                          {% if item.video_url %}
+                          <hr>
+                          操作動画
+                          <iframe data-aos="fade-right" style="width:100%" height="200" src="{{item.video_url}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>                        
+                          {% endif %}
+                          <hr>
+                          詳細情報
+                          <ul class="list-unstyled" data-aos="fade-right">
+                            <li><i class="fa fa-angle-right"></i>{{ item.description }}</li>
+                          </ul>
+                      </div>
+                  </div>
               </div>
-            </div>
-          {% endfor %}
+              {% endfor %}
           </div>
           {% if user.is_authenticated %}
           <button type="submit" id="one" class="floating-btn"><i class="fa fa-shopping-cart" aria-hidden="true"></i>&emsp;カートに入れる</button>
@@ -431,31 +570,28 @@ $("#maxPrice").on('blur', function() {
       </div>
       {% endif %}
       {% if items.has_other_pages %}
-  <ul class="pagination justify-content-center">
-      {% if items.has_previous %}
-      <li class="m-2"><a class="p-3" href="?page={{ items.previous_page_number }}">&laquo;</a></li>
-      {% else %}
-      <li class="m-2 disabled"><span class="p-3">&laquo;</span></li>
+      <ul class="pagination justify-content-center">
+          {% if items.has_previous %}
+          <li class="m-2"><a class="p-3" href="?page={{ items.previous_page_number }}">&laquo;</a></li>
+          {% else %}
+          <li class="m-2 disabled"><span class="p-3">&laquo;</span></li>
+          {% endif %}
+          {% for i in items.paginator.page_range %}
+          {% if items.number == i %}
+          <li class="m-2 active"><span class="p-3">{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+          <li class="m-2"><a class="p-3" href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+          {% endfor %}
+          {% if items.has_next %}
+          <li class="m-2"><a class="p-3" href="?page={{ items.next_page_number }}">&raquo;</a></li>
+          {% else %}
+          <li class="m-2 disabled"><span>&raquo;</span></li>
+          {% endif %}
+      </ul>
       {% endif %}
-      {% for i in items.paginator.page_range %}
-      {% if items.number == i %}
-      <li class="m-2 active"><span class="p-3">{{ i }} <span class="sr-only">(current)</span></span></li>
-      {% else %}
-      <li class="m-2"><a class="p-3" href="?page={{ i }}">{{ i }}</a></li>
-      {% endif %}
-      {% endfor %}
-      {% if items.has_next %}
-      <li class="m-2"><a class="p-3" href="?page={{ items.next_page_number }}">&raquo;</a></li>
-      {% else %}
-      <li class="m-2 disabled"><span>&raquo;</span></li>
-      {% endif %}
-  </ul>
-  {% endif %}
   </section>
 </div>
-
-
-
 
 <script>
 $("input:checkbox").click(function() {
@@ -480,7 +616,6 @@ $("#one").click(function(){
         alert('カートに入れる品目を選んでください。');
         return false;
     }
-    
 });
 </script>
 {% endblock content %}

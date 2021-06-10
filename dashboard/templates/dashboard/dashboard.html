@@ -60,7 +60,7 @@ tbody tr:hover {
               {% endif %}
           </div>
           <div class="card-body">
-              <marquee behavior="" direction="" scrollamount="10">
+              <marquee scrollamount="10">
                   <h3 class="mx-auto">{{ text.first }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.second }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.third }}</h3>
               </marquee>
           </div>
@@ -110,7 +110,11 @@ tbody tr:hover {
         <thead>
           <tr >
             <th>予約時間</th>
-            <th>施設名</th>
+            <th>予約者</th>
+            <th>使用場所</th>
+            <th>使用住所</th>
+            <th>希望使用日</th>
+            <th>希望終了日</th>
             <th>金額</th>
             <th>担当者</th>
           </tr>
@@ -119,7 +123,23 @@ tbody tr:hover {
           {% for order in orders %}
             <tr>
               <td >{{ order.created_on | date:'m-d H:i' }}</td>
-              <td >{{order.user.client.facility}}</td>
+              <td >{{ order.user.username }}</td>
+              <td >
+                {% if order.location_selecter == 1 %}
+                自宅
+                {% else %}
+                施設
+                {% endif %}
+              </td>
+              <td >
+                {% if order.location_selecter == 1 %}
+                  {{order.facility }}
+                {% else %}
+                  {{ order.user.client.facility }}
+                {% endif %}
+              </td>
+              <td >{{order.start_date | date:'m-d' }}</td>
+              <td >{{order.end_date | date:'m-d' }}</td>
               <td >{{order.price}}</td>
               <td>
               {% if order.handler %}
