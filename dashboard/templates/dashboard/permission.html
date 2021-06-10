@@ -3,7 +3,195 @@
 {% load crispy_forms_tags %}
 {% block content %}
 {% include 'dashboard/top.html' %}
+<style>
+#fav-table2 th {
+  color:#448aff;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 0.25em;
+	}
+button.edit
+{
+    background:#337ab7;
+    color:#fff;
+    border-radius:2px;
+    border:none;
+}
+button.edit:hover {
+    background:#E85A4F;
+}
+tr.row-content
+{
+    color:#6c7173;
+}
 
-処理が完了されました。
-
+.table-striped>tbody>tr:nth-of-type(odd)
+{
+    background:#F0F2F2 !important; 
+}
+</style>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-center">
+            <h2>
+                担当未定:&emsp;
+                <h2 style="color:#ad0003;">{{ uncharged }}件</h2>
+            </h2>
+            &emsp;&emsp;
+            <h2>
+                契約未定:&emsp;
+                <h2 style="color:#ad0003;">{{ uncontract }}件</h2>
+            </h2>
+        </div>
+        <hr>
+        <form method="get" class="d-flex justify-content-center">
+            <div class="card mb-4 m-3">
+                <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">状況</h5>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color:#F6D55C;">
+                        <div class="form-group">
+                            <select name="result" id="result" class="form-control">
+                                <option value=3>担当未定</option>
+                                <option value=0 >契約未定</option>
+                                <option value=1>貸出中</option>
+                                <option value=2>終了</option>
+                                <option value=""selected>進行中</option>
+                            </select>
+                        </div>
+                    </li>
+                </div>
+            </div>
+            <div class="card mb-4 m-3">
+                <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">使用期間</h5>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color:#F6D55C;">
+                        <div class="form-group">
+                            使用日付 ： <input type="date" name="fromdate"/>
+                            終了日付 ： <input type="date" name="todate"/>
+                        </div>
+                    </li>
+                </div>
+            </div>
+            <button id="priceFilterBtn" class="alert alert-primary p-2 my-auto" style="height:50%" name="search">サーチ</button>
+        </form>
+        <table class="table table-striped text-center" id="fav-table2">
+            <thead>
+                <tr class="row-name">
+                    <th>ID</th>
+                    <th>状況</th>
+                    <th>申請日付</th>
+                    <th>利用者</th>
+                    <th>ケアマネジャー</th>
+                    <th>Eメール</th>
+                    <th>電話番号</th>
+                    <th>使用場所</th>
+                    <th>使用住所</th>
+                    <th>品目</th>
+                    <th>合計</th>
+                    <th>申請者</th>
+                    <th>メッセージ</th>
+                    <th>申請書</th>
+                    <th>契約書</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for permission in unpermission %}
+                <tr class="row-content">
+                    <td>{{ permission.id }}</td>
+                    <td >
+                    {% if request.user|has_group:"head" %}
+                        {% if permission.result == 0 %}
+                            <span class="badge bg-warning">承認</span>
+                        {% elif permission.result == 1 %}
+                            <span class="badge bg-danger">貸出中</span>
+                        {% elif permission.result == 2 %}
+                            <span class="badge bg-secondary">終了</span>
+                        {% else %}
+                            <a href="{% url 'approve' permission.pk %}"class="badge bg-warning">承認</a>
+                            <a href="{% url 'disapprove' permission.pk %}" class="badge bg-secondary">不承認</a>
+                        {% endif %}
+                    {% else %}
+                        {% if permission.result == 0 %}
+                            <span class="badge bg-warning">承認</span>
+                        {% elif permission.result == 1 %}
+                            <span class="badge bg-danger">貸出中</span>
+                        {% elif permission.result == 2 %}
+                            <span class="badge bg-secondary">終了</span>
+                        {% else %}
+                            <span class="badge bg-info">承認待ち</span>
+                        {% endif %}
+                    {% endif %}
+                    </td>
+                    <td>{{ permission.date }}</td>
+                    <td >{{ permission.order.name }}</td>
+                    <td >{{ permission.order.user }}</td>
+                    <td>{{ permission.order.email }}</td>
+                    <td>{{ permission.order.phone }}</td>
+                    <td>
+                    {% if permission.order.location_selecter == 1 %}
+                        自宅
+                    {% else %}
+                        施設
+                    {% endif %}
+                    </td>
+                    <td>
+                    {% if permission.order.location_selecter == 1 %}
+                        {{ permission.order.facility }}
+                    {% else %}
+                        {{ permission.user.client.facility }}
+                    {% endif %}
+                    </td>
+                    <td>
+                        {% for item in permission.order.items.all %}
+                        ({{ item }})
+                        {% endfor %}
+                    </td>
+                    <td>{{ permission.order.price }}円</td>
+                    <td>{{ permission.user }}</td>
+                    <td>{{ permission.message }}</td>
+                    <td>
+                    {% if permission.result == 0 or permission.result == 1 %}
+                    <a href="{% url 'paper' permission.order.pk %}" class="btn btn-info p-1"><i class="fa fa-edit"></i></a>
+                    {% endif %}
+                    </td>
+                    <td>
+                    {% if request.user|has_group:"head" and permission.result == 0 %}
+                    <button href="#{{permission.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fas fa-edit" aria-hidden="true"></i>登録</button>
+                    {% elif permission.result == 1 %}
+                        <span class="alert alert-danger p-1">契約済み</span>
+                    {% endif %}
+                    <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" enctype="multipart/form-data" action="{% url 'image' permission.pk %}">
+                                {% csrf_token %}
+                                    <div class="modal-body">
+                                        {{ form1 | crispy }}
+                                        <br>
+                                        <label for="start_date">使用日</label>
+                                        <input required type="date" id="start_date" class="form-control" name="start_date">
+                                        <label for="end_date">使用終了日</label>
+                                        <input required type="date" id="end_date" class="form-control" name="end_date">
+                                        <input type="hidden" name="permission_pk" value="{{ permission.pk }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input class="alert alert-danger" type="submit" value="登録">
+                                        <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    $('#fav-table2').tablesorter();
+});
+</script>
 {% endblock content %}

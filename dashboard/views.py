@@ -15,6 +15,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from .models import *
 from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator
+
 
 def chart(request):
     today = datetime.date.today()
@@ -187,11 +189,15 @@ def profile(request, pk):
 
 def image(request, pk):
     permission = Permission.objects.get(pk=pk)
+    start_date = request.POST.get('start_date')
+    end_date = request.POST.get('end_date')
     form = ImageForm(request.POST or None, request.FILES or None,  instance=permission)
     if form.is_valid():
         edit = form.save(commit=False)
         edit.save()
         permission.result = 1
+        permission.start_date = start_date
+        permission.end_date = end_date
         permission.save()
         for i in permission.order.items.all():
             permission_quantity = i.quantity
@@ -233,19 +239,26 @@ def return_image(request, pk):
     return HttpResponseRedirect(reverse_lazy("order_list"))
 
 def permission(request):
-    if request.method == 'POST':
-        start = request.POST.get('fromdate', None)
-        end = request.POST.get('todate', None)
-        if start and end:
-            permissions = Permission.objects.filter(date__lte=end, date__gt=start)
-        else:
-            permissions = Permission.objects.all()
-    else:
-        permissions = Permission.objects.all()
+    result = request.GET.get('result')
+    fromdate = request.GET.get('fromdate')
+    todate = request.GET.get('todate')
 
+    unpermission = Permission.objects.filter(result=0) | Permission.objects.filter(result=3)
+
+    if result != '' and result is not None:
+        unpermission = Permission.objects.filter(result=result)
+
+    if fromdate != '' and fromdate is not None and todate != ' ' and todate is not None:
+        unpermission = Permission.objects.filter(start_date__gte=fromdate).filter(end_date__lte=todate)
+
+    uncharged = Permission.objects.filter(result=3)
+    uncontract = Permission.objects.filter(result=0)
     form1 = ImageForm()
+
     context ={
-        'permissions':permissions,
+        'uncharged': len(uncharged),
+        'uncontract': len(uncontract),
+        'unpermission':unpermission,
         'form1':form1,
     }
     return render(request, 'dashboard/permission.html', context)
@@ -310,22 +323,12 @@ def permission_save(request):
     permission.save()
     return JsonResponse({"success": "Updated"})
 
-@login_required
-def order_list(request):
+def unpermit_order(request):
     orders = OrderModel.objects.filter(status=2)
     total_revenue = 0
     for order in orders:
         total_revenue += order.price
-    pie_data = []
-    pie_label = []
-
-    qs = orders.values('items__items__category__parent').exclude(items__items__name__isnull=True).annotate(sum=Sum('items__quantity')).values('items__items__category__parent__name', 'sum')
-    for i in qs:
-        pie_label.append(i['items__items__category__parent__name'])
-        pie_data.append(i['sum'])
-
     if request.method == 'POST':
-        if 'order_permit' in request.POST:
             order_pk = request.POST.get('order_pk')
             order = OrderModel.objects.get(pk=order_pk)
             order.status = 1
@@ -337,52 +340,66 @@ def order_list(request):
                 order=order,
                 user=request.user,
             )
-
-        if 'return_permit' in request.POST:
-            permission_pk = request.POST.get('permission_pk')
-            start_date = request.POST.get('start_date')
-            end_date = request.POST.get('end_date')
-            permission = Permission.objects.get(pk=permission_pk)
-            permission.result = 2
-            permission.start_date = start_date
-            permission.end_date = end_date
-            permission.save()
-            order = OrderModel.objects.get(pk=permission.order.pk)
-            order.status = 0
-            order.save()
-            form0 = TrackerImageForm(request.POST, request.FILES)
-        else:
-            form0 = TrackerImageForm()
-    else:
-        form0 = TrackerImageForm()
-
-    permissions = Permission.objects.filter(result=1)
-
-    permission_revenue = 0
-    for permission in permissions:
-        permission_revenue += permission.order.price
-
-    unpermission = Permission.objects.filter(result=0) | Permission.objects.filter(result=3)
-    uncharged = Permission.objects.filter(result=3)
-    uncontract = Permission.objects.filter(result=0)
-    form1 = ImageForm()
-
     context = {
         'orders': orders,
         'total_orders': len(orders),
-        'total_revenue': total_revenue,
-        'total_permissions': len(permissions),
-        'permission_revenue': permission_revenue,
-        'uncharged': len(uncharged),
-        'uncontract': len(uncontract),
-        'pie_label': pie_label,
-        'pie_data': pie_data,
-        'form0':form0,
-        'form1':form1,
-        'permissions':permissions,
-        'unpermission':unpermission,
     }
+    return render(request, 'dashboard/unpermit_order.html', context)
 
+@login_required
+def order_list(request):
+    result1 = request.GET.get('result1')
+    name = request.GET.get('name')
+    user = request.GET.get('user')
+    handler = request.GET.get('handler')
+    startdate = request.GET.get('startdate')
+    enddate = request.GET.get('enddate')
+
+    permissions = Permission.objects.filter(result=1)
+    
+    if result1:
+        permissions = Permission.objects.filter(result=result1)
+    if name:
+        permissions = Permission.objects.filter(order__name__icontains=name)
+    if user:
+        permissions = Permission.objects.filter(order__user__username__icontains=user)
+    if handler:
+        permissions = Permission.objects.filter(user__username__icontains=handler)
+    if startdate and enddate:
+        permissions = Permission.objects.filter(start_date__gte=startdate).filter(end_date__lte=enddate)
+
+    if request.method == 'POST':
+        order_pk = request.POST.get('order_pk')
+        order = OrderModel.objects.get(pk=order_pk)
+        order.status = 1
+        order.handler = request.user
+        order.save()
+        message = request.POST.get('message', None)
+        permission = Permission.objects.create(
+            message=message,
+            order=order,
+            user=request.user,
+        )
+        permission_pk = request.POST.get('permission_pk')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        permission = Permission.objects.get(pk=permission_pk)
+        permission.result = 2
+        permission.start_date = start_date
+        permission.end_date = end_date
+        permission.save()
+        order = OrderModel.objects.get(pk=permission.order.pk)
+        order.status = 0
+        order.save()
+        form0 = TrackerImageForm(request.POST, request.FILES)
+    else:
+        form0 = TrackerImageForm()
+
+    context = {
+        'total_permissions': len(permissions),
+        'form0':form0,
+        'permissions':permissions,
+    }
 
     return render(request, 'dashboard/order_list.html', context)
 

@@ -34,10 +34,8 @@ class Order(View):
 
         if name != ' ' and name is not None:
             items_list = items_list.filter(name__icontains=name)
-
         if detail != ' ' and detail is not None:
             items_list = items_list.filter(description__icontains=detail)
-
         if maxPrice != ' ' and maxPrice is not None:
             items_list = items_list.filter(price__range=(0, maxPrice))
         if category != ' ' and category is not None and category != '全ての品目':

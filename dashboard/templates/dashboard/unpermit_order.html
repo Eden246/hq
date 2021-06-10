@@ -1,0 +1,136 @@
+<div class="row justify-content-center mt-3">
+<div class="col-lg-10">
+    <div class="d-flex justify-content-center mt-3">
+        <h2>
+            予約件数:&emsp;
+            <h2 style="color:#ad0003;">{{ total_orders }}件</h2>
+        </h2>
+        &emsp;&emsp;
+        <h2>
+            予約総額:&emsp;
+            <h2 style="color:#ad0003;">{{ total_revenue }}円</h2>
+        </h2>
+    </div>
+    <hr>
+    <table class="table table-striped text-center" id="fav-table1">
+        <thead>
+            <tr class="row-name">
+                <th>ID</th>
+                <th>状況</th>
+                <th>利用者</th>
+                <th>ケアマネジャー</th>
+                <th>Eメール</th>
+                <th>電話番号</th>
+                <th>使用場所</th>
+                <th>使用住所</th>
+                <th>品目</th>
+                <th>予約日</th>
+                <th>合計</th>
+                <th>担当者</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}                    
+            <tr class="row-content">
+                <td>{{ order.pk }}</td>
+                <td><span class="badge bg-primary">予約中</span></td>
+                <td>{{ order.name }}</td>
+                <td>{{ order.user }}</td>
+                <td>{{ order.email }}</td>
+                <td>{{ order.phone }}</td>
+                <td>
+                    {% if order.location_selecter == 1 %}
+                    自宅
+                    {% else %}
+                    施設
+                    {% endif %}
+                </td>
+                <td>
+                    {% if order.location_selecter == 1 %}
+                    {{order.facility }}
+                    {% else %}
+                    {{ order.user.client.facility }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% for item in order.items.all %}
+                    ({{ item }})
+                    {% endfor %}
+                </td>
+                <td>{{ order.created_on | date:'Y-m-d H:i' }}</td>
+                <td>{{ order.price }}円</td>
+                <td>
+                    {% if order.handler %}
+                    {{ order.handler }}
+                    {% else %}
+                    <button href="#{{order.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{order.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>未定</button>
+                    {% endif %}
+                </td>
+            </tr>
+            <div class="modal fade" id="collapseExample{{order.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="modal-body">
+                                <h2>注文番号：{{order.pk}}</h2>
+                                <hr>
+                                <h2>《顧客情報》</h2>
+                                <br>
+                                <h4>利用者：{{ order.name }}</h4>
+                                <h4>ケアマネジャー：{{ order.user }}</h4>
+                                <h4 style="text-transform: lowercase;">メールアドレス：{{ order.email }}</h4>
+                                <h4>電話番号：{{ order.phone }}</h4>
+                                <h4>使用場所:
+                                    {% if order.location_selecter == 1%}
+                                    自宅
+                                    {% else %}
+                                    施設
+                                    {% endif %}
+                                </h4>
+                                <h4>使用住所:
+                                    {% if order.location_selecter == 1%}
+                                    {{ order.facility }}
+                                    {% else %}
+                                    {{ order.user.client.facility }}
+                                    {% endif %}
+                                </h4>
+                                <h4 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h4>
+                                <hr>
+                                <h2>《予約情報》</h2>
+                                <br>
+                                {% for item in order.items.all %}
+                                <h4>品名：{{ item }}</h4>
+                                {% endfor %}
+                                <h4>注文日付：{{ order.created_on }}</h4>
+                                <hr>
+                                <h4 class="text-danger">合計：{{ order.price }}円</h4>
+                                <hr>
+                                {% if order.status == 0 %}
+                                <p class="alert alert-primary"><i style="color:green;" class="fa fa-check"></i><span class="pl-2">承認</span></p>
+                                <h4 class="border">《承認内容》</h4>
+                                <span class="badge bg-primary mx-auto mt-3" style="font-size: 1.2em;">担当者：{{ order.handler }}</span>
+                                <span class="badge bg-danger mx-auto mt-3" style="font-size: 1.2em;">承認日付：{{ order.permit_day }}</span>
+                                <span class="badge rounded-pill bg-secondary mx-auto mt-3" style="font-size: 1em;">承認者：{{ order.permitter }}</span>
+                                {% elif order.status == 1 %}
+                                <p class="alert alert-danger"><i style="color:green;" class="fa fa-cog"></i><span class="pl-2">審査待ち</span></p>
+                                {% else %}
+                                <p class="alert alert-info"><i style="color:red;" class="fa fa-times"></i><span class="pl-2">未完了</span></p>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_pk" value="{{ order.pk }}">
+                                    <input type='text' name='message' class='form-control' placeholder='追加したい内容がある場合'>
+                                    <input class="btn btn-primary" type="submit" value="担当申請" name='order_permit' style="background-color:navy;">
+                                </form>
+                                {% endif %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
