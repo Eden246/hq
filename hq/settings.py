@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'dashboard',
     'crispy_forms',
     'mptt',
-
+    'django_filters',
 ]
 
 

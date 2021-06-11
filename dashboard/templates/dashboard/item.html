@@ -78,6 +78,27 @@ tbody tr:hover {
         {% endfor %}
       </tbody>
     </table>
+      {% if trackers.has_other_pages %}
+  <ul class="pagination justify-content-center">
+      {% if trackers.has_previous %}
+      <li class="m-2"><a class="p-3" href="?page={{ trackers.previous_page_number }}">&laquo;</a></li>
+      {% else %}
+      <li class="m-2 disabled"><span class="p-3">&laquo;</span></li>
+      {% endif %}
+      {% for i in trackers.paginator.page_range %}
+      {% if trackers.number == i %}
+      <li class="m-2 active"><span class="p-3">{{ i }} <span class="sr-only">(current)</span></span></li>
+      {% else %}
+      <li class="m-2"><a class="p-3" href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+      {% endfor %}
+      {% if trackers.has_next %}
+      <li class="m-2"><a class="p-3" href="?page={{ trackers.next_page_number }}">&raquo;</a></li>
+      {% else %}
+      <li class="m-2 disabled"><span>&raquo;</span></li>
+      {% endif %}
+  </ul>
+  {% endif %}
   </div>
 </div>
   <div class="col-lg-3">

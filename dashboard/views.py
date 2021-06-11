@@ -355,18 +355,18 @@ def order_list(request):
     startdate = request.GET.get('startdate')
     enddate = request.GET.get('enddate')
 
-    permissions = Permission.objects.filter(result=1)
+    permission_list = Permission.objects.filter(result=1)
     
     if result1:
-        permissions = Permission.objects.filter(result=result1)
+        permission_list = Permission.objects.filter(result=result1)
     if name:
-        permissions = Permission.objects.filter(order__name__icontains=name)
+        permission_list = Permission.objects.filter(order__name__icontains=name)
     if user:
-        permissions = Permission.objects.filter(order__user__username__icontains=user)
+        permission_list = Permission.objects.filter(order__user__username__icontains=user)
     if handler:
-        permissions = Permission.objects.filter(user__username__icontains=handler)
+        permission_list = Permission.objects.filter(user__username__icontains=handler)
     if startdate and enddate:
-        permissions = Permission.objects.filter(start_date__gte=startdate).filter(end_date__lte=enddate)
+        permission_list = Permission.objects.filter(start_date__gte=startdate).filter(end_date__lte=enddate)
 
     if request.method == 'POST':
         order_pk = request.POST.get('order_pk')
@@ -394,6 +394,10 @@ def order_list(request):
         form0 = TrackerImageForm(request.POST, request.FILES)
     else:
         form0 = TrackerImageForm()
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(permission_list, 10)
+    permissions = paginator.page(page)
 
     context = {
         'total_permissions': len(permissions),
@@ -459,7 +463,7 @@ def item_csv(request):
 @login_required
 def item(request):
     items = MenuItem.objects.all()
-    trackers = Tracker.objects.all().order_by('-created_on')
+    tranker_list = Tracker.objects.all().order_by('-created_on')
     permissions = Permission.objects.filter(result=1).order_by('-date')
     if request.method == 'POST':
         if 'save_new' in request.POST:
@@ -498,6 +502,9 @@ def item(request):
         form0 = TrackerImageForm(request.POST, request.FILES)
         form = ItemForm()
 
+    page = request.GET.get('page', 1)
+    paginator = Paginator(tranker_list.order_by('category__parent'), 10)
+    trackers = paginator.page(page)
     context = {
         'items': items.order_by('category__parent'),
         'form': form,
