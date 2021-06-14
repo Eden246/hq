@@ -152,16 +152,16 @@
                 </div>
                 <div class="card-body">
                     <div class="panel post">
-                        <a href="{% url 'order_list'%}"><span>{{ order_count }}</span>予約・貸出</a>
+                        <a href="{% url 'book_list'%}"><span>{{ order_count }}</span>予約リスト</a>
                     </div>
                     <div class="panel comment">
-                        <a href="{% url 'permission'%}"><span>{{ permission_count }}</span>承認状況</a>
-                    </div>
-                    <div class="panel page">
-                        <a href="{% url 'item'%}"><span>5</span>在庫管理</a>
+                        <a href="{% url 'permission'%}"><span>{{ permission_count }}</span>承認リスト</a>
                     </div>
                     <div class="panel user">
-                        <a href="javascript:void();"><span>4</span>Users</a>
+                        <a href="{% url 'order_list'%}"><span>5</span>貸出リスト</a>
+                    </div>
+                    <div class="panel page">
+                        <a href="{% url 'item'%}"><span>4</span>在庫管理</a>
                     </div>
                     <div class="panel chart">
                         <a href="{% url 'chart' %}"><span>&nbsp;</span>営業実績</a>

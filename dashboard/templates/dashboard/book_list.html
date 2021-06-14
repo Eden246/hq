@@ -1,18 +1,49 @@
+{% extends 'dashboard/base.html' %}
+{% load auth_extras %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% include 'dashboard/top.html' %}
+<style>
+#fav-table th {
+  color:#448aff;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 0.25em;
+	}
+button.edit
+{
+    background:#337ab7;
+    color:#fff;
+    border-radius:2px;
+    border:none;
+}
+button.edit:hover {
+    background:#E85A4F;
+}
+tr.row-content
+{
+    color:#6c7173;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd)
+{
+    background:#F0F2F2 !important; 
+}
+
+button:hover span{
+  color:gold;
+  transition: all 0.4s;
+}
+.btn-primary:hover {
+  color:gold;
+  transition: all 0.4s;
+}
+
+</style>
+
 <div class="row justify-content-center mt-3">
 <div class="col-lg-10">
-    <div class="d-flex justify-content-center mt-3">
-        <h2>
-            予約件数:&emsp;
-            <h2 style="color:#ad0003;">{{ total_orders }}件</h2>
-        </h2>
-        &emsp;&emsp;
-        <h2>
-            予約総額:&emsp;
-            <h2 style="color:#ad0003;">{{ total_revenue }}円</h2>
-        </h2>
-    </div>
-    <hr>
-    <table class="table table-striped text-center" id="fav-table1">
+    <table class="table table-striped text-center" id="fav-table">
         <thead>
             <tr class="row-name">
                 <th>ID</th>
@@ -134,3 +165,10 @@
     </table>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    $('#fav-table').tablesorter();
+});
+</script>
+{% endblock content %}

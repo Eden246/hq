@@ -175,7 +175,7 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, View):
             user=request.user,
         )
         permission.save()
-        return HttpResponseRedirect(reverse_lazy("order_list"))
+        return HttpResponseRedirect(reverse_lazy("permission"))
 
     def test_func(self):
         return self.request.user.groups.filter(name='staff').exists()
@@ -213,6 +213,17 @@ def image(request, pk):
                 contract_image = form.cleaned_data['image']
             )
     # return render(request, 'dashboard/image.html', {'i':items})
+    return HttpResponseRedirect(reverse_lazy("order_list"))
+
+def updateimage(request, pk):
+    permission = Permission.objects.get(pk=pk)
+    end_date = request.POST.get('end_date')
+    form = ImageForm(request.POST or None, request.FILES or None,  instance=permission)
+    if form.is_valid():
+        edit = form.save(commit=False)
+        edit.save()
+        permission.end_date = end_date
+        permission.save()
     return HttpResponseRedirect(reverse_lazy("order_list"))
     
 def return_image(request, pk):
@@ -323,11 +334,8 @@ def permission_save(request):
     permission.save()
     return JsonResponse({"success": "Updated"})
 
-def unpermit_order(request):
+def book_list(request):
     orders = OrderModel.objects.filter(status=2)
-    total_revenue = 0
-    for order in orders:
-        total_revenue += order.price
     if request.method == 'POST':
             order_pk = request.POST.get('order_pk')
             order = OrderModel.objects.get(pk=order_pk)
@@ -340,33 +348,57 @@ def unpermit_order(request):
                 order=order,
                 user=request.user,
             )
-    context = {
-        'orders': orders,
-        'total_orders': len(orders),
-    }
-    return render(request, 'dashboard/unpermit_order.html', context)
+            return redirect(reverse_lazy('permission'))
+    return render(request, 'dashboard/book_list.html', {'orders': orders})
 
 @login_required
 def order_list(request):
+    paginate_by = 2
+    context = {}
+    permission_list = Permission.objects.filter(Q(result=1) or Q(result=2))
+
     result1 = request.GET.get('result1')
     name = request.GET.get('name')
     user = request.GET.get('user')
     handler = request.GET.get('handler')
-    startdate = request.GET.get('startdate')
-    enddate = request.GET.get('enddate')
-
-    permission_list = Permission.objects.filter(result=1)
+    if request.GET.get('startdate'):
+        startdate = request.GET.get('startdate')
+    else:
+        startdate = datetime.datetime.today()-datetime.timedelta(days=9999)
+    if request.GET.get('enddate'):
+        enddate = request.GET.get('enddate')
+    else:
+        enddate = datetime.datetime.today()+datetime.timedelta(days=9999)
     
-    if result1:
-        permission_list = Permission.objects.filter(result=result1)
-    if name:
-        permission_list = Permission.objects.filter(order__name__icontains=name)
-    if user:
-        permission_list = Permission.objects.filter(order__user__username__icontains=user)
-    if handler:
-        permission_list = Permission.objects.filter(user__username__icontains=handler)
-    if startdate and enddate:
-        permission_list = Permission.objects.filter(start_date__gte=startdate).filter(end_date__lte=enddate)
+    if result1 or name or user or handler:
+        permission_list = Permission.objects.filter(Q(start_date__gte=startdate) and Q(end_date__lte=enddate)).filter(result=result1).filter(order__name__icontains=name).filter(order__user__username__icontains=user).filter(user__username__icontains=handler)
+
+    context['is_paginated'] = True
+    paginator = Paginator(permission_list, paginate_by)
+    page_number_range = 10
+    current_page = int(request.GET.get('page',1))
+    context['current_page'] = current_page
+
+    start_index = int((current_page-1)/page_number_range)*page_number_range
+    end_index = start_index + page_number_range
+    current_page_group_range = paginator.page_range[start_index:end_index]
+    start_page = paginator.page(current_page_group_range[0])
+    end_page = paginator.page(current_page_group_range[-1])
+    has_previous_page = start_page.has_previous()
+    has_next_page = end_page.has_next()
+
+    context['current_page_group_range'] = current_page_group_range
+    if has_previous_page:
+        context['has_previous_page'] = has_previous_page
+        context['previous_page'] = start_page.previous_page_number
+    if has_next_page:
+        context['has_next_page'] = has_next_page
+        context['next_page'] = end_page.next_page_number
+
+    e = paginate_by * current_page
+    s = e - paginate_by
+    permission_list = permission_list[s:e]
+    context['permissions'] = permission_list
 
     if request.method == 'POST':
         order_pk = request.POST.get('order_pk')
@@ -394,18 +426,13 @@ def order_list(request):
         form0 = TrackerImageForm(request.POST, request.FILES)
     else:
         form0 = TrackerImageForm()
-
-    page = request.GET.get('page', 1)
-    paginator = Paginator(permission_list, 10)
-    permissions = paginator.page(page)
-
-    context = {
-        'total_permissions': len(permissions),
-        'form0':form0,
-        'permissions':permissions,
-    }
+        context['form0'] = form0
+        form = ImageForm()
+        context['form'] = form
 
     return render(request, 'dashboard/order_list.html', context)
+
+
 
 def test_func(user):
     return user.groups.filter(name='staff').exists()
@@ -456,6 +483,16 @@ def item_csv(request):
     writer = csv.writer(sio)
     writer.writerow(["登録者","お名前","数量","カテゴリー","カテゴリー詳細","登録日付"])
     for i in Tracker.objects.all().values_list("user","name","quantity","category__parent__name","category__name","created_on"):
+        writer.writerow(i)
+    response.write(sio.getvalue().encode('utf_8_sig'))
+    return response
+def recent_item_csv(request):
+    response=HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="list.csv"'
+    sio = io.StringIO()
+    writer = csv.writer(sio)
+    writer.writerow(["登録者","お名前","数量","カテゴリー","カテゴリー詳細","登録日付"])
+    for i in Tracker.objects.filter(created_on__gte=datetime.datetime.today()-datetime.timedelta(days=30)).values_list("user","name","quantity","category__parent__name","category__name","created_on"):
         writer.writerow(i)
     response.write(sio.getvalue().encode('utf_8_sig'))
     return response

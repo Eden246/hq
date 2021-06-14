@@ -34,7 +34,8 @@ tbody tr:hover {
 <div class="col-lg-4">
   <div class="card p-2">
     <h2>在庫履歴</h2>
-    <a href="{% url 'item_csv' %}">csvファイル</a>
+    <a href="{% url 'item_csv' %}">全体csvファイル</a>
+    <a href="{% url 'recent_item_csv' %}">最近1ヶ月csvファイル</a>
     <hr>
     <table class="table table-bordered table-hover" style="width:100%">
       <thead class="thead-dark">

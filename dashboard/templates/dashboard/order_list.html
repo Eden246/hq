@@ -10,12 +10,6 @@
   font-weight: 600;
   border-radius: 0.25em;
 	}
-#fav-table1 th {
-  color:#448aff;
-  font-size: 1em;
-  font-weight: 600;
-  border-radius: 0.25em;
-	}
 button.edit
 {
     background:#337ab7;
@@ -25,6 +19,16 @@ button.edit
 }
 button.edit:hover {
     background:#E85A4F;
+}
+button.extends
+{
+    background:#AFD275;
+    color:#fff;
+    border-radius:2px;
+    border:none;
+}
+button.extends:hover {
+    background:#D79922;
 }
 tr.row-content
 {
@@ -46,189 +50,219 @@ button:hover span{
 }
 
 </style>
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="d-flex justify-content-center">
-                        <h2>
-                            件数:&emsp;
-                            <h2 style="color:#ad0003;">{{ total_permissions }}件</h2>
-                        </h2>
-                        &emsp;&emsp;
-                        <h2>
-                            総月額:&emsp;
-                            <h2 style="color:#ad0003;">{{ permission_revenue }}円</h2>
-                        </h2>
-                    </div>
-                    <hr>
-                    <form method="get" class="d-flex justify-content-center">
-                        <div class="card mb-4 m-3">
-                            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">状況</h5>
-                            <div class="list-group list-group-flush">
-                                <li class="list-group-item" style="background-color:#F6D55C;">
-                                    <div class="form-group">
-                                        <select name="result1" id="result1" class="form-control">
-                                            <option selected>選択してください</option>
-                                            <option value=1>貸出中</option>
-                                            <option value=2>終了</option>
-                                        </select>
-                                    </div>
-                                </li>
-                            </div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <form method="get" class="d-flex justify-content-center">
+            <div class="card mb-4 m-1">
+                <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">状況</h5>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color:#F6D55C;">
+                        <div class="form-group">
+                            <select name="result1" id="result1" class="form-control">
+                                <option value=1>貸出中</option>
+                                <option value=2>終了</option>
+                            </select>
                         </div>
-                        <div class="card mb-4 m-3">
-                            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">使用者</h5>
-                            <div class="list-group list-group-flush">
-                                <li class="list-group-item" style="background-color:#F6D55C;">
-                                    <div class="form-group">
-                                        <input class="form-control" type="search" name="name">
-                                    </div>
-                                </li>
-                            </div>
-                        </div>
-                        <div class="card mb-4 m-3">
-                            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">ケアマネジャー</h5>
-                            <div class="list-group list-group-flush">
-                                <li class="list-group-item" style="background-color:#F6D55C;">
-                                    <div class="form-group">
-                                        <input class="form-control" type="search" name="user">
-                                    </div>
-                                </li>
-                            </div>
-                        </div>
-                        <div class="card mb-4 m-3">
-                            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">担当者</h5>
-                            <div class="list-group list-group-flush">
-                                <li class="list-group-item" style="background-color:#F6D55C;">
-                                    <div class="form-group">
-                                        <input class="form-control" type="search" name="handler">
-                                    </div>
-                                </li>
-                            </div>
-                        </div>
-                        <div class="card mb-4 m-3">
-                            <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">使用期間</h5>
-                            <div class="list-group list-group-flush">
-                                <li class="list-group-item" style="background-color:#F6D55C;">
-                                    <div class="form-group">
-                                        使用日付 ： <input type="date" name="startdate"/>
-                                        終了日付 ： <input type="date" name="enddate"/>
-                                    </div>
-                                </li>
-                            </div>
-                        </div>
-                        <button id="priceFilterBtn" class="alert alert-primary p-2 my-auto" style="height:50%" name="search">サーチ</button>
-                    </form>
-                    <table class="table table-striped text-center" id="fav-table">
-                        <thead>
-                            <tr class="row-name">
-                                <th>ID</th>
-                                <th>状況</th>
-                                <th>利用者</th>
-                                <th>ケアマネジャー</th>
-                                <th>Eメール</th>
-                                <th>電話番号</th>
-                                <th>使用場所</th>
-                                <th>使用住所</th>
-                                <th>品目</th>
-                                <th>使用日付</th>
-                                <th>終了日付</th>
-                                <th>合計</th>
-                                <th>担当者</th>
-                                <th>返品</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for permission in permissions %}
-                            <tr class="row-content">
-                                <td>{{ permission.id }}</td>
-                                <td>
-                                    {% if permission.result == 1 %}
-                                    <span class="badge bg-danger">貸出中</span>
-                                    {% elif permission.result == 2 %}
-                                    <span class="badge bg-secondary">終了</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ permission.order.name }}</td>
-                                <td>{{ permission.order.user }}</td>
-                                <td>{{ permission.order.email }}</td>
-                                <td>{{ permission.order.phone }}</td>
-                                <td>
-                                    {% if permission.order.location_selecter == 1 %}
-                                    自宅
-                                    {% else %}
-                                    施設
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if permission.order.location_selecter == 1 %}
-                                    {{ permission.order.facility }}
-                                    {% else %}
-                                    {{ permission.user.client.facility }}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% for item in permission.order.items.all %}
-                                    ({{ item }})
-                                    {% endfor %}
-                                </td>
-                                <td>{{ permission.start_date }}</td>
-                                <td>{{ permission.end_date }}</td>
-                                <td>{{ permission.order.price }}円</td>
-                                <td>{{ permission.user }}</td>
-                                <td>
-                                    {% if permission.result == 1%}
-                                    <button href="#{{permission.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>返品</button>
-                                    <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <form method="post" enctype="multipart/form-data" action="{% url 'return_image' permission.pk %}">
-                                                    {% csrf_token %}
-                                                    <div class="modal-body">
-                                                        {{ form0 | crispy }}
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <input class="alert alert-danger" type="submit" value="登録" name="return_permit">
-                                                        <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% else %}
-                                    <span class="alert alert-danger p-1">返品済み</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    {% if permissions.has_other_pages %}
-                    <ul class="pagination justify-content-center">
-                        {% if permissions.has_previous %}
-                        <li class="m-2"><a class="p-3" href="?page={{ permissions.previous_page_number }}">&laquo;</a></li>
-                        {% else %}
-                        <li class="m-2 disabled"><span class="p-3">&laquo;</span></li>
-                        {% endif %}
-                        {% for i in permissions.paginator.page_range %}
-                        {% if permissions.number == i %}
-                        <li class="m-2 active"><span class="p-3">{{ i }} <span class="sr-only">(current)</span></span></li>
-                        {% else %}
-                        <li class="m-2"><a class="p-3" href="?page={{ i }}">{{ i }}</a></li>
-                        {% endif %}
-                        {% endfor %}
-                        {% if permissions.has_next %}
-                        <li class="m-2"><a class="p-3" href="?page={{ permissions.next_page_number }}">&raquo;</a></li>
-                        {% else %}
-                        <li class="m-2 disabled"><span>&raquo;</span></li>
-                        {% endif %}
-                    </ul>
-                    {% endif %}
+                    </li>
                 </div>
             </div>
-        </div>
-            
+            <div class="card mb-4 m-1">
+                <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">使用者</h5>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color:#F6D55C;">
+                        <div class="form-group">
+                            <input class="form-control" type="search" name="name">
+                        </div>
+                    </li>
+                </div>
             </div>
+            <div class="card mb-4 m-1">
+                <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">ケアマネジャー</h5>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color:#F6D55C;">
+                        <div class="form-group">
+                            <input class="form-control" type="search" name="user">
+                        </div>
+                    </li>
+                </div>
+            </div>
+            <div class="card mb-4 m-1">
+                <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">担当者</h5>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color:#F6D55C;">
+                        <div class="form-group">
+                            <input class="form-control" type="search" name="handler">
+                        </div>
+                    </li>
+                </div>
+            </div>
+            <div class="card mb-4 m-1">
+                <h5 class="card-header" style="background-color: #173F5F;color:#F6D55C;">使用期間</h5>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item" style="background-color:#F6D55C;">
+                        <div class="form-group">
+                            使用日付 ： <input type="date" name="startdate"/>
+                            終了日付 ： <input type="date" name="enddate"/>
+                        </div>
+                    </li>
+                </div>
+            </div>
+            <button id="priceFilterBtn" class="alert alert-primary p-2 my-auto" style="height:50%" name="search">サーチ</button>
+        </form>
+        <table class="table table-striped text-center" id="fav-table">
+            <thead>
+                <tr class="row-name">
+                    <th>ID</th>
+                    <th>状況</th>
+                    <th>利用者</th>
+                    <th>ケアマネジャー</th>
+                    <th>Eメール</th>
+                    <th>電話番号</th>
+                    <th>使用場所</th>
+                    <th>使用住所</th>
+                    <th>品目</th>
+                    <th>使用日付</th>
+                    <th>終了日付</th>
+                    <th>合計</th>
+                    <th>担当者</th>
+                    <th>契約書</th>
+                    <th>延長</th>
+                    <th>返品</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for permission in permissions %}
+                <tr class="row-content">
+                    <td>{{ permission.id }}</td>
+                    <td>
+                        {% if permission.result == 1 %}
+                        <span class="badge bg-danger">貸出中</span>
+                        {% elif permission.result == 2 %}
+                        <span class="badge bg-secondary">終了</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ permission.order.name }}</td>
+                    <td>{{ permission.order.user }}</td>
+                    <td>{{ permission.order.email }}</td>
+                    <td>{{ permission.order.phone }}</td>
+                    <td>
+                        {% if permission.order.location_selecter == 1 %}
+                        自宅
+                        {% else %}
+                        施設
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if permission.order.location_selecter == 1 %}
+                        {{ permission.order.facility }}
+                        {% else %}
+                        {{ permission.user.client.facility }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% for item in permission.order.items.all %}
+                        ({{ item }})
+                        {% endfor %}
+                    </td>
+                    <td>{{ permission.start_date }}</td>
+                    <td>{{ permission.end_date }}</td>
+                    <td>{{ permission.order.price }}円</td>
+                    <td>{{ permission.user }}</td>
+                    <td>
+                    {% if permission.image %}
+                        <button type="button" class="alert alert-info p-2" data-bs-toggle="modal" data-bs-target="#contract{{permission.pk}}" style="width:100%"><i class="fas fa-stamp"></i></button>
+                        <div class="modal fade" id="contract{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <p>ファイル名：{{ permission.image }}</p>
+                                        <img id="myImage" src="{{ permission.image.url }}" alt="Test" style="width:100%;">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    </td>
+                    <td>
+                        {% if permission.result == 1%}
+                        <button href="#{{permission.pk}}" type="button" class="btn btn-primary extends p-1" data-bs-toggle="modal" data-bs-target="#extends{{permission.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>延長</button>
+                        <div class="modal fade" id="extends{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="POST" enctype="multipart/form-data" action="{% url 'updateimage' permission.pk %}">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            {{ form | crispy }}
+                                        <label for="end_date">延長日</label>
+                                        <input required type="date" id="end_date" class="form-control" name="end_date">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input class="alert alert-danger" type="submit" value="登録" name="return_permit">
+                                            <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <span class="alert alert-danger p-1">返品済み</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if permission.result == 1%}
+                        <button href="#{{permission.pk}}" type="button" class="btn btn-primary edit p-1" data-bs-toggle="modal" data-bs-target="#collapseExample{{permission.pk}}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>返品</button>
+                        <div class="modal fade" id="collapseExample{{permission.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="post" enctype="multipart/form-data" action="{% url 'return_image' permission.pk %}">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            {{ form0 | crispy }}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input class="alert alert-danger" type="submit" value="登録" name="return_permit">
+                                            <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">取消し</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <span class="alert alert-danger p-1">返品済み</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="container-fluid text-center">
+            {% if is_paginated %}
+            <p>
+            {% if has_previous_page %}
+                <a href="/dashboard/order_list?result1={{request.GET.result1}}&name={{request.GET.name}}&user={{request.GET.user}}&handler={{request.GET.handler}}&page={{previous_page}}">前のページ</a>
+            {% endif %}
+            &nbsp;
+            {% for page in current_page_group_range %}
+                &nbsp;
+                {% if page == page_obj.number %}
+                    <a >{{ page }}</a>
+                {% else %}
+                <a href="/dashboard/order_list?result1={{request.GET.result1}}&name={{request.GET.name}}&user={{request.GET.user}}&handler={{request.GET.handler}}&page={{page}}">{{ page }}</a>
+                {% endif %}
+                &nbsp;
+            {% endfor %}
+            &nbsp;
+            {% if has_next_page %}
+                <a href="/dashboard/order_list?result1={{request.GET.result1}}&name={{request.GET.name}}&user={{request.GET.user}}&handler={{request.GET.handler}}&page={{next_page}}">次のページ</a>
+            {% endif %}
+            </p>
+            {% endif %}
         </div>
+
     </div>
 </div>
 
@@ -236,9 +270,5 @@ button:hover span{
 $(document).ready(function() {
     $('#fav-table').tablesorter();
 });
-$(document).ready(function() {
-    $('#fav-table1').tablesorter();
-});
-
 </script>
 {% endblock content %}
