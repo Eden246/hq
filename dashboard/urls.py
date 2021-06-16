@@ -21,4 +21,10 @@ urlpatterns = [
     path('item_save/', item_save, name='item_save'),
     path('paper/<int:pk>/', paper, name='paper'),
     path('chart/', chart, name='chart'),
+    path('permit_notification/<int:notification_pk>/',permit_notification, name='permit_notification'),
+    path('approve_notification/<int:notification_pk>/',approve_notification, name='approve_notification'),
+    path('disapprove_notification/<int:notification_pk>/',disapprove_notification, name='disapprove_notification'),
+    path('image_notification/<int:notification_pk>/',image_notification, name='image_notification'),
+    path('updateimage_notification/<int:notification_pk>/',updateimage_notification, name='updateimage_notification'),
+    path('back_notification/<int:notification_pk>/',back_notification, name='back_notification'),
 ]

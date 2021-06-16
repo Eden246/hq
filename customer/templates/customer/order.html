@@ -594,18 +594,7 @@ $("#maxPrice").on('blur', function() {
 </div>
 
 <script>
-$("input:checkbox").click(function() {
-    if ($(this).is(":checked")) {
-        var group = "input:checkbox[name='" + $(this).attr("name") + "']";
-        $(group).prop("checked", false);
-        $(this).prop("checked", true);
-    } else {
-        $(this).prop("checked", false);
-    }
-});
-
 this.$slideOut = $('#slideOut');
-
 this.$slideOut.find('.slideOutTab').on('click', function() {
   $("#slideOut").toggleClass('showSlideOut');
 });
@@ -616,6 +605,11 @@ $("#one").click(function(){
         alert('カートに入れる品目を選んでください。');
         return false;
     }
+});
+
+$('.front').click(function ()
+{
+   $(this).find('input[type=checkbox]').prop("checked", !$(this).find('input[type=checkbox]').prop("checked"));
 });
 </script>
 {% endblock content %}

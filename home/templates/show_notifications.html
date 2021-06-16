@@ -1,55 +1,116 @@
-<div class="dropdown">
-	<span class="badge bg-success notification-badge" onclick="showNotifications()">{{ notifications.count }}</span>
-	<div class="dropdown-content d-none" id="notification-container">
-		{% for notification in notifications %}
-			{% if notification.message %}
-				{% if notification.notification_type == 1 %}
-				<div class="dropdown-item-parent">
-					<a href="{% url 'message-notification' notification.pk notification.message.thread.pk %}">{{ notification.from_user }}様からのメッセージが届きました。</a>
-					<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
-				</div>
-				{% endif %}
-			{% elif notification.comment %}
-				{% if notification.notification_type == 2 %}
-				<div class="dropdown-item-parent">
-					<a href="{% url 'post-notification' notification.pk notification.comment.post.pk %}">{{ notification.from_user }}様がコメントを残しました。</a>
-					<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
-				</div>
-				{% endif %}
-			{% elif notification.comment %}
-				{% if notification.notification_type == 3 %}
-				<div class="dropdown-item-parent">
-					<a href="{% url 'post-notification' notification.pk notification.comment.post.pk %}">{{ notification.from_user }}様がコメントを残しました。</a>
-					<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
-				</div>
-				{% endif %}
-			{% elif notification.order %}
-				{% if notification.notification_type == 4 %}
-				<div class="dropdown-item-parent">
-					<a href="{% url 'order-notification' notification.pk notification.order.pk %}">{{ notification.from_user }}様が予約しました。</a>
-					<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
-				</div>
-				{% endif %}
-			{% else %}
-			<div class="dropdown-item-parent">
-					<a href="{% url 'follow-notification' notification.pk notification.from_user.client.pk %}">{{ notification.date }}、{{ notification.from_user }}様からの予約</a>
-					<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
-				</div>
-			{% endif %}
-			{% endfor %}
-		</div>
-	</div>
+<style>
+.notification {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+    background-color: darkorange;
+    border-radius: 10px;
+    box-shadow: 5px 20px 50px darkorange;
+    font-weight: 400;
+    color: #ffffffee;
+}
+
+.notification a {
+    text-decoration: none;
+    color: #ffffffee;
+    font-weight: 700;
+    letter-spacing: .5px;
+    transition: 2s;
+}
+
+.notification a:hover {
+    color: #ffffffaa;
+}
+
+.animation {
+    animation: shake 1s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%  { -webkit-transform:     translate(0px, .6px); }
+  10% { -webkit-transform:     translate(0px, -.6px); }
+  20% { -webkit-transform:     translate(0px, .6px); }
+  30% { -webkit-transform:     translate(0px, -.6px); }
+  60% { -webkit-transform:     translate(0px, .6px); }
+  50% { -webkit-transform:     translate(0px, -.6px); }
+  60% { -webkit-transform:     translate(0px, .6px); }
+  70% { -webkit-transform:     translate(0px, -.6px); }
+  80% { -webkit-transform:     translate(0px, .6px); }
+  90% { -webkit-transform:     translate(0px, -.6px); }
+  100%{ -webkit-transform:     translate(0px, .6px); }
+ }
+
+.badge1 {
+  margin: 0.5em 1em;
+  border-radius: 5px;
+  height: 2em;
+  display: inline-block;
+  top: 0;
+  transition: all 0.2s ease;
+  box-shadow: 2px 10px 25px darkorange;
+}
+.rounded {
+  height: 20px;
+  background: white;
+  margin: 6px 5px auto;
+  z-index: 10;
+  border-radius: 50%;
+}
+.rounded i.fab {
+  font-size: 2.6em;
+  margin-top: 16px;
+}
+.orange {
+  background: darkorange;
+  color: orange;
+}
+</style>
+<article class="badge1 orange">
+	<div class="rounded">新着通知：{{ notifications.count }}件</div>
+</article>
+{% for notification in notifications %}
+	<section class="notification animation mt-3" id="notification">
+		{% if notification.notification_type == 1 %}
+			<a href="{% url 'message-notification' notification.pk notification.message.thread.pk %}">{{ notification.from_user }}様からの<span class="text-warning">メッセージ</span>が届きました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% elif notification.notification_type == 3 %}
+			<a href="{% url 'permit_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">担当</span>を<span class="text-success">申請</span>をしました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% elif notification.notification_type == 4 %}
+			<a href="{% url 'order-notification' notification.pk notification.order.pk %}">{{ notification.from_user }}様が<span class="text-success">予約</span>しました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% elif notification.notification_type == 5 %}
+			<a href="{% url 'approve_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">担当</span>を<span class="text-success">承認</span>しました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% elif notification.notification_type == 6 %}
+			<a href="{% url 'disapprove_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">担当</span>を<span class="text-danger">拒否</span>しました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% elif notification.notification_type == 7 %}
+			<a href="{% url 'image_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">お客様</span>と<span class="text-danger">契約</span>しました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% elif notification.notification_type == 8 %}
+			<a href="{% url 'updateimage_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">レンタル期間</span>を<span class="text-danger">延長</span>しました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% elif notification.notification_type == 9 %}
+			<a href="{% url 'back_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">返品</span><span class="text-danger">処理</span>しました。</a>
+			{{ notification.date }}&emsp;
+			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
+		{% endif %}
+	</section>
+{% endfor %}
 
 <script>
-function showNotifications() {
-	const container = document.getElementById('notification-container');
-
-	if (container.classList.contains('d-none')) {
-		container.classList.remove('d-none');
-	} else {
-		container.classList.add('d-none');
-	}
-}
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -69,7 +130,6 @@ function getCookie(name) {
 function removeNotification(removeNotificationURL, redirectURL) {
 	const csrftoken = getCookie('csrftoken');
 	let xmlhttp = new XMLHttpRequest();
-
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState == XMLHttpRequest.DONE) {
 			if (xmlhttp.status == 200) {
@@ -79,7 +139,6 @@ function removeNotification(removeNotificationURL, redirectURL) {
 			}
 		}
 	};
-
 	xmlhttp.open("DELETE", removeNotificationURL, true);
 	xmlhttp.setRequestHeader("X-CSRFToken", csrftoken);
 	xmlhttp.send();

@@ -44,7 +44,6 @@ urlpatterns = [
     path('post/<int:post_pk>/comment/<int:pk>/reply', CommentReplyView.as_view(), name='comment-reply'),
     path('profile/<int:pk>', ProfileView, name='profile'),
     path('profile/edit/<int:pk>', ClientEditView.as_view(), name='profile_edit'),
-    path('notification/<int:notification_pk>/profile/<int:profile_pk>', FollowNotification.as_view(), name='follow-notification'),
     path('notification/<int:notification_pk>/message/<int:message_pk>', MessageNotification.as_view(), name='message-notification'),
     path('notification/<int:notification_pk>/post/<int:post_pk>', PostNotification.as_view(), name='post-notification'),
     path('notification/<int:notification_pk>/post/<int:post_pk>', CommentNotification.as_view(), name='comment-notification'),

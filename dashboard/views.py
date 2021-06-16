@@ -10,16 +10,16 @@ from .forms import *
 from django.http.response import HttpResponse, JsonResponse
 from django.db.models import Count, F, Sum
 from django.db.models.functions import TruncDate
-import datetime
+from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
 from .models import *
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
-
+import datetime
 
 def chart(request):
-    today = datetime.date.today()
+    today = timezone.now()
     labels = []
     data = []
     year = request.GET.get('year')
@@ -63,7 +63,7 @@ def chart(request):
             data.append(i['count'])
 
     else:
-        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).annotate(create=TruncDate(
+        qs = OrderModel.objects.filter(created_on__lte=timezone.now(), created_on__gt=timezone.now()-datetime.timedelta(days=30)).annotate(create=TruncDate(
             'created_on')).values('create').annotate(count=Sum('items__quantity')).values('create', 'count')
         for i in qs:
             labels.append(i['create'].strftime('%Y/%m/%d'))
@@ -81,7 +81,7 @@ def chart(request):
             'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
 
     else:
-        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).values(
+        qs = OrderModel.objects.filter(created_on__lte=timezone.now(), created_on__gt=timezone.now()-datetime.timedelta(days=30)).values(
             'items__items__category__parent').exclude(items__items__name__isnull=True).annotate(total_price=Sum(F('items__items__price')*F('items__quantity'))).values('items__items__category__parent__name', 'total_price')
 
     for i in qs:
@@ -127,7 +127,7 @@ def chart(request):
             bar_data.append(i['items__quantity'])
 
     else:
-        qs = OrderModel.objects.filter(created_on__lte=datetime.datetime.today(), created_on__gt=datetime.datetime.today()-datetime.timedelta(days=30)).values(
+        qs = OrderModel.objects.filter(created_on__lte=timezone.now(), created_on__gt=timezone.now()-datetime.timedelta(days=30)).values(
             'items__items__name').exclude(items__items__name__isnull=True).annotate(items__quantity=Sum('items__quantity')).values('items__items__name', 'items__quantity')
 
         for i in qs:
@@ -212,8 +212,15 @@ def image(request, pk):
                 category = menu_item.category,
                 contract_image = form.cleaned_data['image']
             )
-    # return render(request, 'dashboard/image.html', {'i':items})
+        notification = Notification.objects.create(
+            notification_type=7, from_user=request.user, to_user=User.objects.get(groups__name__in=['head']))
     return HttpResponseRedirect(reverse_lazy("order_list"))
+
+def image_notification(request,notification_pk):
+    notification = Notification.objects.get(pk=notification_pk)
+    notification.user_has_seen = True
+    notification.save()
+    return redirect('order_list')
 
 def updateimage(request, pk):
     permission = Permission.objects.get(pk=pk)
@@ -223,9 +230,18 @@ def updateimage(request, pk):
         edit = form.save(commit=False)
         edit.save()
         permission.end_date = end_date
+        permission.user = request.user
         permission.save()
+    notification = Notification.objects.create(
+        notification_type=8, from_user=request.user, to_user=User.objects.get(groups__name__in=['head']))
     return HttpResponseRedirect(reverse_lazy("order_list"))
-    
+
+def updateimage_notification(request,notification_pk):
+    notification = Notification.objects.get(pk=notification_pk)
+    notification.user_has_seen = True
+    notification.save()
+    return redirect('order_list')
+
 def return_image(request, pk):
     permission = Permission.objects.get(pk=pk)
     form = ImageForm(request.POST or None, request.FILES or None,  instance=permission)
@@ -274,8 +290,16 @@ def permission(request):
     }
     return render(request, 'dashboard/permission.html', context)
 
+def permit_notification(request,notification_pk):
+    notification = Notification.objects.get(pk=notification_pk)
+
+    notification.user_has_seen = True
+    notification.save()
+
+    return redirect('permission')
+
 def approve(request, pk):
-    today = datetime.datetime.now()
+    today = timezone.now()
     permission = Permission.objects.get(pk=pk)
     permission.result = 0
     permission.save()
@@ -284,15 +308,36 @@ def approve(request, pk):
     order.permitter = request.user
     order.permit_day = today
     order.save()
+    notification = Notification.objects.create(
+        notification_type=5, from_user=request.user, to_user=order.handler)
     return redirect('order_list')
+
+def approve_notification(request,notification_pk):
+    notification = Notification.objects.get(pk=notification_pk)
+
+    notification.user_has_seen = True
+    notification.save()
+
+    return redirect('permission')
 
 def disapprove(request, pk):
     permission = Permission.objects.get(pk=pk)
     permission.delete()
     order = OrderModel.objects.get(pk=permission.order.pk)
+    notification = Notification.objects.create(
+        notification_type=6, from_user=request.user, to_user=order.handler)
     order.status = 2
+    order.handler = None
     order.save()
     return redirect('order_list')
+
+def disapprove_notification(request,notification_pk):
+    notification = Notification.objects.get(pk=notification_pk)
+
+    notification.user_has_seen = True
+    notification.save()
+
+    return redirect('book_list')
 
 def back(request, pk):
     permission = Permission.objects.get(pk=pk)
@@ -311,7 +356,14 @@ def back(request, pk):
             category = i.itmes.category,
             contract_image = form0.cleaned_data['contract_image']
         )
+    notification = Notification.objects.create(
+        notification_type=9, from_user=request.user, to_user=User.objects.get(groups__name__in=['head']))
+    return redirect('order_list')
 
+def back_notification(request,notification_pk):
+    notification = Notification.objects.get(pk=notification_pk)
+    notification.user_has_seen = True
+    notification.save()
     return redirect('order_list')
 
 def not_back(request, pk):
@@ -337,18 +389,20 @@ def permission_save(request):
 def book_list(request):
     orders = OrderModel.objects.filter(status=2)
     if request.method == 'POST':
-            order_pk = request.POST.get('order_pk')
-            order = OrderModel.objects.get(pk=order_pk)
-            order.status = 1
-            order.handler = request.user
-            order.save()
-            message = request.POST.get('message', None)
-            permission = Permission.objects.create(
-                message=message,
-                order=order,
-                user=request.user,
-            )
-            return redirect(reverse_lazy('permission'))
+        order_pk = request.POST.get('order_pk')
+        order = OrderModel.objects.get(pk=order_pk)
+        order.status = 1
+        order.handler = request.user
+        order.save()
+        message = request.POST.get('message', None)
+        permission = Permission.objects.create(
+            message=message,
+            order=order,
+            user=request.user,
+        )
+        notification = Notification.objects.create(
+        notification_type=3, from_user=request.user, to_user=User.objects.get(groups__name__in=['head']))
+        return redirect(reverse_lazy('permission'))
     return render(request, 'dashboard/book_list.html', {'orders': orders})
 
 @login_required
@@ -364,11 +418,11 @@ def order_list(request):
     if request.GET.get('startdate'):
         startdate = request.GET.get('startdate')
     else:
-        startdate = datetime.datetime.today()-datetime.timedelta(days=9999)
+        startdate = timezone.now()-datetime.timedelta(days=9999)
     if request.GET.get('enddate'):
         enddate = request.GET.get('enddate')
     else:
-        enddate = datetime.datetime.today()+datetime.timedelta(days=9999)
+        enddate = timezone.now()+datetime.timedelta(days=9999)
     
     if result1 or name or user or handler:
         permission_list = Permission.objects.filter(Q(start_date__gte=startdate) and Q(end_date__lte=enddate)).filter(result=result1).filter(order__name__icontains=name).filter(order__user__username__icontains=user).filter(user__username__icontains=handler)
@@ -440,21 +494,27 @@ def test_func(user):
 @user_passes_test(test_func, login_url="/login/")
 def dashboard(request):
     orders = OrderModel.objects.all().order_by('-created_on')[:10]
-    users = User.objects.filter(permission__date__lte=datetime.datetime.today(), permission__date__gt=datetime.datetime.today()-datetime.timedelta(days=30), permission__result=1).annotate(total_price=Sum(F('permission__order__items__items__price')*F('permission__order__items__quantity'))).annotate(sum=Sum('permission__order__items__quantity')).values('username', 'sum', 'total_price').order_by('-total_price')[:10]
+    users = User.objects.filter(permission__date__lte=timezone.now(), permission__date__gt=timezone.now()-datetime.timedelta(days=30),permission__result=1).annotate(total_price=Sum(F('permission__order__items__items__price')*F('permission__order__items__quantity'))).values('username', 'total_price').order_by('-total_price')
+    users1 = User.objects.filter(Q(permission__date__lte=timezone.now()), Q(permission__date__gt=timezone.now()-datetime.timedelta(days=30)),Q(permission__result=1)|Q(permission__result=2)).annotate(count=Count('permission__order')).values('username', 'count').order_by('-count')
     text = Text.objects.first()
     text_form = TextForm(request.POST or None, instance = text)
     if text_form.is_valid():
         text_form.save()
     order_count = OrderModel.objects.filter(status=2).count()
-    permission_count = Permission.objects.all().count()
+    uncharged_count = Permission.objects.filter(result=3).count()
+    rent_count = Permission.objects.filter(result=1).count()
+    item_count = MenuItem.objects.all().count()
 
     context = {
         'orders': orders,
         'users': users,
+        'users1': users1,
         'text':text,
         'text_form': text_form,
         'order_count': order_count,
-        'permission_count':permission_count,
+        'uncharged_count': uncharged_count,
+        'rent_count':rent_count,
+        'item_count':item_count,
     }
     return render(request, 'dashboard/dashboard.html', context)
 
@@ -492,7 +552,7 @@ def recent_item_csv(request):
     sio = io.StringIO()
     writer = csv.writer(sio)
     writer.writerow(["登録者","お名前","数量","カテゴリー","カテゴリー詳細","登録日付"])
-    for i in Tracker.objects.filter(created_on__gte=datetime.datetime.today()-datetime.timedelta(days=30)).values_list("user","name","quantity","category__parent__name","category__name","created_on"):
+    for i in Tracker.objects.filter(created_on__gte=timezone.now()-datetime.timedelta(days=30)).values_list("user","name","quantity","category__parent__name","category__name","created_on"):
         writer.writerow(i)
     response.write(sio.getvalue().encode('utf_8_sig'))
     return response
@@ -500,7 +560,7 @@ def recent_item_csv(request):
 @login_required
 def item(request):
     items = MenuItem.objects.all()
-    tranker_list = Tracker.objects.all().order_by('-created_on')
+    tracker_list = Tracker.objects.all().order_by('-created_on')
     permissions = Permission.objects.filter(result=1).order_by('-date')
     if request.method == 'POST':
         if 'save_new' in request.POST:
@@ -540,7 +600,7 @@ def item(request):
         form = ItemForm()
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(tranker_list.order_by('category__parent'), 10)
+    paginator = Paginator(tracker_list.order_by('category__parent'), 10)
     trackers = paginator.page(page)
     context = {
         'items': items.order_by('category__parent'),

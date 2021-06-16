@@ -61,20 +61,20 @@ class Order(View):
         return render(request, 'customer/order.html', context)
 
     def post(self, request, *args, **kwargs):
-        item = request.POST.get('items[]')
-        menu_item = MenuItem.objects.get(pk__contains=int(item))
-        if OrderItem.objects.filter(user=request.user, items=menu_item, ordered=False):
-            order_item = OrderItem.objects.filter(
-                user=request.user, items=menu_item, ordered=False)[0]
-            order_item.quantity += 1
-            order_item.save()
-            messages.info(request, "カートに追加されました。")
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-        else:
-            messages.info(request, "カートに追加されました。")
-            OrderItem.objects.create(
-                user=request.user, items=menu_item, ordered=False).save()
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        items = request.POST.getlist('items[]')
+        for item in items:
+            menu_item = MenuItem.objects.get(pk__contains=int(item))
+            if OrderItem.objects.filter(user=request.user, items=menu_item, ordered=False):
+                order_item = OrderItem.objects.filter(
+                    user=request.user, items=menu_item, ordered=False)[0]
+                order_item.quantity += 1
+                order_item.save()
+            else:
+                OrderItem.objects.create(
+                    user=request.user, items=menu_item, ordered=False).save()
+                            
+        messages.info(request, "カートに追加されました。")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required

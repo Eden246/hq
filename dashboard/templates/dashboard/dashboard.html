@@ -1,11 +1,49 @@
 {% extends 'dashboard/base.html' %}
 {% load crispy_forms_tags %}
 {% load auth_extras %}
+{% load custom_tags %}
 {% block content %}
 {% include 'dashboard/top.html' %}
 <style>
+#fav-table {
+  border:1px solid #000066;
+}
 
 #fav-table th {
+  background-color:#0c1793;
+  border-bottom: 2px solid #bc13fe;
+  color: #F0F0F0;
+  font-size: 1em;
+  font-weight: 600;
+	}
+
+#fav-table  td {
+  background-color:#F0F0F0;
+  border-bottom: 2px solid #bc13fe;
+  color: #0c1793;
+  font-size: 1em;
+  font-weight: 600;
+}
+#fav-table2 {
+  border:1px solid #000066;
+}
+
+#fav-table2 th {
+  background-color:#0c1793;
+  border-bottom: 2px solid #bc13fe;
+  color: #F0F0F0;
+  font-size: 1em;
+  font-weight: 600;
+	}
+
+#fav-table2  td {
+  background-color:#F0F0F0;
+  border-bottom: 2px solid #bc13fe;
+  color: #0c1793;
+  font-size: 1em;
+  font-weight: 600;
+}
+#fav-table3 th {
   background-color:#155084;
   border-bottom: 2px solid #E2B842;
   color: #E2B842;
@@ -14,7 +52,7 @@
   border-radius: 0.25em;
 	}
 
-#fav-table  td {
+#fav-table3  td {
   background-color:#155084;
   border-bottom: 2px solid #E2B842;
   color: #E2B842;
@@ -47,122 +85,179 @@ tbody tr {
 tbody tr:hover {
   background: #014055;
 }
+.badge.badge-success {
+   background-color: darkorange;
+}
 </style>
 
 <br>
-<div class="row text-center justify-content-center d-flex">
-  <div class="col-lg-6">
-      <div class="card" data-aos="flip-left">
-          <div class="card-header bg-info text-white">
-              アナウンサー
-              {% if request.user|has_group:"head" %}
-              <button type="button" class="btn btn-primary p-2" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-edit"></i></button>
-              {% endif %}
-          </div>
-          <div class="card-body">
-              <marquee scrollamount="10">
-                  <h3 class="mx-auto">{{ text.first }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.second }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.third }}</h3>
-              </marquee>
-          </div>
-      </div>
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-              <div class="modal-content">
-                  <form method="POST">
-                  {% csrf_token %}
-                      <div class="modal-body">
-                          {{ text_form | crispy }}
-                      </div>
-                      <div class="modal-footer">
-                          <input class="alert alert-danger" type="submit" value="Update">
-                          <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">Close</button>
-                      </div>
-                  </form>
-              </div>
-          </div>
-      </div>
-  </div>
-  <div class="row text-center justify-content-center d-flex mt-3">
-    <div class="col-lg-2 card">
-      <h4 class="badge bg-warning">30日以内実績</h4>
-      <table id="fav-table">
-        <thead>
-            <tr>
-                <th scope="col">お名前</th>
-                <th scope="col">対応物品数</th>
-                <th scope="col">合計</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-              <th scope="row">{{ user.username }}</th>
-              <td>{{ user.sum }}</td>
-              <td>{{ user.total_price }}</td>
-            </tr>
-              {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <div class="col-lg-5 card">
-      <h4 class="badge bg-primary">最近予約</h4>
-      <table>
-        <thead>
-          <tr >
-            <th>予約時間</th>
-            <th>予約者</th>
-            <th>使用場所</th>
-            <th>使用住所</th>
-            <th>希望使用日</th>
-            <th>希望終了日</th>
-            <th>金額</th>
-            <th>担当者</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for order in orders %}
-            <tr>
-              <td >{{ order.created_on | date:'m-d H:i' }}</td>
-              <td >{{ order.user.username }}</td>
-              <td >
-                {% if order.location_selecter == 1 %}
-                自宅
-                {% else %}
-                施設
-                {% endif %}
-              </td>
-              <td >
-                {% if order.location_selecter == 1 %}
-                  {{order.facility }}
-                {% else %}
-                  {{ order.user.client.facility }}
-                {% endif %}
-              </td>
-              <td >{{order.start_date | date:'m-d' }}</td>
-              <td >{{order.end_date | date:'m-d' }}</td>
-              <td >{{order.price}}</td>
-              <td>
-              {% if order.handler %}
-              {{ order.handler }}
-              {% else %}
-              <a href="{% url 'order-detail' order.pk %}"><i class="fa fa-edit"></i></a>
-              {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+<div class="row justify-content-center d-flex m-5">
+    <div class="col-lg-8">
+        <div class="row">
+            <div class="card" data-aos="flip-left">
+                <div class="card-header bg-info text-white">
+                    アナウンサー
+                    {% if request.user|has_group:"head" %}
+                    <button type="button" class="btn btn-primary p-2" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-edit"></i></button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <marquee scrollamount="10">
+                        <h3 class="mx-auto">{{ text.first }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.second }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{{ text.third }}</h3>
+                    </marquee>
+                </div>
+            </div>
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                {{ text_form | crispy }}
+                            </div>
+                            <div class="modal-footer">
+                                <input class="alert alert-danger" type="submit" value="Update">
+                                <button type="button" class="badge bg-danger" data-bs-dismiss="modal" style="height:55px;">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-9 card">
+                <h4 class="badge bg-primary mb-2" >最近予約</h4>
+                <table class="h6">
+                    <thead>
+                        <tr >
+                            <th>予約時間</th>
+                            <th>予約者</th>
+                            <th>使用場所</th>
+                            <th>使用住所</th>
+                            <th>希望使用日</th>
+                            <th>希望終了日</th>
+                            <th>金額</th>
+                            <th>担当者</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td >{{ order.created_on | date:'m-d H:i' }}</td>
+                            <td >{{ order.user.username }}</td>
+                            <td >
+                                {% if order.location_selecter == 1 %}
+                                自宅
+                                {% else %}
+                                施設
+                                {% endif %}
+                            </td>
+                            <td >
+                                {% if order.location_selecter == 1 %}
+                                {{order.facility }}
+                                {% else %}
+                                {{ order.user.client.facility }}
+                                {% endif %}
+                            </td>
+                            <td >{{order.start_date | date:'m-d' }}</td>
+                            <td >{{order.end_date | date:'m-d' }}</td>
+                            <td >{{order.price}}</td>
+                            <td>
+                                {% if order.handler %}
+                                {{ order.handler }}
+                                {% else %}
+                                <a href="{% url 'order-detail' order.pk %}"><i class="fa fa-edit"></i></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-3 card">
+                <div class="row">
+                    <h4 class="badge bg-white" style="color:navy;">個人別営業実績</h4>
+                    <table id="fav-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">お名前</th>
+                                <th scope="col">毎月売上高</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td scope="row">{{ user.username }}</td>
+                                <td>{{ user.total_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <h4 class="badge bg-white" style="color:navy;">30日以内、新規契約件数</h4>
+                    <table id="fav-table2">
+                        <thead>
+                            <tr>
+                                <th scope="col">お名前</th>
+                                <th scope="col">契約件数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users1 %}
+                            <tr>
+                                <td scope="row">{{ user.username }}</td>
+                                <td>{{ user.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-12 card">
+                <h4 class="badge bg-danger mb-2">返品予定</h4>
+                <table id="fav-table3" class="h6">
+                    <thead>
+                        <tr>
+                            <th scope="col">お名前</th>
+                            <th scope="col">対応物品数</th>
+                            <th scope="col">合計</th>
+                            <th scope="col">合計</th>
+                            <th scope="col">合計</th>
+                            <th scope="col">合計</th>
+                            <th scope="col">合計</th>
+                            <th scope="col">合計</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <div class="col-lg-3 card">
-      <h4 class="badge bg-danger">近日返品リスト</h4>
+        <h4 class="badge bg-warning">メッセージ</h4>
+        {% show_notifications %}
     </div>
-  </div>
 </div>
-  <br>
 
   <script>
 $(document).ready(function() {
-    $('#fav-table').tablesorter({ theme : 'blue' });
+    $('#fav-table').tablesorter();
 });
+$(document).ready(function() {
+    $('#fav-table2').tablesorter();
+});
+var notiBar = document.getElementById("notification");
 </script>
 {% endblock content %}

@@ -125,7 +125,7 @@ button:hover span{
                                     {{ order.user.client.facility }}
                                     {% endif %}
                                 </h4>
-                                <h4 {% if order.user.limit.limit < 0 %} class="text-danger" {% endif %}>限度額残量：{{ order.user.limit }}円</h4>
+                                <h4 {% if order.limit < 0 %} class="text-danger" {% endif %}>注文前の限度額：{{ order.limit }}円</h4>
                                 <hr>
                                 <h2>《予約情報》</h2>
                                 <br>

@@ -200,16 +200,6 @@ class PostNotification(View):
 
         return redirect('post_detail', pk=post_pk)
 
-class FollowNotification(View):
-    def get(self, request, notification_pk, profile_pk, *args, **kwargs):
-        notification = Notification.objects.get(pk=notification_pk)
-        client = Client.objects.get(pk=profile_pk)
-
-        notification.user_has_seen = True
-        notification.save()
-
-        return redirect('profile', pk=profile_pk)
-
 class RemoveNotification(View):
     def delete(self, request, notification_pk, *args, **kwargs):
         notification = Notification.objects.get(pk=notification_pk)

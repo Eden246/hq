@@ -37,7 +37,7 @@ class ImageForm(forms.ModelForm):
         fields = ['image',]
     def __init__(self, *args, **kwargs):
         super(ImageForm, self).__init__(*args, **kwargs)
-        self.fields['image'].label = ""
+        self.fields['image'].label = "《契約書》"
 
 class TrackerImageForm(forms.ModelForm):
     class Meta:

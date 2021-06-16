@@ -1,5 +1,5 @@
-{% load custom_tags %}
 <style>
+
  .panel {
 	 box-sizing: border-box;
 	 position: relative;
@@ -21,6 +21,7 @@
 	 text-decoration: none;
 	 z-index: 2;
 }
+
  .panel a span {
 	 display: block;
 	 font-size: 50px;
@@ -35,10 +36,23 @@
 	 transition: all .5s;
 	 line-height: normal;
 }
- .panel.post {
+ .panel.home {
+	 background-color: #9DC88D;
+}
+ .panel.home:after {
+	 content: "\f015";
+	 font-size: 200px;
+	 color: #9DA08D;
+	 top: 25px;
+	 right: 20px;
+}
+ .panel.home:hover:after {
+	 top: 0px;
+}
+ .panel.book {
 	 background-color: #b8aa0e;
 }
- .panel.post:after {
+ .panel.book:after {
 	 content: "\f15c";
 	 font-size: 200px;
 	 color: #a5980d;
@@ -47,7 +61,7 @@
 	 -webkit-transform: rotate(45deg);
 	 transform: rotate(45deg);
 }
- .panel.post:hover:after {
+ .panel.book:hover:after {
 	 top: 8px;
 }
  .panel.catalog {
@@ -63,52 +77,91 @@
  .panel.catalog:hover:after {
 	 top: 8px;
 }
+ .panel.logout {
+	 background-color: #ec0356;
+}
+ .panel.logout:after {
+	 content: "\f00d";
+	 font-size: 200px;
+	 color: #D0014c;
+	 top: 25px;
+	 right: 40px;
+}
+ .panel.logout:hover:after {
+	 top: -10px;
+}
  .panel.chart {
-	 background-color: #FF652F;
+	 background-color: #652F;
 }
  .panel.chart:after {
 	 content: "\f080";
 	 font-size: 200px;
-	 color: #F1A10A;
-	 top: 45px;
+	 color: #F1652F;
+	 top: 15px;
 	 right: 25px;
 }
  .panel.chart:hover:after {
-	 top: 8px;
+	 top: -15px;
 }
- .panel.comment {
+ .panel.permit {
 	 background-color: #0377c0;
 }
- .panel.comment:after {
+ .panel.permit:after {
 	 content: "\f08d";
 	 font-size: 180px;
 	 color: #036bac;
-	 top: 30px;
-	 right: 35px;
+	 top: 25px;
+	 right: 20px;
 }
- .panel.comment:hover:after {
+ .panel.permit:hover:after {
 	 top: -5px;
 }
- .panel.page {
+ .panel.rent {
+	 background-color: #F13C20;
+}
+ .panel.rent:after {
+	 content: "\f472";
+	 font-size: 160px;
+	 color: #D01A20;
+	 top: 25px;
+	 right: 20px;
+}
+ .panel.rent:hover:after {
+	 top: 0px;
+}
+ .panel.item {
+	 background-color: #14A7;
+}
+ .panel.item:after {
+	 content: "\f494";
+	 font-size: 160px;
+	 color: #7474;
+	 top: 25px;
+	 right: 20px;
+}
+ .panel.item:hover:after {
+	 top: 0px;
+}
+ .panel.message {
 	 background-color: #279824;
 }
- .panel.page:after {
-	 content: "\f075";
+ .panel.message:after {
+	 content: "\f4ad";
 	 font-size: 160px;
 	 color: #238820;
-	 top: 62px;
-	 right: 39px;
+	 top: 25px;
+	 right: 20px;
 }
- .panel.page:hover:after {
-	 top: 24px;
+ .panel.message:hover:after {
+	 top: 0px;
 }
  .panel.user {
-	 background-color: #fc1c3e;
+	 background-color: #119466;
 }
  .panel.user:after {
-	 content: "\f007";
+	 content: "\f2c1";
 	 font-size: 200px;
-	 color: #ec0326;
+	 color: #116066;
 	 top: 45px;
 	 right: 35px;
 }
@@ -118,67 +171,45 @@
  .panel:hover:after {
 	 transition: all .5s;
 }
-.bel{
-  animation: shake 5s cubic-bezier(.36, .07, .19, .97) both 3;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-@keyframes shake {
-  10%,
-  90% {
-    transform: translate3d(-1px, 0, 0);
-  }
-  20%,
-  80% {
-    transform: translate3d(2px, 0, 0);
-  }
-  30%,
-  50%,
-  70% {
-    transform: translate3d(-4px, 0, 0);
-  }
-  40%,
-  60% {
-    transform: translate3d(4px, 0, 0);
-  }
-}
 </style>
-    <div class="row justify-content-center">
-        <div class="col-lg-9">
+    <div class="row justify-content-center m-0">
+        <div class="col-lg-10">
             <div class="card" data-aos="fade-down" data-aos-delay="100">
                 <div class="card-header text-white" style="background-color:#123C69">
                     ダッシュボード
                 </div>
                 <div class="card-body">
-                    <div class="panel post">
+				    <div class="panel home">
+                        <a href="{% url 'dashboard' %}"><span>&nbsp;</span>管理ホーム</a>
+                    </div>
+                    <div class="panel book">
                         <a href="{% url 'book_list'%}"><span>{{ order_count }}</span>予約リスト</a>
                     </div>
-                    <div class="panel comment">
-                        <a href="{% url 'permission'%}"><span>{{ permission_count }}</span>承認リスト</a>
+                    <div class="panel permit">
+                        <a href="{% url 'permission'%}"><span>{{ uncharged_count }}</span>承認リスト</a>
                     </div>
-                    <div class="panel user">
-                        <a href="{% url 'order_list'%}"><span>5</span>貸出リスト</a>
+                    <div class="panel rent">
+                        <a href="{% url 'order_list'%}"><span>{{ rent_count }}</span>貸出リスト</a>
                     </div>
-                    <div class="panel page">
-                        <a href="{% url 'item'%}"><span>4</span>在庫管理</a>
+                    <div class="panel item">
+                        <a href="{% url 'item'%}"><span>{{ item_count }}</span>在庫管理</a>
                     </div>
                     <div class="panel chart">
                         <a href="{% url 'chart' %}"><span>&nbsp;</span>営業実績</a>
                     </div>
+                    <div class="panel message">
+                        <a href="{% url 'inbox'%}"><span>&nbsp;</span>メッセージ</a>
+                    </div>
+                    <div class="panel user">
+                        <a href=""><span>&nbsp;</span>プロファイル</a>
+                    </div>
                     <div class="panel catalog">
                         <a href="{% url 'home' %}"><span>&nbsp;</span>カタログ</a>
                     </div>
-                    <div class="panel catalog">
-                        <a href="{% url 'dashboard' %}"><span>&nbsp;</span>管理画面</a>
-                    </div>
-                    <div class="panel catalog">
+                    <div class="panel logout">
                         <a href="{% url 'logout' %}"><span>&nbsp;</span>ログアウト</a>
                     </div>
                 </div>
             </div>
         </div>
-		<div class="col-lg-1 bel">
-			<i style="font-size: 2em; color:gold;" class="fa fa-bell"></i>{% show_notifications %}
-		</div>
     </div>
