@@ -152,13 +152,14 @@ tbody tr:hover {
               <label for="type">追加タイプ（選択）</label>
               <select name="type" id="type" class="form-control">
                 <option value="在庫追加" selected>在庫追加</option>
-                <option value="返品処理">返品処理</option>
+                <option value="その他">その他</option>
               </select>
               <label for="quantity">数量</label>
               <input required type="text" id="quantity_id" placeholder="数量を入力してください" class="form-control" name="quantity">
               {% csrf_token %}
               {{ form0 | crispy }}
-            <input class="btn btn-success btn-block" id="one" type="submit" value="追加" name='save_renew'>
+              上記の項目を
+            <input id="one" type="submit" value="追加" name='save_renew'>
           </form>
       </div>
   </div>
@@ -237,12 +238,15 @@ $("input:checkbox").click(function() {
         $(this).prop("checked", false);
     }
 });
-$("#one").click(function(){
-    if($('#onetarget input:checked').length == 0)
-    {
-        alert('品目を選択してください。');
-        return false;
-    }
+$(function(){
+  $("input[type='checkBox']").change(function(){
+    var len = $("input[type='checkBox']:checked").length;
+    if(len == 0)
+      $("input[type='submit']").prop("disabled", true);
+    else
+      $("input[type='submit']").removeAttr("disabled");
+  });
+  $("input[type='checkBox']").trigger('change');
 });
 </script>
 {% endblock content %}
