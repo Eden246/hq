@@ -183,16 +183,16 @@
                         <a href="{% url 'dashboard' %}"><span>&nbsp;</span>管理ホーム</a>
                     </div>
                     <div class="panel book">
-                        <a href="{% url 'book_list'%}"><span>{{ order_count }}</span>予約リスト</a>
+                        <a href="{% url 'book_list'%}"><span>{{ order_count }}件</span>予約リスト</a>
                     </div>
                     <div class="panel permit">
-                        <a href="{% url 'permission'%}"><span>{{ uncharged_count }}</span>承認リスト</a>
+                        <a href="{% url 'permission'%}"><span>{{ uncharged_count }}件</span>承認リスト</a>
                     </div>
                     <div class="panel rent">
-                        <a href="{% url 'order_list'%}"><span>{{ rent_count }}</span>貸出リスト</a>
+                        <a href="{% url 'order_list'%}"><span>{{ rent_count }}件</span>貸出リスト</a>
                     </div>
                     <div class="panel item">
-                        <a href="{% url 'item'%}"><span>{{ item_count }}</span>在庫管理</a>
+                        <a href="{% url 'item'%}"><span>{{ item_count }}品目</span>在庫管理</a>
                     </div>
                     <div class="panel chart">
                         <a href="{% url 'chart' %}"><span>&nbsp;</span>営業実績</a>

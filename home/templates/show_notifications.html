@@ -79,7 +79,7 @@
 			{{ notification.date }}&emsp;
 			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
 		{% elif notification.notification_type == 3 %}
-			<a href="{% url 'permit_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">担当</span>を<span class="text-success">申請</span>をしました。</a>
+			<a href="{% url 'permit_notification' notification.pk %}">{{ notification.from_user }}様が<span class="text-primary">担当</span>を<span class="text-success">申請</span>しました。</a>
 			{{ notification.date }}&emsp;
 			<span class="dropdown-item-close" onclick="removeNotification(`{% url 'notification-delete' notification.pk %}`, `{{ request.path }}`)">&times;</span>
 		{% elif notification.notification_type == 4 %}

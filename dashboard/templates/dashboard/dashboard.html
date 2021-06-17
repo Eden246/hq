@@ -215,31 +215,47 @@ tbody tr:hover {
                 </div>
             </div>
             <div class="col-lg-12 card">
-                <h4 class="badge bg-danger mb-2">返品予定</h4>
+                <h4 class="badge bg-danger mb-2">30日以内、返品予定</h4>
                 <table id="fav-table3" class="h6">
                     <thead>
                         <tr>
                             <th scope="col">お名前</th>
-                            <th scope="col">対応物品数</th>
-                            <th scope="col">合計</th>
-                            <th scope="col">合計</th>
-                            <th scope="col">合計</th>
-                            <th scope="col">合計</th>
-                            <th scope="col">合計</th>
-                            <th scope="col">合計</th>
+                            <th scope="col">使用場所</th>
+                            <th scope="col">使用住所</th>
+                            <th scope="col">対応物品</th>
+                            <th scope="col">金額</th>
+                            <th scope="col">利用開始日</th>
+                            <th scope="col">利用終了日</th>
+                            <th scope="col">担当者</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for permission in permissions %}                            
                         <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td>{{ permission.order.name }}</td>
+                            <td>
+                            {% if permission.order.location_selecter == 1 %}
+                                自宅
+                            {% else %}
+                                施設
+                            {% endif %}
+                            <td>
+                            {% if permission.order.location_selecter == 1 %}
+                                {{  permission.order.facility }}
+                            {% else %}
+                                {{ permission.order.user.client.facility }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% for item in permission.order.items.all %}
+                            ({{ item }})
+                            {% endfor %}
+                            <td>{{ permission.order.price }}円</td>
+                            <td>{{ permission.start_date }}</td>
+                            <td class="text-danger">{{ permission.end_date }}</td>
+                            <td>{{ permission.user }}</td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

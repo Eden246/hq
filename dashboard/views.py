@@ -1,3 +1,4 @@
+from decimal import Context
 from django.db.models.aggregates import Sum
 from django.http import response
 from django.shortcuts import get_object_or_404, render, redirect
@@ -281,12 +282,20 @@ def permission(request):
     uncharged = Permission.objects.filter(result=3)
     uncontract = Permission.objects.filter(result=0)
     form1 = ImageForm()
+    order_count = OrderModel.objects.filter(status=2).count()
+    uncharged_count = Permission.objects.filter(result=3).count()
+    rent_count = Permission.objects.filter(result=1).count()
+    item_count = MenuItem.objects.all().count()
 
     context ={
         'uncharged': len(uncharged),
         'uncontract': len(uncontract),
         'unpermission':unpermission,
         'form1':form1,
+        'order_count': order_count,
+        'uncharged_count': uncharged_count,
+        'rent_count':rent_count,
+        'item_count':item_count,
     }
     return render(request, 'dashboard/permission.html', context)
 
@@ -388,6 +397,11 @@ def permission_save(request):
 
 def book_list(request):
     orders = OrderModel.objects.filter(status=2)
+    order_count = OrderModel.objects.filter(status=2).count()
+    uncharged_count = Permission.objects.filter(result=3).count()
+    rent_count = Permission.objects.filter(result=1).count()
+    item_count = MenuItem.objects.all().count()
+
     if request.method == 'POST':
         order_pk = request.POST.get('order_pk')
         order = OrderModel.objects.get(pk=order_pk)
@@ -403,7 +417,14 @@ def book_list(request):
         notification = Notification.objects.create(
         notification_type=3, from_user=request.user, to_user=User.objects.get(groups__name__in=['head']))
         return redirect(reverse_lazy('permission'))
-    return render(request, 'dashboard/book_list.html', {'orders': orders})
+    context = {
+        'orders': orders,
+        'order_count': order_count,
+        'uncharged_count': uncharged_count,
+        'rent_count':rent_count,
+        'item_count':item_count,
+    }
+    return render(request, 'dashboard/book_list.html', context)
 
 @login_required
 def order_list(request):
@@ -483,6 +504,14 @@ def order_list(request):
         context['form0'] = form0
         form = ImageForm()
         context['form'] = form
+        order_count = OrderModel.objects.filter(status=2).count()
+        uncharged_count = Permission.objects.filter(result=3).count()
+        rent_count = Permission.objects.filter(result=1).count()
+        item_count = MenuItem.objects.all().count()
+        context['order_count'] = order_count
+        context['uncharged_count'] = uncharged_count
+        context['rent_count'] = rent_count
+        context['item_count'] = item_count
 
     return render(request, 'dashboard/order_list.html', context)
 
@@ -494,6 +523,7 @@ def test_func(user):
 @user_passes_test(test_func, login_url="/login/")
 def dashboard(request):
     orders = OrderModel.objects.all().order_by('-created_on')[:10]
+    permissions = Permission.objects.filter(date__lte=timezone.now(), date__gt=timezone.now()-datetime.timedelta(days=30)).order_by('end_date')
     users = User.objects.filter(permission__date__lte=timezone.now(), permission__date__gt=timezone.now()-datetime.timedelta(days=30),permission__result=1).annotate(total_price=Sum(F('permission__order__items__items__price')*F('permission__order__items__quantity'))).values('username', 'total_price').order_by('-total_price')
     users1 = User.objects.filter(Q(permission__date__lte=timezone.now()), Q(permission__date__gt=timezone.now()-datetime.timedelta(days=30)),Q(permission__result=1)|Q(permission__result=2)).annotate(count=Count('permission__order')).values('username', 'count').order_by('-count')
     text = Text.objects.first()
@@ -507,6 +537,7 @@ def dashboard(request):
 
     context = {
         'orders': orders,
+        'permissions': permissions,
         'users': users,
         'users1': users1,
         'text':text,
@@ -599,6 +630,11 @@ def item(request):
         form0 = TrackerImageForm(request.POST, request.FILES)
         form = ItemForm()
 
+    order_count = OrderModel.objects.filter(status=2).count()
+    uncharged_count = Permission.objects.filter(result=3).count()
+    rent_count = Permission.objects.filter(result=1).count()
+    item_count = MenuItem.objects.all().count()
+
     page = request.GET.get('page', 1)
     paginator = Paginator(tracker_list.order_by('category__parent'), 10)
     trackers = paginator.page(page)
@@ -607,7 +643,11 @@ def item(request):
         'form': form,
         'form0': form0,
         'permissions':permissions,
-        'trackers':trackers
+        'trackers':trackers,
+        'order_count': order_count,
+        'uncharged_count': uncharged_count,
+        'rent_count':rent_count,
+        'item_count':item_count,
     }
     return render(request, 'dashboard/item.html', context)
 
